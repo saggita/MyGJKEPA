@@ -1,0 +1,22 @@
+# 3ds Max Wavefront OBJ Exporter v0.97b - (c)2007 guruware
+# File Created: 09.01.2012 18:16:52
+
+#
+# object Rectangle001
+#
+
+v  7.4742 0.0000 -7.4855
+v  -1.9714 0.0000 -7.4855
+v  7.4741 0.0000 1.9600
+v  -6.6166 0.0000 -2.6851
+v  -6.6168 0.0000 6.7605
+v  2.8288 0.0000 6.7603
+# 6 vertices
+
+g Rectangle001
+f 1 2 3 
+f 2 4 3 
+f 4 5 6 
+f 6 3 4 
+# 0 polygons - 4 triangles
+
