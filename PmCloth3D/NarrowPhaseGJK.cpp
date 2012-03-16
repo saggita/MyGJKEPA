@@ -11,7 +11,7 @@ CNarrowPhaseGJK::~CNarrowPhaseGJK(void)
 {
 }
 
-bool CNarrowPhaseGJK::CalcCollisionInfo(const CCollisionObject& objA, const CCollisionObject& objB, const CTransform &transB2A, const CGJKSimplex& simplex, CVector3D v, double distSqr, CNarrowCollisionInfo* pCollisionInfo) const
+bool CNarrowPhaseGJK::GenerateCollisionInfo(const CCollisionObject& objA, const CCollisionObject& objB, const CTransform &transB2A, const CGJKSimplex& simplex, CVector3D v, double distSqr, CNarrowCollisionInfo* pCollisionInfo) const
 {
 	CVector3D closestPntA;
 	CVector3D closestPntB;
@@ -51,7 +51,7 @@ bool CNarrowPhaseGJK::CalcCollisionInfo(const CCollisionObject& objA, const CCol
 	return pCollisionInfo->bIntersect;
 }
 
-bool CNarrowPhaseGJK::CheckCollision(const CCollisionObject& objA, const CCollisionObject& objB, CNarrowCollisionInfo* pCollisionInfo, bool bProximity/* = false*/) 
+bool CNarrowPhaseGJK::CheckCollision(CCollisionObject& objA, CCollisionObject& objB, CNarrowCollisionInfo* pCollisionInfo, bool bProximity/* = false*/) 
 {
 	CVector3D suppPntA; // support point from object A
 	CVector3D suppPntB; // support point from object B
@@ -109,7 +109,7 @@ bool CNarrowPhaseGJK::CheckCollision(const CCollisionObject& objA, const CCollis
 		bool isDegenerate = simplex.IsDegenerate(w);
 		if ( simplex.IsDegenerate(w) || distSqr - vw <= distSqr * 1e-6 )
 		{
-			return CalcCollisionInfo(objA, objB, transB2A, simplex, v, distSqr, pCollisionInfo);			
+			return GenerateCollisionInfo(objA, objB, transB2A, simplex, v, distSqr, pCollisionInfo);			
 		}
 
 		// Add w into simplex. Determinants will be computed inside AddPoint(..). 
@@ -117,7 +117,7 @@ bool CNarrowPhaseGJK::CheckCollision(const CCollisionObject& objA, const CCollis
 
 		if ( !simplex.IsAffinelyIndependent() ) 
 		{
-			return CalcCollisionInfo(objA, objB, transB2A, simplex, v, distSqr, pCollisionInfo);
+			return GenerateCollisionInfo(objA, objB, transB2A, simplex, v, distSqr, pCollisionInfo);
 		}
 
 		// Run Johnson's Algorithm
@@ -125,7 +125,7 @@ bool CNarrowPhaseGJK::CheckCollision(const CCollisionObject& objA, const CCollis
 		// The subset simplex can be a vertex, edge, triangle or tetrahedron. 
 		if ( !simplex.RunJohnsonAlgorithm(v) )
 		{
-			return CalcCollisionInfo(objA, objB, transB2A, simplex, v, distSqr, pCollisionInfo);			
+			return GenerateCollisionInfo(objA, objB, transB2A, simplex, v, distSqr, pCollisionInfo);			
 		}
 
 		distSqrPrev = distSqr;
@@ -159,8 +159,8 @@ bool CNarrowPhaseGJK::CheckCollision(const CCollisionObject& objA, const CCollis
 	// TODO: Need to use GJK to compute the shallow penetration depth.
 
 	//return RunEPAAlgorithmWithMargins(objA, objB, v);
-	CEPAAlgorithm EPAAlgorithm;
-	return EPAAlgorithm.ComputePenetrationDepthAndContactPoints(simplex, objA, objB, v);
+	
+	return m_EPAAlgorithm.ComputePenetrationDepthAndContactPoints(simplex, objA, objB, v, pCollisionInfo);
 }
 
 

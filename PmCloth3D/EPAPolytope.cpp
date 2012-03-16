@@ -22,6 +22,9 @@ void CEPAPolytope::Clear()
 	m_Vertices.clear();
 	m_SilhouetteVertices.clear();
 	m_SilhouetteTriangles.clear();
+	m_SilhouetteEdges.clear();
+	m_SupportPointsA.clear();
+	m_SupportPointsB.clear();
 }
 
 CEPATriangle* CEPAPolytope::PopAClosestTriangleToOriginFromHeap()
@@ -160,7 +163,11 @@ bool CEPAPolytope::AddTetrahedron(const CVector3D& p0, const CVector3D& p1, cons
 	for ( int i = 0; i < 4; i++ )
 	{
 		pTri[i]->ComputeClosestPointToOrigin(*this);
+
+#ifdef _DEBUG
 		pTri[i]->m_Index = m_Count++;
+#endif
+
 		m_Triangles.push_back(pTri[i]);
 		std::push_heap(m_Triangles.begin(), m_Triangles.end(), compare);
 	}
@@ -168,22 +175,19 @@ bool CEPAPolytope::AddTetrahedron(const CVector3D& p0, const CVector3D& p1, cons
 	return true;
 }
 
-bool CEPAPolytope::AddPoint(const CVector3D& w, CEPATriangle* pTriangleUsedToObtainW)
+bool CEPAPolytope::ExpandPolytopeWithNewPoint(const CVector3D& w, CEPATriangle* pTriangleUsedToObtainW)
 {
-	// First, we need to get a loop of edges using 'Flood Fill Silhouette' algorithm.
+#ifdef _DEBUG
 	for ( unsigned int i = 0; i < m_Triangles.size(); i++ )
 	{
-		m_Triangles[i]->SetVisited(false);
 		m_Triangles[i]->m_bVisible = false;
 	}
-
-	pTriangleUsedToObtainW->SetVisited(false);
+#endif
 
 	m_SilhouetteVertices.clear();
 	m_SilhouetteVertices.reserve(20);
 	m_SilhouetteTriangles.clear();
 	m_SilhouetteTriangles.reserve(20);
-	m_VisibleTriangles.clear();
 	m_SilhouetteEdges.clear();
 	m_SilhouetteEdges.reserve(20);
 
@@ -193,6 +197,9 @@ bool CEPAPolytope::AddPoint(const CVector3D& w, CEPATriangle* pTriangleUsedToObt
 	assert(pTriangleUsedToObtainW->IsObsolete() == false);
 	pTriangleUsedToObtainW->m_bVisible = true;
 
+	pTriangleUsedToObtainW->SetObsolete(true);
+
+	// 'Flood Fill Silhouette' algorithm to detect visible triangles from w and edges in loop.
 	for ( int i = 0; i < 3; i++ )
 		pTriangleUsedToObtainW->m_Edges[i]->m_pPairEdge->m_pEPATriangle->DoSilhouette(w, pTriangleUsedToObtainW->m_Edges[i], *this);
 
@@ -205,6 +212,9 @@ bool CEPAPolytope::AddPoint(const CVector3D& w, CEPATriangle* pTriangleUsedToObt
 #ifdef _DEBUG
 	for ( int i = 0; i < m_Triangles.size(); i++ )
 	{
+		if ( m_Triangles[i]->IsObsolete() )
+			continue;
+
 		if ( m_Triangles[i]->m_bVisible )
 			assert(m_Triangles[i]->IsVisibleFromPoint(w) == true);
 		else
@@ -240,44 +250,55 @@ bool CEPAPolytope::AddPoint(const CVector3D& w, CEPATriangle* pTriangleUsedToObt
 		newTriangles[i]->m_Edges[2]->m_pPairEdge = newTriangles[j]->m_Edges[0];
 
 		newTriangles[i]->m_AdjacentTriangles[0] = newTriangles[k];
-		newTriangles[i]->m_Edges[0]->m_pPairEdge = newTriangles[j]->m_Edges[2];
+		newTriangles[i]->m_Edges[0]->m_pPairEdge = newTriangles[k]->m_Edges[2];
 
-		int indexEdge;
-		int indexNextVertex = m_SilhouetteTriangles[i]->GetNextVertexIndexCCW(m_SilhouetteVertices[j], &indexEdge);
-
-		assert(indexNextVertex == m_SilhouetteVertices[i]);
-		assert(0 <= indexEdge && indexEdge < 3);
-		
-		m_SilhouetteTriangles[i]->m_AdjacentTriangles[indexEdge] = newTriangles[i];
 		newTriangles[i]->m_AdjacentTriangles[1] = m_SilhouetteTriangles[i];
 		newTriangles[i]->m_Edges[1]->m_pPairEdge = m_SilhouetteEdges[i];
-		m_SilhouetteEdges[i]->m_pPairEdge = newTriangles[i]->m_Edges[1]->m_pPairEdge;
+		m_SilhouetteEdges[i]->m_pPairEdge = newTriangles[i]->m_Edges[1];
+		m_SilhouetteTriangles[i]->m_AdjacentTriangles[m_SilhouetteEdges[i]->m_IndexLocal] = newTriangles[i];
 	}
 
 	for ( unsigned int i = 0; i < silhouetteSize; i++ )
 	{	
+#ifdef _DEBUG
 		newTriangles[i]->m_Index = m_Count++;
+#endif
+
 		m_Triangles.push_back(newTriangles[i]);
 		std::push_heap(m_Triangles.begin(), m_Triangles.end(), compare);
 	}
 
 #ifdef _DEBUG
 	for ( unsigned int i = 0; i < GetTriangles().size(); i++ )
-	{
-		if ( !GetTriangles()[i]->IsObsolete() )
 		{
-			for ( int j = 0; j < 3; j++ )
+			if ( !GetTriangles()[i]->IsObsolete() )
 			{
-				assert(GetTriangles()[i]->GetEdge(j)->GetIndexVertex(0) == GetTriangles()[i]->GetEdge(j)->m_pPairEdge->GetIndexVertex(1));
-				assert(GetTriangles()[i]->GetEdge(j)->GetIndexVertex(1) == GetTriangles()[i]->GetEdge(j)->m_pPairEdge->GetIndexVertex(0));
+				for ( int j = 0; j < 3; j++ )
+				{
+					CEPAEdge* edge = GetTriangles()[i]->GetEdge(j);
+					assert(edge->GetIndexVertex(0) == edge->m_pPairEdge->GetIndexVertex(1));
+					assert(edge->GetIndexVertex(1) == edge->m_pPairEdge->GetIndexVertex(0));
+				}
 			}
 		}
-	}
 #endif
 
 	return true;
 }
 
-//bool CEPAPolytope::DoSilhouette(const CVector3D& w, const CEPATriangle* pTriangle)
-//{
-//}
+bool CEPAPolytope::IsOriginInTetrahedron(const CVector3D& p1, const CVector3D& p2, const CVector3D& p3, const CVector3D& p4)
+{
+    if ((p2-p1).Cross(p3-p1).Dot(p1) > 0.0 || (p2-p1).Cross(p3-p1).Dot(p4) > 0.0) 
+		return false;
+
+    if ((p4-p2).Cross(p3-p2).Dot(p2) > 0.0 || (p4-p2).Cross(p3-p2).Dot(p1) > 0.0)
+        return false;
+
+    if ((p4-p3).Cross(p1-p3).Dot(p3) > 0.0 || (p4-p3).Cross(p1-p3).Dot(p2) > 0.0) 
+		return false;
+
+    if ((p2-p4).Cross(p1-p4).Dot(p4) > 0.0 || (p2-p4).Cross(p1-p4).Dot(p3) > 0.0) 
+		return false;
+
+    return true;
+}

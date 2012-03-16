@@ -1,5 +1,6 @@
 #pragma once
 
+#include <vector>
 #include "Vector3D.h"
 
 typedef unsigned int Bits;
@@ -16,12 +17,12 @@ private:
     double m_MaxLengthSqr;			// Maximum value among m_LengthSqr[i]
     CVector3D m_SuppPointsA[4];		  
     CVector3D m_SuppPointsB[4];		  
-    CVector3D m_DiffLength[4][4];	// diffLength[i][j] = m_Points[i] - m_Points[j]
+    CVector3D m_DiffLength[4][4];	// m_DiffLength[i][j] = m_Points[i] - m_Points[j]
     double m_DiffLengthSqr[4][4];
-	double m_Det[16][4];			// determinant 
+	double m_Det[16][4];			// Determinant 
  
-	Bits m_CurBits; // Identifies current simplex
-	unsigned int m_LastFound; // Identifies last found slot for support point. It should be between 0 and 3.
+	Bits m_CurBits; 
+	unsigned int m_LastFound; // indicates a bit location found last time. It is between 0 to 3. 
 	Bits m_LastBit; // m_LastBit = 1 << m_LastFound
 	Bits m_AllBits; // m_AllBits = m_CurBits | m_LastBit
 
@@ -33,15 +34,15 @@ private:
     CVector3D computeClosestPointForSubset(Bits subset);        
 
 public:
-	bool IsFull() const;                                                                            // Return true if the simplex contains 4 points
-    bool isEmpty() const;                                                                           // Return true if the simple is empty
-    unsigned int getSimplex(CVector3D* suppPointsA, CVector3D* suppPointsB, CVector3D* points) const;  // Return the points of the simplex
-    double MaxLengthSqr() const;                                                      // Return the maximum squared length of a point
-    void AddPoint(const CVector3D& point, const CVector3D& suppPointA, const CVector3D& suppPointB);   // Addd a point to the simplex
+	bool IsFull() const;                                                                          
+    bool isEmpty() const;                                                                         
+    int GetPoints(std::vector<CVector3D>& suppPointsA, std::vector<CVector3D>& suppPointsB, std::vector<CVector3D>& points) const;  
+    double MaxLengthSqr() const;                                                      
+    void AddPoint(const CVector3D& point, const CVector3D& suppPointA, const CVector3D& suppPointB);  
     bool IsDegenerate(const CVector3D& point) const;                                             
-    bool IsAffinelyIndependent() const;                                                               // Return true if the set is affinely dependent
-    void ClosestPointAandB(CVector3D& pA, CVector3D& pB) const;                             // Compute the closest points of object A and B
-    bool RunJohnsonAlgorithm(CVector3D& v);                                                          // Compute the closest point to the origin of the current simplex
+    bool IsAffinelyIndependent() const;                                                              
+    void ClosestPointAandB(CVector3D& pA, CVector3D& pB) const;                             
+    bool RunJohnsonAlgorithm(CVector3D& v);                                                 
 };
 
 // Return true if some bits of "a" overlap with bits of "b"

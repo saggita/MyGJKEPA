@@ -73,27 +73,28 @@ void CGJKSimplex::UpdateDiffLengths()
     }
 }
 
-// Return the points of the simplex
-unsigned int CGJKSimplex::getSimplex(CVector3D* suppPointsA, CVector3D* suppPointsB, CVector3D* points) const {
-    unsigned int nbVertices = 0;
-    int i;
-    Bits bit;
+int CGJKSimplex::GetPoints(std::vector<CVector3D>& suppPointsA, std::vector<CVector3D>& suppPointsB, std::vector<CVector3D>& points) const 
+{
+	assert(suppPointsA.size() == 0 );
+	assert(suppPointsB.size() == 0 );
+	assert(points.size() == 0 );
 
-    // For each four point in the possible simplex
-    for (i=0, bit=0x1; i<4; i++, bit <<=1) {
-        // If the current point is in the simplex
-        if (overlap(m_CurBits, bit)) {
-            // Store the points
-            suppPointsA[nbVertices] = m_SuppPointsA[nbVertices];
-            suppPointsB[nbVertices] = m_SuppPointsB[nbVertices];
-            points[nbVertices] = m_Points[nbVertices];
+	int count = 0;
+	int i;
+	Bits bit;
 
-            nbVertices++;
-        }
-    }
+	for ( i = 0, bit = 0x1; i < 4; i++, bit <<= 1 ) 
+	{
+		if ( overlap(m_CurBits, bit) ) 
+		{
+			suppPointsA.push_back(m_SuppPointsA[count]);
+			suppPointsB.push_back(m_SuppPointsB[count]);
+			points.push_back(m_Points[count]);
+			count++;
+		}
+	}
 
-    // Return the number of points in the simplex
-    return nbVertices;
+	return count;
 }
 
 void CGJKSimplex::CalcDeterminants() 

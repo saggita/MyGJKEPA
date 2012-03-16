@@ -12,12 +12,14 @@ public:
 
 	enum CollisionObjectType { None, Point, Box, Sphere, Cone, Capsule, Cylinder, ConvexHull, PolyMesh };
 
+
 protected:
 	CollisionObjectType m_CollisionObjectType; 
 	CTransform m_Transform;
 
 	CVector3D m_HalfExtent;
 	double m_Margin;
+	float m_Color[4];
 
 	// bullet
 	btCollisionObject* m_pBulletColObj;
@@ -27,6 +29,7 @@ public:
 	void SetCollisionObjectType(CollisionObjectType collisionObjectType) { m_CollisionObjectType = collisionObjectType; }
 	
 	void SetSize(double x, double y, double z) { m_HalfExtent.Set(x/2.0, y/2.0, z/2.0); }
+	void SetColor(float r, float g, float b) { m_Color[0] = r; m_Color[1] = g; m_Color[2] = b; m_Color[3] = 1.0; }
 
 	const CTransform& GetTransform() const;
 	CTransform& GetTransform();

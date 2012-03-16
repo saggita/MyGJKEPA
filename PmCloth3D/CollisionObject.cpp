@@ -4,6 +4,8 @@
 CCollisionObject::CCollisionObject(void) : m_HalfExtent(1.0), m_Margin(0.01)
 {
 	m_pBulletColObj = new btCollisionObject();	
+
+	SetColor(1.0, 1.0, 1.0);
 }
 
 CCollisionObject::~CCollisionObject(void)
@@ -112,9 +114,8 @@ CVector3D CCollisionObject::GetLocalSupportPoint(const CVector3D& dir, double ma
 
 void CCollisionObject::Render() const
 {
-	GLfloat white[4] = {0.5, 0.5, 0.5, 1.0};
-	glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, white);
-	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, white);
+	glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, m_Color);
+	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, m_Color);
 
 	const CVector3D& translation = m_Transform.GetTranslation();
 	const CQuaternion& rotation = m_Transform.GetRotation();
@@ -194,22 +195,26 @@ void CCollisionObject::Render() const
 		glPushMatrix();
 		glMultMatrixd(rotMatrix);
 
-		glEnable(GL_DEPTH_TEST);
+		/*glEnable(GL_DEPTH_TEST);
 		glLineWidth(1.0f);
 		glutSolidCube(1.0);
+		*/
 
 		glPushAttrib(GL_LIGHTING_BIT);
 		
+		
 		glDisable(GL_LIGHTING);
-		glDisable(GL_DEPTH_TEST);
+		/*glDisable(GL_DEPTH_TEST);
 		glLineWidth(1.0f);
 		glEnable(GL_LINE_STIPPLE);
 		glLineStipple(1, 0x0101);	// dash/dot/dash 
-		glColor3f(1,1,1);
+		glColor3f(0,0,1);
 		glutWireCube(1);
+		
 
 		glDisable(GL_LINE_STIPPLE);
-		glEnable(GL_DEPTH_TEST);
+		glEnable(GL_DEPTH_TEST);*/
+		glColor3f(0,0,1);
 		glLineWidth(1.0f);
 		glutWireCube(1);
 

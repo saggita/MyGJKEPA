@@ -47,12 +47,14 @@ void CClothSim3D::Create()
 	pColObj->SetCollisionObjectType(CCollisionObject::Box);
 	pColObj->GetTransform().GetTranslation().Set(0.0, 2.0, 0.0);
 	pColObj->SetSize(6.0, 3.0, 5.0);
+	pColObj->SetColor(1.0, 0.0, 0.0);
 	pColObj->GetTransform().GetRotation().SetRotation(CQuaternion(CVector3D(1.0, 1.0, 0).Normalize(), 3.141592/3.0));
 
 	// Object 1
 	CCollisionObject* pPointObj = new CCollisionObject();
 	pPointObj->SetCollisionObjectType(CCollisionObject::Box);
 	pPointObj->SetSize(3.0, 4.0, 5.0);
+	pPointObj->SetColor(0.5, 0.5, 0.5);
 	pPointObj->GetTransform().GetRotation().SetRotation(CQuaternion(CVector3D(1.0, 0.0, 0).Normalize(), 0));
 	pPointObj->GetTransform().GetTranslation().Set(2.0, 7.0, 0.0);
 	//pPointObj->GetTransform().GetTranslation().Set(2.0, 10.0, 0.0);
@@ -60,10 +62,12 @@ void CClothSim3D::Create()
 	m_pNarrorPhase->m_CollisionObjectList.push_back(pColObj);
 	m_pNarrorPhase->m_CollisionObjectList.push_back(pPointObj);
 
-	g_MarkerA.SetSize(0.5, 0.5, 0.5);
-	g_MarkerB.SetSize(0.5, 0.5, 0.5);
-	g_MarkerA.SetCollisionObjectType(CCollisionObject::Point);
-	g_MarkerB.SetCollisionObjectType(CCollisionObject::Point);		
+	g_MarkerA.SetSize(0.05, 1.5, 1.5);
+	g_MarkerA.SetColor(1.0, 1.0, 0.0);
+	g_MarkerB.SetSize(0.05, 1.5, 1.5);
+	g_MarkerB.SetColor(1.0, 1.0, 0.0);
+	g_MarkerA.SetCollisionObjectType(CCollisionObject::Sphere);
+	g_MarkerB.SetCollisionObjectType(CCollisionObject::Sphere);		
 	
 	m_pBVHMasterTree = new CBVHMasterTree();
 
@@ -72,7 +76,6 @@ void CClothSim3D::Create()
 
 	m_pBVHMasterTree->Build();
 }
-
 
 // TODO:possible memory leak or access violation. Need to do check this code..
 void CClothSim3D::ClearAll()
@@ -148,9 +151,6 @@ unsigned int CClothSim3D::Update(double dt)
 	return numIter;
 }
 
-CCollisionObject obj;
-CVector3D v(1.0, 0, 0);
-
 unsigned int CClothSim3D::SubsUpdate(double dt)
 {
 	m_dt = dt;
@@ -166,7 +166,7 @@ unsigned int CClothSim3D::SubsUpdate(double dt)
 	g_MarkerA.GetTransform().GetTranslation() = m_pNarrorPhase->m_CollisionObjectList[0]->GetTransform() * collisionInfo.witnessPntA;
 	g_MarkerB.GetTransform().GetTranslation() = m_pNarrorPhase->m_CollisionObjectList[1]->GetTransform() * collisionInfo.witnessPntB;
 
-	double dist = (g_MarkerA.GetTransform().GetTranslation() - g_MarkerB.GetTransform().GetTranslation()).Length();
+	//double dist = (g_MarkerA.GetTransform().GetTranslation() - g_MarkerB.GetTransform().GetTranslation()).Length();
 
 	CVector3D axis;
 	static double angleRad = 0;
@@ -179,19 +179,9 @@ unsigned int CClothSim3D::SubsUpdate(double dt)
 	CMatrix33 rot;
 	rot.SetRotation(CVector3D(1.0, 1.0, 1.0).Normalize(), angleRad);
 
-	//m_pNarrorPhase->m_CollisionObjectList[0]->GetTransform().GetRotation().SetRotation(CVector3D(-1.0, 1.0, 1.0).Normalize(), angleRad);
-	//m_pNarrorPhase->m_CollisionObjectList[1]->GetTransform().GetRotation().SetRotation(CVector3D(1.0, 1.0, 0.0).Normalize(), angleRad);
-	
-	v = rot * v;
-
-	CVector3D supp = m_pNarrorPhase->m_CollisionObjectList[1]->GetLocalSupportPoint(-v, 0);
-	supp = m_pNarrorPhase->m_CollisionObjectList[1]->GetTransform() * supp;
-	v = m_pNarrorPhase->m_CollisionObjectList[1]->GetTransform().GetTranslation() + v;
-	
-	obj.SetCollisionObjectType(CCollisionObject::Sphere);
-	obj.SetSize(0.1, 0.1, 0.1);
-	obj.GetTransform().GetTranslation() = supp;
-
+	m_pNarrorPhase->m_CollisionObjectList[0]->GetTransform().GetRotation().SetRotation(CVector3D(-1.0, 1.0, 1.0).Normalize(), angleRad);
+	m_pNarrorPhase->m_CollisionObjectList[1]->GetTransform().GetRotation().SetRotation(CVector3D(1.0, 1.0, 0.0).Normalize(), angleRad);
+		
 	return 0;
 }
 
@@ -206,32 +196,28 @@ void CClothSim3D::Render() const
 	glEnable(GL_POLYGON_OFFSET_FILL);
 	glPolygonOffset(1,1);
 
-	for ( std::vector<CCollisionObject*>::const_iterator iter = m_pNarrorPhase->m_CollisionObjectList.begin(); iter != m_pNarrorPhase->m_CollisionObjectList.end(); iter++ )
+	/*for ( std::vector<CCollisionObject*>::const_iterator iter = m_pNarrorPhase->m_CollisionObjectList.begin(); iter != m_pNarrorPhase->m_CollisionObjectList.end(); iter++ )
 	{
 		(**iter).Render();
+	}*/
+
+	for ( int i = m_pNarrorPhase->m_CollisionObjectList.size()-1; i >= 0; i-- )
+	{
+		m_pNarrorPhase->m_CollisionObjectList[i]->Render();
 	}
 
+	glDisable(GL_DEPTH_TEST);
 
-	GLfloat color[4];
-	color[0] = 1.0f;
-	color[1] = 1.0f;
-	color[2] = 0.0f;
-	glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, color);
+	glLineWidth(3.0f);
 	glDisable(GL_LIGHT0);
-	glColor3f(1,1,0);
-	g_MarkerA.Render();
-	g_MarkerB.Render();
-
+	glColor3f(0,1,0);
 	glBegin(GL_LINES);
 	glVertex3d(g_MarkerA.GetTransform().GetTranslation().m_X, g_MarkerA.GetTransform().GetTranslation().m_Y, g_MarkerA.GetTransform().GetTranslation().m_Z);
 	glVertex3d(g_MarkerB.GetTransform().GetTranslation().m_X, g_MarkerB.GetTransform().GetTranslation().m_Y, g_MarkerB.GetTransform().GetTranslation().m_Z);
 	glEnd();
-
-	obj.Render();
-	
-	glBegin(GL_LINES);
-	glVertex3d(0, 0, 0);
-	glVertex3d(-v.m_X, -v.m_Y, -v.m_Z);
-	glEnd();
+		
+	glEnable(GL_LIGHT0);
+	g_MarkerA.Render();
+	g_MarkerB.Render();
 }
 
