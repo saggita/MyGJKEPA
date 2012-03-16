@@ -7,9 +7,12 @@ CEPAEdge::CEPAEdge()
 
 }
 
-CEPAEdge::CEPAEdge(CEPATriangle* pEPATriangle, int index) : m_pEPATriangle(pEPATriangle), m_Index(index) 
+CEPAEdge::CEPAEdge(CEPATriangle* pEPATriangle, int indexLocal, int indexVertex0, int indexVertex1) : m_pEPATriangle(pEPATriangle), m_IndexLocal(indexLocal) 
 { 
-	assert(index >= 0 && index < 3); 
+	assert(indexLocal >= 0 && indexLocal < 3); 
+
+	m_IndexVertex[0] = indexVertex0;
+	m_IndexVertex[1] = indexVertex1;
 }
 
 CEPAEdge::~CEPAEdge() 
@@ -18,12 +21,12 @@ CEPAEdge::~CEPAEdge()
 
 int CEPAEdge::GetSourceVertexIndex() const
 {
-	return (*m_pEPATriangle).GetIndexVertex(m_Index);
+	return (*m_pEPATriangle).GetIndexVertex(m_IndexLocal);
 }
 
 int CEPAEdge::GetTargetVertexIndex() const
 {
-	return (*m_pEPATriangle)[(m_Index + 1 ) % 3];
+	return (*m_pEPATriangle)[(m_IndexLocal + 1 ) % 3];
 }
 
 bool CEPAEdge::DoSilhouette(const CVector3D* pVertices, int index, CTrianglesStore& triangleStore)
@@ -36,7 +39,7 @@ bool CEPAEdge::DoSilhouette(const CVector3D* pVertices, int index, CTrianglesSto
 
 			unsigned int numTriangles = triangleStore.getNbTriangles();
 
-			if ( !m_pEPATriangle->GetAdjacentEdge((m_Index + 1 ) % 3).DoSilhouette(pVertices, index, triangleStore) )
+			if ( !m_pEPATriangle->GetAdjacentEdge((m_IndexLocal + 1 ) % 3).DoSilhouette(pVertices, index, triangleStore) )
 			{
 
 			}
@@ -47,7 +50,7 @@ bool CEPAEdge::DoSilhouette(const CVector3D* pVertices, int index, CTrianglesSto
 
 			if ( triangle )
 			{
-				halfLink(CEPAEdge(triangle, 1), *this);
+				//halfLink(CEPAEdge(triangle, 1), *this);
 				return true;
 			}
 

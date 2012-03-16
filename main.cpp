@@ -25,7 +25,7 @@ HGLCamera   hCamera(threeButtons, false, 25.0f, 0.0f, -5.0f, 30.0f, 30.0f);
 GLuint btmPlate;
 int mouseButton = -1;
 bool bMousePressed = false;
-bool bPause = false;
+bool bPause = true;
 
 CClothSim3D g_Cloth;
 double g_dt = 0.001;

@@ -51,7 +51,6 @@ bool CNarrowPhaseGJK::CalcCollisionInfo(const CCollisionObject& objA, const CCol
 	return pCollisionInfo->bIntersect;
 }
 
-
 bool CNarrowPhaseGJK::CheckCollision(const CCollisionObject& objA, const CCollisionObject& objB, CNarrowCollisionInfo* pCollisionInfo, bool bProximity/* = false*/) 
 {
 	CVector3D suppPntA; // support point from object A
@@ -60,8 +59,8 @@ bool CNarrowPhaseGJK::CheckCollision(const CCollisionObject& objA, const CCollis
 	CVector3D closestPntB;
 	CVector3D w; // support point of Minkowski difference(A-B)
 	double vw; // v dot w
-	double margin = objA.GetMargin() + objB.GetMargin();
-	double marginSqr = margin * margin;
+	const double margin = objA.GetMargin() + objB.GetMargin();
+	const double marginSqr = margin * margin;
 	CGJKSimplex simplex;
 
 	// transform a local position in objB space to local position in objA space
@@ -69,6 +68,7 @@ bool CNarrowPhaseGJK::CheckCollision(const CCollisionObject& objA, const CCollis
 
 	// rotate matrix which transform a local vector in objA space to local vector in objB space
 	CQuaternion rotA2B = objB.GetTransform().GetRotation().InverseOther() * objA.GetTransform().GetRotation();
+	//CQuaternion rotA2B = objB.GetTransform().GetRotation().GetMatrix33().TransposeOther() * objA.GetTransform().GetRotation().GetMatrix33(); // the same thing as a line above 
 
 	// closest point to the origin
 	// TODO:Need to use cached one to exploit frame coherence. 
@@ -154,6 +154,9 @@ bool CNarrowPhaseGJK::CheckCollision(const CCollisionObject& objA, const CCollis
 				
 		++numIter;
 	} 
+
+	// TODO: Need to invesgate hybrid method metioned in Geno's book.
+	// TODO: Need to use GJK to compute the shallow penetration depth.
 
 	//return RunEPAAlgorithmWithMargins(objA, objB, v);
 	CEPAAlgorithm EPAAlgorithm;

@@ -24,11 +24,11 @@ private:
 	int m_IndicesVertex[3];
 	CEPAEdge m_AdjacentEdges[3];
 	CEPATriangle* m_AdjacentTriangles[3];
+	CEPAEdge* m_Edges[3];
 	bool m_bObsolete;
 	double m_Det;
 	bool m_bVisited;
 	
-
 	CVector3D m_ClosestPointToOrigin; 
 
 	double m_Lambda1; 
@@ -45,6 +45,12 @@ public:
 
 	int GetIndexVertex(int i) const { return m_IndicesVertex[i]; }
 	CEPAEdge& GetAdjacentEdge(int index);
+	CEPAEdge* GetEdge(int i)
+	{
+		assert(0 <= i && i < 3);
+		return m_Edges[i];
+	}
+
 	void SetAdjacentEdge(int index, CEPAEdge& EPAEdge);
 	double GetDistSqr() const { return m_DistSqr; }
 	bool IsObsolete() const { return m_bObsolete; }
@@ -59,6 +65,7 @@ public:
 	CVector3D ComputeClosestPointOfObject(const CVector3D* supportPointsOfObject) const;
 	bool DoSilhouette(const CVector3D* pVertices, int index, CTrianglesStore& triangleStore);
 	bool DoSilhouette(const CVector3D& w, int indexPivotVertex, const CEPATriangle* callerTriangle, CEPAPolytope& EPAPolytope);
+	bool DoSilhouette(const CVector3D& w, CEPAEdge* edge, CEPAPolytope& EPAPolytope);
 
 	int operator[](int i) const;  
 	bool operator<(const CEPATriangle& other) const;

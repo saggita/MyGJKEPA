@@ -54,8 +54,8 @@ void CClothSim3D::Create()
 	pPointObj->SetCollisionObjectType(CCollisionObject::Box);
 	pPointObj->SetSize(3.0, 4.0, 5.0);
 	pPointObj->GetTransform().GetRotation().SetRotation(CQuaternion(CVector3D(1.0, 0.0, 0).Normalize(), 0));
-	//pPointObj->GetTransform().GetTranslation().Set(2.0, 7.0, 0.0);
-	pPointObj->GetTransform().GetTranslation().Set(2.0, 10.0, 0.0);
+	pPointObj->GetTransform().GetTranslation().Set(2.0, 7.0, 0.0);
+	//pPointObj->GetTransform().GetTranslation().Set(2.0, 10.0, 0.0);
 
 	m_pNarrorPhase->m_CollisionObjectList.push_back(pColObj);
 	m_pNarrorPhase->m_CollisionObjectList.push_back(pPointObj);
@@ -179,8 +179,8 @@ unsigned int CClothSim3D::SubsUpdate(double dt)
 	CMatrix33 rot;
 	rot.SetRotation(CVector3D(1.0, 1.0, 1.0).Normalize(), angleRad);
 
-	m_pNarrorPhase->m_CollisionObjectList[0]->GetTransform().GetRotation().SetRotation(CVector3D(-1.0, 1.0, 1.0).Normalize(), angleRad);
-	m_pNarrorPhase->m_CollisionObjectList[1]->GetTransform().GetRotation().SetRotation(CVector3D(1.0, 0.0, 0.0).Normalize(), angleRad);
+	//m_pNarrorPhase->m_CollisionObjectList[0]->GetTransform().GetRotation().SetRotation(CVector3D(-1.0, 1.0, 1.0).Normalize(), angleRad);
+	//m_pNarrorPhase->m_CollisionObjectList[1]->GetTransform().GetRotation().SetRotation(CVector3D(1.0, 1.0, 0.0).Normalize(), angleRad);
 	
 	v = rot * v;
 

@@ -142,11 +142,27 @@ void CCollisionObject::Render() const
 
 		glPushMatrix();
 		glMultMatrixd(rotMatrix);
+
+		glEnable(GL_DEPTH_TEST);
+		glLineWidth(1.0f);
 		glutSolidSphere(1.0, 16, 16);
+		
 		glPushAttrib(GL_LIGHTING_BIT);
 		glDisable(GL_LIGHTING);
+
+		glDisable(GL_DEPTH_TEST);
+		glLineWidth(1.0f);
+		glEnable(GL_LINE_STIPPLE);
+		glLineStipple(1, 0x0101);	// dash/dot/dash 
 		glColor3f(1,1,1);
 		glutWireSphere(1.0, 16, 16);
+
+		glDisable(GL_LINE_STIPPLE);
+		glEnable(GL_DEPTH_TEST);
+		glLineWidth(1.0f);
+		glutWireSphere(1.0, 16, 16);
+
+		glLineWidth(1.0f);
 		glPopAttrib();
 		glPopMatrix();
 	}
@@ -177,12 +193,28 @@ void CCollisionObject::Render() const
 
 		glPushMatrix();
 		glMultMatrixd(rotMatrix);
+
+		glEnable(GL_DEPTH_TEST);
+		glLineWidth(1.0f);
 		glutSolidCube(1.0);
+
 		glPushAttrib(GL_LIGHTING_BIT);
+		
 		glDisable(GL_LIGHTING);
+		glDisable(GL_DEPTH_TEST);
+		glLineWidth(1.0f);
+		glEnable(GL_LINE_STIPPLE);
+		glLineStipple(1, 0x0101);	// dash/dot/dash 
 		glColor3f(1,1,1);
 		glutWireCube(1);
+
+		glDisable(GL_LINE_STIPPLE);
+		glEnable(GL_DEPTH_TEST);
+		glLineWidth(1.0f);
+		glutWireCube(1);
+
 		glPopAttrib();
+		
 		glPopMatrix();
 	}
 	else if ( m_CollisionObjectType == Cone )

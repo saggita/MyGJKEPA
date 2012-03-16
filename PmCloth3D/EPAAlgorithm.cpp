@@ -14,8 +14,8 @@ bool link(const CEPAEdge& edge0, const CEPAEdge& edge1)
 
 	if ( bOK )
 	{
-		edge0.GetEPATriangle()->m_AdjacentEdges[edge0.GetIndex()] = edge1;
-		edge1.GetEPATriangle()->m_AdjacentEdges[edge1.GetIndex()] = edge0;
+		edge0.GetEPATriangle()->m_AdjacentEdges[edge0.GetIndexLocal()] = edge1;
+		edge1.GetEPATriangle()->m_AdjacentEdges[edge1.GetIndexLocal()] = edge0;
 	}
 
 	return bOK;
@@ -26,7 +26,7 @@ void halfLink(const CEPAEdge& edge0, const CEPAEdge& edge1)
 	assert(edge0.GetSourceVertexIndex() == edge1.GetTargetVertexIndex() &&
 		   edge0.GetTargetVertexIndex() == edge1.GetSourceVertexIndex());
 
-	edge0.GetEPATriangle()->m_AdjacentEdges[edge0.GetIndex()] = edge1;
+	edge0.GetEPATriangle()->m_AdjacentEdges[edge0.GetIndexLocal()] = edge1;
 }
 
 //=====================
@@ -145,26 +145,58 @@ bool CEPAAlgorithm::ComputePenetrationDepthAndContactPoints(const CGJKSimplex& s
 			break;
 	}
 
-	if ( numTriangles == 0 )
-		return false;
+	/*if ( numTriangles == 0 )
+		return false;*/
 
 	// Now we can expand the polytope which contains the origin to get the penetration depth and contact points. 
 	CEPATriangle* triangle = 0;
-    double upperBoundSquarePenDepth = DBL_MAX;
+    double upperBound = DBL_MAX;
+	double lowerBound = -DBL_MAX;
 
 	int numIter = 0;
 
+
+
 	while ( 1 )
 	{
+
+#ifdef _DEBUG
+		for ( unsigned int i = 0; i < m_Polytope.GetTriangles().size(); i++ )
+		{
+			if ( !m_Polytope.GetTriangles()[i]->IsObsolete() )
+			{
+				assert(m_Polytope.GetTriangles()[i]->GetEdge(i)->GetIndexVertex(0) == m_Polytope.GetTriangles()[i]->GetEdge(i)->m_pPairEdge->GetIndexVertex(1));
+				assert(m_Polytope.GetTriangles()[i]->GetEdge(i)->GetIndexVertex(1) == m_Polytope.GetTriangles()[i]->GetEdge(i)->m_pPairEdge->GetIndexVertex(0));
+			}
+		}
+#endif
+
 		CEPATriangle* pClosestTriangle = m_Polytope.PopAClosestTriangleToOriginFromHeap();
+
+		if ( !pClosestTriangle )
+		{
+			assert(0); // Should not reach here.
+			return false;
+		}
+
 		v = pClosestTriangle->GetClosestPoint();
 
 		suppPointsA[numVertices] = objA.GetLocalSupportPoint(v, objA.GetMargin());
 		suppPointsB[numVertices] = transB2A * objB.GetLocalSupportPoint(rotA2B * (-v), objB.GetMargin());
 		CVector3D w = suppPointsA[numVertices] - suppPointsB[numVertices];
 
-		if ( v.Dot(w) - pClosestTriangle->GetDistSqr() < 1e-12 )
+		// Compute upper bound and lower bound
+		upperBound = std::min(upperBound, w * v.NormalizeOther());
+		lowerBound = std::max(lowerBound, v.Length());
+
+		// lowerBound should increase monotonically
+		assert(lowerBound == v.Length());
+
+		if ( upperBound - lowerBound < 1e-6 )
 			break;
+
+		/*if ( v.Dot(w) - pClosestTriangle->GetDistSqr() < 1e-12 )
+			break;*/
 
 		m_Polytope.AddPoint(w, pClosestTriangle);
 		numIter++;

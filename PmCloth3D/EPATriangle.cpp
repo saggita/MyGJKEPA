@@ -5,19 +5,27 @@
 #include "EPATriangle.h"
 #include "EPAPolytope.h"
 
-CEPATriangle::CEPATriangle()
+CEPATriangle::CEPATriangle() : m_bObsolete(false)
 {
+	for ( int i = 0; i < 3; i++ )
+		m_Edges[i] = NULL;
 }
 
+// vertex 0, 1 and 2 should be formed in counter clockwise
 CEPATriangle::CEPATriangle(int indexVertex0, int indexVertex1, int indexVertex2) : m_bObsolete(false)
 {
 	m_IndicesVertex[0] = indexVertex0;
 	m_IndicesVertex[1] = indexVertex1;
 	m_IndicesVertex[2] = indexVertex2;
+
+	for ( unsigned int i = 0; i < 3; i++ )
+		m_Edges[i] = new CEPAEdge(this, i, m_IndicesVertex[i], m_IndicesVertex[(i+1) % 3]);
 }
 
 CEPATriangle::~CEPATriangle()
 {
+	for ( int i = 0; i < 3; i++ )
+		delete m_Edges[i]; // deleting NULL is not harmful. So we don't check if m_Edges[i] is NULL or not
 }
 
 CEPAEdge& CEPATriangle::GetAdjacentEdge(int index)
@@ -110,7 +118,8 @@ bool CEPATriangle::ComputeClosestPointToOrigin(const CEPAPolytope& EPAPolytope)
         // Compute the closest point v
         m_ClosestPointToOrigin = p0 + 1.0 / m_Det * (m_Lambda1 * v1 + m_Lambda2 * v2);
 
-        // Compute the square distance of closest point to the origin
+		// Compute the square distance of closest point to the origin
+		//if ( IsClosestPointInternal() )
 		m_DistSqr = m_ClosestPointToOrigin.LengthSqr();
 
         return true;
@@ -138,7 +147,7 @@ bool CEPATriangle::DoSilhouette(const CVector3D* pVertices, int index, CTriangle
 				 m_AdjacentEdges[1].DoSilhouette(pVertices, index, triangleStore) &&
 				 m_AdjacentEdges[2].DoSilhouette(pVertices, index, triangleStore);
 
-	if ( bDone )
+	/*if ( bDone )
 	{
 		int i,j;
 
@@ -150,7 +159,7 @@ bool CEPATriangle::DoSilhouette(const CVector3D* pVertices, int index, CTriangle
             if (!link(CEPAEdge(triangle, 0), CEPAEdge(&triangleStore[j], 2))) 
                 return false;
         }
-	}
+	}*/
 
 	return bDone;
 }
@@ -219,6 +228,50 @@ bool CEPATriangle::DoSilhouette(const CVector3D& w, int indexPivotVertex, const 
 	{
 		EPAPolytope.m_SilhouetteVertices.push_back(indexPivotVertex);
 		EPAPolytope.m_SilhouetteTriangles.push_back(this);
+	}
+	
+	return true;
+}
+
+// edge->m_pEPATriangle is a neighbor triangle which called this function. 
+// Please note that edge doesn't belong to this triangle. It is from the neighbor triangle.
+// edge->m_pPairEdge belongs to this triangle. 
+bool CEPATriangle::DoSilhouette(const CVector3D& w, CEPAEdge* edge, CEPAPolytope& EPAPolytope)
+{
+#ifdef _DEBUG
+	int index = m_Index;
+#endif
+
+	assert(edge != NULL);
+	assert(edge->m_pPairEdge != NULL);
+	assert(edge->m_pEPATriangle != NULL);
+	
+	if ( m_bObsolete )
+		return true;
+
+	if ( !IsVisibleFromPoint(w) ) // if this triangle is not visible from point w
+	{
+		int indexVertex0 = edge->m_IndexVertex[0];
+		EPAPolytope.m_SilhouetteVertices.push_back(indexVertex0);
+		EPAPolytope.m_SilhouetteTriangles.push_back(this);
+		EPAPolytope.m_SilhouetteEdges.push_back(edge->m_pPairEdge);
+		return true;
+	}
+	else // if visible
+	{
+		m_bVisible = true;
+		m_bObsolete = true;
+		CEPAEdge* myEdge = edge->m_pPairEdge;
+
+		assert(m_Edges[myEdge->m_IndexLocal] == myEdge);
+
+		int indexNextEdgeCCW = (myEdge->m_IndexLocal + 1) % 3;
+		assert(0 <= indexNextEdgeCCW && indexNextEdgeCCW < 3);
+		m_Edges[indexNextEdgeCCW]->m_pPairEdge->m_pEPATriangle->DoSilhouette(w, m_Edges[indexNextEdgeCCW], EPAPolytope);
+
+		indexNextEdgeCCW = (indexNextEdgeCCW + 1) % 3;
+		assert(0 <= indexNextEdgeCCW && indexNextEdgeCCW < 3);
+		m_Edges[indexNextEdgeCCW]->m_pPairEdge->m_pEPATriangle->DoSilhouette(w, m_Edges[indexNextEdgeCCW], EPAPolytope);
 	}
 
 	return true;
