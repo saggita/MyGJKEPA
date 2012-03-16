@@ -262,12 +262,15 @@ bool CEPAPolytope::AddPoint(const CVector3D& w, CEPATriangle* pTriangleUsedToObt
 	}
 
 #ifdef _DEBUG
-	for ( unsigned int i = 0; i < m_Triangles.size(); i++ )
+	for ( unsigned int i = 0; i < GetTriangles().size(); i++ )
 	{
-		if ( !m_Triangles[i]->IsObsolete() )
+		if ( !GetTriangles()[i]->IsObsolete() )
 		{
-			assert(m_Triangles[i]->m_Edges[i]->m_IndexVertex[0] == m_Triangles[i]->m_Edges[i]->m_pPairEdge->m_IndexVertex[1]);
-			assert(m_Triangles[i]->m_Edges[i]->m_IndexVertex[1] == m_Triangles[i]->m_Edges[i]->m_pPairEdge->m_IndexVertex[0]);
+			for ( int j = 0; j < 3; j++ )
+			{
+				assert(GetTriangles()[i]->GetEdge(j)->GetIndexVertex(0) == GetTriangles()[i]->GetEdge(j)->m_pPairEdge->GetIndexVertex(1));
+				assert(GetTriangles()[i]->GetEdge(j)->GetIndexVertex(1) == GetTriangles()[i]->GetEdge(j)->m_pPairEdge->GetIndexVertex(0));
+			}
 		}
 	}
 #endif

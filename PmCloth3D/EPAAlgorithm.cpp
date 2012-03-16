@@ -165,8 +165,11 @@ bool CEPAAlgorithm::ComputePenetrationDepthAndContactPoints(const CGJKSimplex& s
 		{
 			if ( !m_Polytope.GetTriangles()[i]->IsObsolete() )
 			{
-				assert(m_Polytope.GetTriangles()[i]->GetEdge(i)->GetIndexVertex(0) == m_Polytope.GetTriangles()[i]->GetEdge(i)->m_pPairEdge->GetIndexVertex(1));
-				assert(m_Polytope.GetTriangles()[i]->GetEdge(i)->GetIndexVertex(1) == m_Polytope.GetTriangles()[i]->GetEdge(i)->m_pPairEdge->GetIndexVertex(0));
+				for ( int j = 0; j < 3; j++ )
+				{
+					assert(m_Polytope.GetTriangles()[i]->GetEdge(j)->GetIndexVertex(0) == m_Polytope.GetTriangles()[i]->GetEdge(j)->m_pPairEdge->GetIndexVertex(1));
+					assert(m_Polytope.GetTriangles()[i]->GetEdge(j)->GetIndexVertex(1) == m_Polytope.GetTriangles()[i]->GetEdge(j)->m_pPairEdge->GetIndexVertex(0));
+				}
 			}
 		}
 #endif
