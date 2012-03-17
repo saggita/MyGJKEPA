@@ -107,7 +107,10 @@ bool CEPATriangle::DoSilhouette(const CVector3D& w, CEPAEdge* edge, CEPAPolytope
 	}
 	else // if visible
 	{
+#ifdef _DEBUG
 		m_bVisible = true;
+#endif
+
 		m_bObsolete = true;
 		CEPAEdge* myEdge = edge->m_pPairEdge;
 

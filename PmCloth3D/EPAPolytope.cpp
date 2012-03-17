@@ -195,7 +195,10 @@ bool CEPAPolytope::ExpandPolytopeWithNewPoint(const CVector3D& w, CEPATriangle* 
 	int indexVertexW = (int)m_Vertices.size() - 1;
 
 	assert(pTriangleUsedToObtainW->IsObsolete() == false);
+
+#ifdef _DEBUG
 	pTriangleUsedToObtainW->m_bVisible = true;
+#endif
 
 	pTriangleUsedToObtainW->SetObsolete(true);
 
