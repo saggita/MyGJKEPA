@@ -175,6 +175,14 @@ bool CEPAPolytope::AddTetrahedron(const CVector3D& p0, const CVector3D& p1, cons
 	return true;
 }
 
+// p0, p1 and p2 form a triangle. With the triangle, p and q create two tetrahedrons. 
+// With gluing these two tetrahedrons, hexahedron can be formed.
+bool CEPAPolytope::AddHexahedron(const CVector3D& p0, const CVector3D& p1, const CVector3D& p2, const CVector3D& p, const CVector3D& q)
+{
+
+	return true;
+}
+
 bool CEPAPolytope::ExpandPolytopeWithNewPoint(const CVector3D& w, CEPATriangle* pTriangleUsedToObtainW)
 {
 #ifdef _DEBUG

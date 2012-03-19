@@ -33,6 +33,7 @@ public:
 	CEPATriangle* PopAClosestTriangleToOriginFromHeap();
 
 	bool AddTetrahedron(const CVector3D& p0, const CVector3D& p1, const CVector3D& p2, const CVector3D& p3);
+	bool AddHexahedron(const CVector3D& p0, const CVector3D& p1, const CVector3D& p2, const CVector3D& p, const CVector3D& q);
 	bool ExpandPolytopeWithNewPoint(const CVector3D& w, CEPATriangle* pTriangleUsedToObtainW);
 
 	static bool IsOriginInTetrahedron(const CVector3D& p1, const CVector3D& p2, const CVector3D& p3, const CVector3D& p4);

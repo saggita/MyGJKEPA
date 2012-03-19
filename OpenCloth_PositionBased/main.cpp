@@ -476,7 +476,7 @@ void InitGL() {
 	//------------------------------------------------
 	g_pGJK = new CNarrowPhaseGJK();
 	g_pConvexObj = new CCollisionObject();
-	g_pConvexObj->SetCollisionObjectType(CCollisionObject::Box);
+	g_pConvexObj->SetCollisionObjectType(CCollisionObject::Sphere);
 	g_pConvexObj->GetTransform().GetTranslation().Set(0.0, 2.0, 0.0);
 	g_pConvexObj->SetSize(3.0, 2.0, 1.0);
 	g_pConvexObj->SetColor(1.0, 0.0, 0.0);
@@ -973,8 +973,9 @@ void StepPhysics(float dt ) {
 	IntegrateExplicitWithDamping(dt);
 	 
 	// for collision constraints
-	UpdateInternalConstraints(dt);	
+	
 	UpdateExternalConstraints();
+	UpdateInternalConstraints(dt);	
 
 	Integrate(dt);
 
@@ -983,6 +984,19 @@ void StepPhysics(float dt ) {
 		glm::vec3& p = X[i];
 		clothVertices[i]->GetTransform().GetTranslation().Set(p.x, p.y, p.z);
 	}
+
+	CVector3D axis;
+	static double angleRad = 0;
+
+	angleRad += 2*3.141592 / 200;
+
+	if ( angleRad > 2*3.141592 )
+		angleRad -= 2*3.141592;
+
+	CMatrix33 rot;
+	rot.SetRotation(CVector3D(1.0, 1.0, 1.0).Normalize(), angleRad);
+
+	g_pConvexObj->GetTransform().GetRotation().SetRotation(CVector3D(-1.0, 1.0, 1.0).Normalize(), angleRad);
 }
 
 void main(int argc, char** argv) {

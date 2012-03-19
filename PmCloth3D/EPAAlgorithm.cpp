@@ -44,6 +44,8 @@ bool CEPAAlgorithm::ComputePenetrationDepthAndContactPoints(const CGJKSimplex& s
 	int numVertices = simplex.GetPoints(suppPointsA, suppPointsB, points);
 	m_Polytope.Clear();
 
+	assert(numVertices == points.size());
+
 	switch ( numVertices )
 	{
 		case 1:
@@ -51,16 +53,20 @@ bool CEPAAlgorithm::ComputePenetrationDepthAndContactPoints(const CGJKSimplex& s
 			return false;
 		case 2:
 			// The origin lies in a line segment. 
-			// We create a hexahedron which is glued two tetrahedrons based on Geno's book. 
+			// We create a hexahedron which is glued two tetrahedrons. It is explained in Geno's book. 
 
 
 			break;
-
 		case 3:
-			// The origin lies in a triangle. 
-			// Add two new vertices to create a hexahedron based on Geno's book. 
+			{
+				// The origin lies in a triangle. 
+				// Add two new vertices to create a hexahedron. It is explained in Geno's book. 
+				CVector3D n = (points[1] - points[0]).Cross(points[2] - points[0]);
+				CVector3D w0 =  objA.GetLocalSupportPoint(-n) - transB2A * objB.GetLocalSupportPoint(rotA2B * n);
+				CVector3D w1 =  objA.GetLocalSupportPoint(n) - transB2A * objB.GetLocalSupportPoint(rotA2B * (-n));
 
-
+				m_Polytope.AddHexahedron(points[0], points[1], points[2], w0, w1);
+			}
 			break;
 		case 4:
 			{
