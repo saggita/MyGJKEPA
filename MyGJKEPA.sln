@@ -26,6 +26,11 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MyGJKEPA", "MyGJKEPA.vcxpro
 		{0134A467-8581-4C3D-BEB4-E4B59810BB32} = {0134A467-8581-4C3D-BEB4-E4B59810BB32}
 	EndProjectSection
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "OpenCloth_PositionBased", "OpenCloth_PositionBased\OpenCloth_PositionBased.vcxproj", "{836F4E4C-205B-4A16-A30F-43913021F9A9}"
+	ProjectSection(ProjectDependencies) = postProject
+		{D5E2412C-9AA6-41FA-922F-05450EF6912C} = {D5E2412C-9AA6-41FA-922F-05450EF6912C}
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -72,6 +77,12 @@ Global
 		{8D06611F-13AA-4D6F-8946-12B2486A22B4}.Release|Win32.ActiveCfg = Release|Win32
 		{8D06611F-13AA-4D6F-8946-12B2486A22B4}.Release|Win32.Build.0 = Release|Win32
 		{8D06611F-13AA-4D6F-8946-12B2486A22B4}.Release|x64.ActiveCfg = Release|Win32
+		{836F4E4C-205B-4A16-A30F-43913021F9A9}.Debug|Win32.ActiveCfg = Debug|Win32
+		{836F4E4C-205B-4A16-A30F-43913021F9A9}.Debug|Win32.Build.0 = Debug|Win32
+		{836F4E4C-205B-4A16-A30F-43913021F9A9}.Debug|x64.ActiveCfg = Debug|Win32
+		{836F4E4C-205B-4A16-A30F-43913021F9A9}.Release|Win32.ActiveCfg = Release|Win32
+		{836F4E4C-205B-4A16-A30F-43913021F9A9}.Release|Win32.Build.0 = Release|Win32
+		{836F4E4C-205B-4A16-A30F-43913021F9A9}.Release|x64.ActiveCfg = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

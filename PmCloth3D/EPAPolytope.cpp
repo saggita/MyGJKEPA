@@ -261,7 +261,7 @@ bool CEPAPolytope::ExpandPolytopeWithNewPoint(const CVector3D& w, CEPATriangle* 
 		m_SilhouetteTriangles[i]->m_AdjacentTriangles[m_SilhouetteEdges[i]->m_IndexLocal] = newTriangles[i];
 	}
 
-	for ( unsigned int i = 0; i < silhouetteSize; i++ )
+	for ( int i = 0; i < silhouetteSize; i++ )
 	{	
 #ifdef _DEBUG
 		newTriangles[i]->m_Index = m_Count++;

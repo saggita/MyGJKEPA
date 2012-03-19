@@ -1,16 +1,18 @@
-#include "CollisionObject.h"
 #include <GL/glut.h>
+#include <cassert>
+#include <memory.h>
+#include "CollisionObject.h"
 
 CCollisionObject::CCollisionObject(void) : m_HalfExtent(1.0), m_Margin(0.01)
 {
-	m_pBulletColObj = new btCollisionObject();	
+	//m_pBulletColObj = new btCollisionObject();	
 
 	SetColor(1.0, 1.0, 1.0);
 }
 
 CCollisionObject::~CCollisionObject(void)
 {
-	delete m_pBulletColObj;
+	//delete m_pBulletColObj;
 }
 
 const CTransform& CCollisionObject::GetTransform() const 

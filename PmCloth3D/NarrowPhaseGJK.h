@@ -9,9 +9,7 @@
 
 class CClothSim3D;
 
-//===========================
-struct CNarrowCollisionInfo
-//===========================
+class CNarrowCollisionInfo
 {
 public:
 	CNarrowCollisionInfo() : pObjA(NULL), pObjB(NULL), bIntersect(false), penetrationDepth(0) {}
@@ -34,12 +32,10 @@ public:
 	// Compiler provided assigne operator(=) will be good enough.
 };
 
-//====================
+
 class CNarrowPhaseGJK
-//====================
 {
 protected:
-	CClothSim3D* m_pSimulation;
 	CEPAAlgorithm m_EPAAlgorithm;
 
 protected:
@@ -49,7 +45,7 @@ protected:
 	bool GenerateCollisionInfo(const CCollisionObject& objA, const CCollisionObject& objB, const CTransform &transB2A, const CGJKSimplex& simplex, CVector3D v, double distSqr, CNarrowCollisionInfo* pCollisionInfo) const;
 
 public:
-	CNarrowPhaseGJK(CClothSim3D* pSimulation);
+	CNarrowPhaseGJK();
 	virtual ~CNarrowPhaseGJK(void);
 
 	std::vector<CCollisionObject*> m_CollisionObjectList;

@@ -1,12 +1,9 @@
 #define NOMINMAX
 
+#include <cassert>
 #include <algorithm>
 #include "EPAAlgorithm.h"
 #include "NarrowPhaseGJK.h"
-
-//=====================
-// CEPAAlgorithm
-//=====================
 
 CEPAAlgorithm::CEPAAlgorithm(void)
 {

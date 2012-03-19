@@ -2,7 +2,7 @@
 
 #include "Transform.h"
 
-#include "btBulletCollisionCommon.h"
+//#include "btBulletCollisionCommon.h"
 
 class CCollisionObject
 {
@@ -22,7 +22,7 @@ protected:
 	float m_Color[4];
 
 	// bullet
-	btCollisionObject* m_pBulletColObj;
+	//btCollisionObject* m_pBulletColObj;
 
 public:
 	CollisionObjectType GetCollisionObjectType() { return m_CollisionObjectType; }
@@ -39,7 +39,7 @@ public:
 
 	CVector3D GetLocalSupportPoint(const CVector3D& dir, double margin = 0) const;
 
-	btCollisionObject* GetBulletObject() { return m_pBulletColObj; }
+	//btCollisionObject* GetBulletObject() { return m_pBulletColObj; }
 
 	void Render() const;
 };

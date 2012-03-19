@@ -1,12 +1,11 @@
 #pragma once
 
+#include <cassert>
 #include "Vector3D.h"
 
 class CEPATriangle;
 
-//==================
 class CEPAEdge
-//==================
 {
 friend class CEPATriangle;
 friend class CEPAPolytope;

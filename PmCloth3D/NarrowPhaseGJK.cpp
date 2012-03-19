@@ -1,8 +1,9 @@
+#include <cassert>
 #include "NarrowPhaseGJK.h"
 #include "EPAAlgorithm.h"
 #include "Simplex.h"
 
-CNarrowPhaseGJK::CNarrowPhaseGJK(CClothSim3D* pSimulation) : m_pSimulation(pSimulation)
+CNarrowPhaseGJK::CNarrowPhaseGJK() 
 {
 	
 }

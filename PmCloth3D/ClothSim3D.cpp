@@ -40,7 +40,7 @@ void CClothSim3D::Create()
 {	
 	ClearAll();
 
-	m_pNarrorPhase = new CNarrowPhaseGJK(this);
+	m_pNarrorPhase = new CNarrowPhaseGJK();
 	
 	// Object 0
 	CCollisionObject* pColObj = new CCollisionObject();
