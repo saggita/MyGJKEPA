@@ -34,9 +34,9 @@ CEPATriangle* CEPAPolytope::PopAClosestTriangleToOriginFromHeap()
 	if ( m_Triangles.size() == 0 )
 		return pReturnTriangle;
 
-	CEPATriangleComparison compare;
-
 	// TODO: Need to figure out how to utilize std::pop_heap
+	
+	// CEPATriangleComparison compare;
 
 	//while ( 1 )
 	//{
@@ -210,7 +210,7 @@ bool CEPAPolytope::ExpandPolytopeWithNewPoint(const CVector3D& w, CEPATriangle* 
 	assert(m_SilhouetteTriangles.size() >= 3);
 
 	// Now, we create new triangles to patch the silhouette loop 
-	unsigned int silhouetteSize = m_SilhouetteVertices.size();
+	int silhouetteSize = (int)m_SilhouetteVertices.size();
 
 #ifdef _DEBUG
 	for ( int i = 0; i < m_Triangles.size(); i++ )
@@ -235,7 +235,7 @@ bool CEPAPolytope::ExpandPolytopeWithNewPoint(const CVector3D& w, CEPATriangle* 
 
 	CEPATriangleComparison compare;
 
-	for ( unsigned int i = 0; i < silhouetteSize; i++ )
+	for ( int i = 0; i < silhouetteSize; i++ )
 	{
 		int j = i+1 < silhouetteSize ? i+1 : 0;
 

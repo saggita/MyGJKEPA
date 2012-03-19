@@ -12,15 +12,12 @@ public:
 	~CEPAPolytope(void);
 
 private:
-	std::vector<CVector3D> m_Vertices;
-
-	// array of CEPATriangle constructing polytope. 
-	std::vector<CEPATriangle*> m_Triangles;
+	std::vector<CVector3D> m_Vertices; // array of vertices constructing this polytope. 	
+	std::vector<CEPATriangle*> m_Triangles; // array of CEPATriangle constructing this polytope. 
 
 	std::vector<int> m_SilhouetteVertices;
 	std::vector<CEPATriangle*> m_SilhouetteTriangles;
 	std::vector<CEPAEdge*> m_SilhouetteEdges;
-	std::vector<CEPATriangle*> m_VisibleTriangles;
 	std::vector<CVector3D> m_SupportPointsA; // support points from object A in local coordinate
 	std::vector<CVector3D> m_SupportPointsB; // support points from object B in local coordinate
 

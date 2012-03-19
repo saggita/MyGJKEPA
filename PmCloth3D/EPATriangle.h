@@ -4,12 +4,6 @@
 #include "Vector3D.h"
 #include "EPAEdge.h"
 
-static const unsigned int MAX_TRIANGLES = 200;     // Maximum number of triangles
-static const unsigned int MAX_SUPPORT_POINTS = 100;    // Maximum number of support points of the polytope
-static const unsigned int MAX_FACETS = 200;            // Maximum number of facets of the polytope
-
-class CTrianglesStore;
-
 //================
 class CEPATriangle
 //================
