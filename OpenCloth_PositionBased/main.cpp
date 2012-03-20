@@ -476,8 +476,8 @@ void InitGL() {
 	//------------------------------------------------
 	g_pGJK = new CNarrowPhaseGJK();
 	g_pConvexObj = new CCollisionObject();
-	g_pConvexObj->SetCollisionObjectType(CCollisionObject::Sphere);
-	g_pConvexObj->GetTransform().GetTranslation().Set(0.0, 2.0, 0.0);
+	g_pConvexObj->SetCollisionObjectType(CCollisionObject::Box);
+	g_pConvexObj->GetTransform().GetTranslation().Set(0.0, 2.0, 0.0); 
 	g_pConvexObj->SetSize(3.0, 2.0, 1.0);
 	g_pConvexObj->SetColor(1.0, 0.0, 0.0);
 	g_pConvexObj->GetTransform().GetRotation().SetRotation(CQuaternion(CVector3D(1.0, 1.0, 0).Normalize(), 3.141592/3.0));
@@ -988,7 +988,7 @@ void StepPhysics(float dt ) {
 	CVector3D axis;
 	static double angleRad = 0;
 
-	angleRad += 2*3.141592 / 200;
+	angleRad += 2*3.141592 / 500;
 
 	if ( angleRad > 2*3.141592 )
 		angleRad -= 2*3.141592;
