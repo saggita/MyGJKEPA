@@ -44,9 +44,9 @@ void CClothSim3D::Create()
 
 	// Object 1
 	CCollisionObject* pPointObj = new CCollisionObject();
-	pPointObj->SetCollisionObjectType(CCollisionObject::Sphere);
+	pPointObj->SetCollisionObjectType(CCollisionObject::ConvexHull);
 	pPointObj->SetSize(3.0, 4.0, 5.0);
-	pPointObj->SetColor(0.5, 0.5, 0.5);
+	pPointObj->SetColor(0.7, 0.7, 0.0);
 	pPointObj->GetTransform().GetRotation().SetRotation(CQuaternion(CVector3D(1.0, 0.0, 0).Normalize(), 0));
 	pPointObj->GetTransform().GetTranslation().Set(2.0, 5.0, 0.0);
 	//pPointObj->GetTransform().GetTranslation().Set(2.0, 10.0, 0.0);
@@ -62,7 +62,6 @@ void CClothSim3D::Create()
 	g_MarkerB.SetCollisionObjectType(CCollisionObject::Sphere);		
 }
 
-// TODO:possible memory leak or access violation. Need to do check this code..
 void CClothSim3D::ClearAll()
 {
 	if ( m_pNarrorPhase )
@@ -77,7 +76,6 @@ void CClothSim3D::ClearAll()
 	if ( m_pNarrorPhase )
 		delete m_pNarrorPhase;
 }
-
 
 unsigned int CClothSim3D::Update(double dt)
 {

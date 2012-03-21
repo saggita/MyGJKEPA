@@ -1,7 +1,138 @@
+#ifdef WIN32
+#include <windows.h>
+#endif
+
 #include <GL/glut.h>
 #include <cassert>
 #include <memory.h>
 #include "CollisionObject.h"
+
+#define BarrelVtxCount2 57
+#define BarrelIndexCount 60
+
+static float BarrelVtx2[] = {
+0.0f,-0.5f,0.0f,				0.0f,-1.0f,0.0f,
+0.282362f,-0.5f,-0.205148f,     0.0f,-1.0f,0.0f,
+0.349018f,-0.5f,0.0f,           0.0f,-1.0f,0.0f,
+0.107853f,-0.5f,-0.331936f,     0.0f,-1.0f,0.0f,
+-0.107853f,-0.5f,-0.331936f,    0.0f,-1.0f,0.0f,
+0.107853f,-0.5f,-0.331936f,     0.0f,-1.0f,0.0f,
+-0.282362f,-0.5f,-0.205148f,    0.0f,-1.0f,0.0f,
+-0.349018f,-0.5f,0.0f,          0.0f,-1.0f,0.0f,
+-0.282362f,-0.5f,0.205148f,     0.0f,-1.0f,0.0f,
+-0.107853f,-0.5f,0.331936f,     0.0f,-1.0f,0.0f,
+0.107853f,-0.5f,0.331936f,      0.0f,-1.0f,0.0f,
+0.282362f,-0.5f,0.205148f,      0.0f,-1.0f,0.0f,
+0.0f,0.5f,0.0f,                 0.0f,1.0f,0.0f,
+0.349018f,0.5f,0.0f,            0.0f,1.0f,0.0f,
+0.282362f,0.5f,-0.205148f,      0.0f,1.0f,0.0f,
+0.107853f,0.5f,-0.331936f,      0.0f,1.0f,0.0f,
+0.107853f,0.5f,-0.331936f,      0.0f,1.0f,0.0f,
+-0.107853f,0.5f,-0.331936f,     0.0f,1.0f,0.0f,
+-0.282362f,0.5f,-0.205148f,     0.0f,1.0f,0.0f,
+-0.349018f,0.5f,0.0f,           0.0f,1.0f,0.0f,
+-0.282362f,0.5f,0.205148f,      0.0f,1.0f,0.0f,
+-0.107853f,0.5f,0.331936f,      0.0f,1.0f,0.0f,
+0.107853f,0.5f,0.331936f,       0.0f,1.0f,0.0f,
+0.282362f,0.5f,0.205148f,       0.0f,1.0f,0.0f,
+0.349018f,-0.5f,0.0f,           0.957307f,-0.289072f,0.0f,
+0.404509f,0.0f,-0.293893f,      0.809017f,0.0f,-0.587785f,
+0.5f,0.0f,0.0f,                 1.0f,0.0f,0.0f,
+0.282362f,-0.5f,-0.205148f,     0.774478f,-0.289072f,-0.562691f,
+0.154508f,0.0f,-0.475528f,      0.309017f,0.0f,-0.951057f,
+0.107853f,-0.5f,-0.331936f,     0.295824f,-0.289072f,-0.910453f,
+0.107853f,-0.5f,-0.331936f,     0.295824f,-0.289072f,-0.910453f,
+-0.154509f,0.0f,-0.475528f,     -0.309017f,0.0f,-0.951057f,
+0.154508f,0.0f,-0.475528f,      0.309017f,0.0f,-0.951057f,
+-0.107853f,-0.5f,-0.331936f,    -0.295824f,-0.289072f,-0.910453f,
+-0.404509f,0.0f,-0.293893f,     -0.809017f,0.0f,-0.587785f,
+-0.282362f,-0.5f,-0.205148f,    -0.774478f,-0.289072f,-0.562691f,
+-0.5f,0.0f,0.0f,                -1.0f,0.0f,0.0f,
+-0.349018f,-0.5f,0.0f,          -0.957307f,-0.289072f,0.0f,
+-0.404508f,0.0f,0.293893f,      -0.809017f,0.0f,0.587785f,
+-0.282362f,-0.5f,0.205148f,     -0.774478f,-0.289072f,0.562691f,
+-0.154509f,0.0f,0.475528f,      -0.309017f,0.0f,0.951056f,
+-0.107853f,-0.5f,0.331936f,     -0.295824f,-0.289072f,0.910453f,
+0.154509f,0.0f,0.475528f,       0.309017f,0.0f,0.951056f,
+0.107853f,-0.5f,0.331936f,      0.295824f,-0.289072f,0.910453f,
+0.404509f,0.0f,0.293892f,       0.809017f,0.0f,0.587785f,
+0.282362f,-0.5f,0.205148f,      0.774478f,-0.289072f,0.562691f,
+0.282362f,0.5f,-0.205148f,      0.774478f,0.289072f,-0.562691f,
+0.349018f,0.5f,0.0f,            0.957307f,0.289072f,0.0f,
+0.107853f,0.5f,-0.331936f,      0.295824f,0.289072f,-0.910453f,
+-0.107853f,0.5f,-0.331936f,     -0.295824f,0.289072f,-0.910453f,
+0.107853f,0.5f,-0.331936f,      0.295824f,0.289072f,-0.910453f,
+-0.282362f,0.5f,-0.205148f,     -0.774478f,0.289072f,-0.562691f,
+-0.349018f,0.5f,0.0f,           -0.957307f,0.289072f,0.0f,
+-0.282362f,0.5f,0.205148f,      -0.774478f,0.289072f,0.562691f,
+-0.107853f,0.5f,0.331936f,      -0.295824f,0.289072f,0.910453f,
+0.107853f,0.5f,0.331936f,       0.295824f,0.289072f,0.910453f,
+0.282362f,0.5f,0.205148f,       0.774478f,0.289072f,0.562691f,
+};
+
+
+static int BarrelIdx[] = {
+0,1,2,
+0,3,1,
+0,4,5,
+0,6,4,
+0,7,6,
+0,8,7,
+0,9,8,
+0,10,9,
+0,11,10,
+0,2,11,
+12,13,14,
+12,14,15,
+12,16,17,
+12,17,18,
+12,18,19,
+12,19,20,
+12,20,21,
+12,21,22,
+12,22,23,
+12,23,13,
+24,25,26,
+24,27,25,
+27,28,25,
+27,29,28,
+30,31,32,
+30,33,31,
+33,34,31,
+33,35,34,
+35,36,34,
+35,37,36,
+37,38,36,
+37,39,38,
+39,40,38,
+39,41,40,
+41,42,40,
+41,43,42,
+43,44,42,
+43,45,44,
+45,26,44,
+45,24,26,
+26,46,47,
+26,25,46,
+25,48,46,
+25,28,48,
+32,49,50,
+32,31,49,
+31,51,49,
+31,34,51,
+34,52,51,
+34,36,52,
+36,53,52,
+36,38,53,
+38,54,53,
+38,40,54,
+40,55,54,
+40,42,55,
+42,56,55,
+42,44,56,
+44,47,56,
+44,26,47,
+};
 
 CCollisionObject::CCollisionObject(void) : m_HalfExtent(1.0), m_Margin(0.01)
 {
@@ -46,6 +177,44 @@ CTransform& CCollisionObject::GetTransform()
 //
 //	m_pBulletColObj->getWorldTransform().setBasis(rot);
 //}
+
+void CCollisionObject::SetCollisionObjectType(CollisionObjectType collisionObjectType) 
+{ 
+	m_CollisionObjectType = collisionObjectType; 
+
+	if ( m_CollisionObjectType == ConvexHull )
+	{
+		for ( int i = 0; i < BarrelVtxCount2; i++ )
+		{
+			CVector3D vertex, normal;
+			vertex[0] = BarrelVtx2[i*6];
+			vertex[1] = BarrelVtx2[i*6+1];
+			vertex[2] = BarrelVtx2[i*6+2];
+
+			normal[0] = BarrelVtx2[i*6+3];
+			normal[1] = BarrelVtx2[i*6+4];
+			normal[2] = BarrelVtx2[i*6+5];
+
+			m_Normals.push_back(normal);
+			m_Vertices.push_back(vertex);
+		}
+
+		for ( int i = 0; i < BarrelIndexCount; i++ )
+		{
+			int indices[3];
+			indices[0] = BarrelIdx[i*3];
+			indices[1] = BarrelIdx[i*3+1];
+			indices[2] = BarrelIdx[i*3+2];
+			
+			TriangleFace face;
+
+			for ( int i = 0; i < 3; i++ )
+				face.indices[i] = indices[i];
+
+			m_Faces.push_back(face);
+		}
+	}
+}
 
 CVector3D CCollisionObject::GetLocalSupportPoint(const CVector3D& dir, double margin/* = 0*/) const
 {
@@ -108,6 +277,22 @@ CVector3D CCollisionObject::GetLocalSupportPoint(const CVector3D& dir, double ma
 				unitVec = v.NormalizeOther();
 			}
 			supportPoint += unitVec * margin;
+		}
+	}
+	else if ( m_CollisionObjectType == ConvexHull )
+	{
+		double maxDot = -DBL_MAX;
+	
+		for ( int i = 0; i < (int)m_Vertices.size(); i++ )
+		{
+			const CVector3D& vertex = m_Vertices[i];
+			double dot = vertex.Dot(dir);
+
+			if ( dot > maxDot )
+			{
+				supportPoint = vertex;
+				maxDot = dot;
+			}
 		}
 	}
 	
@@ -251,6 +436,55 @@ void CCollisionObject::Render() const
 		glColor3f(1,1,1);
 		glutWireCone(m_HalfExtent.m_X, 2.0*m_HalfExtent.m_Y, 16, 16);
 		glPopAttrib();
+		glPopMatrix();
+	}
+	else if ( m_CollisionObjectType == ConvexHull )
+	{
+		GLdouble val[16];
+		memset(val, 0, sizeof(GLdouble)*16);
+		
+		double x, y, z;
+		x = 1.0;
+		y = 1.0;
+		z = 1.0;
+
+		GLdouble rotMatrix[16];
+		rotMatrix[0] = x*mat(0, 0); rotMatrix[4] = y*mat(0, 1); rotMatrix[8] =  z*mat(0, 2); rotMatrix[12] = translation.m_X;
+		rotMatrix[1] = x*mat(1, 0); rotMatrix[5] = y*mat(1, 1); rotMatrix[9] =  z*mat(1, 2); rotMatrix[13] = translation.m_Y;
+		rotMatrix[2] = x*mat(2, 0); rotMatrix[6] = y*mat(2, 1); rotMatrix[10] = z*mat(2, 2); rotMatrix[14] = translation.m_Z;
+		rotMatrix[3] = 0;           rotMatrix[7] = 0;           rotMatrix[11] = 0;           rotMatrix[15] = 1;
+
+		glMatrixMode(GL_MODELVIEW);
+
+		glPushMatrix();
+		glMultMatrixd(rotMatrix);
+
+		glPushAttrib(GL_LIGHTING_BIT);
+		//glDisable(GL_LIGHTING);
+
+		glColor3f(0,0,1);
+		glLineWidth(1.0f);
+		
+		glBegin(GL_TRIANGLES);
+
+		for ( int i = 0; i < (int)m_Faces.size(); i++ )
+		{
+			const TriangleFace& face = m_Faces[i];
+
+			for ( int j = 0; j < 3; j++ )
+			{
+				const CVector3D& vertex = m_Vertices[face.indices[j]];
+				const CVector3D& normal = m_Normals[face.indices[j]];
+
+				glNormal3d(normal.m_X, normal.m_Y, normal.m_Z);
+				glVertex3d(vertex.m_X, vertex.m_Y, vertex.m_Z);
+			}
+		}
+
+		glEnd();
+
+		glPopAttrib();
+		
 		glPopMatrix();
 	}
 }

@@ -29,6 +29,7 @@
     <ClInclude Include="Matrix33.h" />
     <ClInclude Include="Matrix44.h" />
     <ClInclude Include="NarrowPhaseGJK.h" />
+    <ClInclude Include="Point2D.h" />
     <ClInclude Include="Point3D.h" />
     <ClInclude Include="Quaternion.h" />
     <ClInclude Include="Simplex.h" />
@@ -47,6 +48,7 @@
     <ClCompile Include="Matrix33.cpp" />
     <ClCompile Include="Matrix44.cpp" />
     <ClCompile Include="NarrowPhaseGJK.cpp" />
+    <ClCompile Include="Point2D.cpp" />
     <ClCompile Include="Point3D.cpp" />
     <ClCompile Include="Quaternion.cpp" />
     <ClCompile Include="Simplex.cpp" />
