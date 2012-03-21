@@ -476,7 +476,7 @@ void InitGL() {
 	//------------------------------------------------
 	g_pGJK = new CNarrowPhaseGJK();
 	g_pConvexObj = new CCollisionObject();
-	g_pConvexObj->SetCollisionObjectType(CCollisionObject::Box);
+	g_pConvexObj->SetCollisionObjectType(CCollisionObject::Sphere);
 	g_pConvexObj->GetTransform().GetTranslation().Set(0.0, 2.0, 0.0); 
 	g_pConvexObj->SetSize(3.0, 2.0, 1.0);
 	g_pConvexObj->SetColor(1.0, 0.0, 0.0);
@@ -979,7 +979,7 @@ void StepPhysics(float dt ) {
 
 	Integrate(dt);
 
-	for(int i=0;i<total_points;i++) 
+	for(unsigned int i=0;i<total_points;i++) 
 	{
 		glm::vec3& p = X[i];
 		clothVertices[i]->GetTransform().GetTranslation().Set(p.x, p.y, p.z);
@@ -996,7 +996,7 @@ void StepPhysics(float dt ) {
 	CMatrix33 rot;
 	rot.SetRotation(CVector3D(1.0, 1.0, 1.0).Normalize(), angleRad);
 
-	g_pConvexObj->GetTransform().GetRotation().SetRotation(CVector3D(-1.0, 1.0, 1.0).Normalize(), angleRad);
+	//g_pConvexObj->GetTransform().GetRotation().SetRotation(CVector3D(-1.0, 1.0, 1.0).Normalize(), angleRad);
 }
 
 void main(int argc, char** argv) {

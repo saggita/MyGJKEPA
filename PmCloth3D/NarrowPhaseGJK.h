@@ -39,8 +39,6 @@ protected:
 	CEPAAlgorithm m_EPAAlgorithm;
 
 protected:
-	bool RunEPAAlgorithmWithMargins(const CCollisionObject& objA, const CCollisionObject& objB, const CVector3D& v) const;
-	
 	// helper function to generate CollisionInfo
 	bool GenerateCollisionInfo(const CCollisionObject& objA, const CCollisionObject& objB, const CTransform &transB2A, const CGJKSimplex& simplex, CVector3D v, double distSqr, CNarrowCollisionInfo* pCollisionInfo) const;
 

@@ -175,10 +175,107 @@ bool CEPAPolytope::AddTetrahedron(const CVector3D& p0, const CVector3D& p1, cons
 	return true;
 }
 
-// p0, p1 and p2 form a triangle. With the triangle, p and q create two tetrahedrons. 
-// With gluing these two tetrahedrons, hexahedron can be formed.
-bool CEPAPolytope::AddHexahedron(const CVector3D& p0, const CVector3D& p1, const CVector3D& p2, const CVector3D& p, const CVector3D& q)
+// p0, p1 and p2 form a triangle. With this triangle, p and q create two tetrahedrons. 
+// w0 is in the side of the direction which is calculated by (p1-p0).Cross(p2-p0)
+// w1 is in the side of the direction which is calculated by -(p1-p0).Cross(p2-p0)
+// By gluing these two tetrahedrons, hexahedron can be formed.
+bool CEPAPolytope::AddHexahedron(const CVector3D& p0, const CVector3D& p1, const CVector3D& p2, const CVector3D& w0, const CVector3D& w1)
 {
+	assert((p1-p0).Cross(p2-p0).Dot(w0-p0) > 0);
+	assert((p1-p0).Cross(p2-p0).Dot(w1-p0) < 0);
+
+	int index[5];
+	m_Vertices.push_back(p0);
+	index[0] = (int)m_Vertices.size() - 1;
+
+	m_Vertices.push_back(p1);
+	index[1] = (int)m_Vertices.size() - 1;
+
+	m_Vertices.push_back(p2);
+	index[2] = (int)m_Vertices.size() - 1;
+
+	m_Vertices.push_back(w0);
+	index[3] = (int)m_Vertices.size() - 1;
+
+	m_Vertices.push_back(w1);
+	index[4] = (int)m_Vertices.size() - 1;
+
+	CEPATriangle* pTri[6];
+
+	pTri[0] = new CEPATriangle(index[0], index[1], index[3]); assert(CheckWinding(m_Vertices[index[0]], m_Vertices[index[1]], m_Vertices[index[3]]));
+	pTri[1] = new CEPATriangle(index[1], index[2], index[3]); assert(CheckWinding(m_Vertices[index[1]], m_Vertices[index[2]], m_Vertices[index[3]]));
+	pTri[2] = new CEPATriangle(index[2], index[0], index[3]); assert(CheckWinding(m_Vertices[index[2]], m_Vertices[index[0]], m_Vertices[index[3]]));
+	pTri[3] = new CEPATriangle(index[1], index[0], index[4]); assert(CheckWinding(m_Vertices[index[1]], m_Vertices[index[0]], m_Vertices[index[4]]));
+	pTri[4] = new CEPATriangle(index[2], index[1], index[4]); assert(CheckWinding(m_Vertices[index[2]], m_Vertices[index[1]], m_Vertices[index[4]]));
+	pTri[5] = new CEPATriangle(index[0], index[2], index[4]); assert(CheckWinding(m_Vertices[index[0]], m_Vertices[index[2]], m_Vertices[index[4]]));
+	
+	// construct adjacency
+	pTri[0]->m_AdjacentTriangles[0] = pTri[3];
+	pTri[0]->m_AdjacentTriangles[1] = pTri[1];
+	pTri[0]->m_AdjacentTriangles[2] = pTri[2];
+
+	pTri[1]->m_AdjacentTriangles[0] = pTri[4];
+	pTri[1]->m_AdjacentTriangles[1] = pTri[2];
+	pTri[1]->m_AdjacentTriangles[2] = pTri[0];
+
+	pTri[2]->m_AdjacentTriangles[0] = pTri[5];
+	pTri[2]->m_AdjacentTriangles[1] = pTri[0];
+	pTri[2]->m_AdjacentTriangles[2] = pTri[1];
+
+	pTri[3]->m_AdjacentTriangles[0] = pTri[0];
+	pTri[3]->m_AdjacentTriangles[1] = pTri[5];
+	pTri[3]->m_AdjacentTriangles[2] = pTri[4];
+
+	pTri[4]->m_AdjacentTriangles[0] = pTri[1];
+	pTri[4]->m_AdjacentTriangles[1] = pTri[3];
+	pTri[4]->m_AdjacentTriangles[2] = pTri[5];
+
+	pTri[5]->m_AdjacentTriangles[0] = pTri[2];
+	pTri[5]->m_AdjacentTriangles[1] = pTri[4];
+	pTri[5]->m_AdjacentTriangles[2] = pTri[3];
+
+	pTri[0]->m_Edges[0]->m_pPairEdge = pTri[3]->m_Edges[0];
+	pTri[0]->m_Edges[1]->m_pPairEdge = pTri[1]->m_Edges[2];
+	pTri[0]->m_Edges[2]->m_pPairEdge = pTri[2]->m_Edges[1];
+
+	pTri[1]->m_Edges[0]->m_pPairEdge = pTri[4]->m_Edges[0];
+	pTri[1]->m_Edges[1]->m_pPairEdge = pTri[2]->m_Edges[2];
+	pTri[1]->m_Edges[2]->m_pPairEdge = pTri[0]->m_Edges[1];
+
+	pTri[2]->m_Edges[0]->m_pPairEdge = pTri[5]->m_Edges[0];
+	pTri[2]->m_Edges[1]->m_pPairEdge = pTri[0]->m_Edges[2];
+	pTri[2]->m_Edges[2]->m_pPairEdge = pTri[1]->m_Edges[1];
+
+	pTri[3]->m_Edges[0]->m_pPairEdge = pTri[0]->m_Edges[0];
+	pTri[3]->m_Edges[1]->m_pPairEdge = pTri[5]->m_Edges[2];
+	pTri[3]->m_Edges[2]->m_pPairEdge = pTri[4]->m_Edges[1];
+
+	pTri[4]->m_Edges[0]->m_pPairEdge = pTri[1]->m_Edges[0];
+	pTri[4]->m_Edges[1]->m_pPairEdge = pTri[3]->m_Edges[2];
+	pTri[4]->m_Edges[2]->m_pPairEdge = pTri[5]->m_Edges[1];
+
+	pTri[5]->m_Edges[0]->m_pPairEdge = pTri[2]->m_Edges[0];
+	pTri[5]->m_Edges[1]->m_pPairEdge = pTri[4]->m_Edges[2];
+	pTri[5]->m_Edges[2]->m_pPairEdge = pTri[3]->m_Edges[1];
+
+	CEPATriangleComparison compare;
+
+	for ( int i = 0; i < 6; i++ )
+	{
+		pTri[i]->ComputeClosestPointToOrigin(*this);
+
+#ifdef _DEBUG
+		pTri[i]->m_Index = m_Count++;
+
+		for ( int j = 0; j < 3; j++ )
+		{
+			assert(pTri[i]->m_AdjacentTriangles[j] == pTri[i]->m_Edges[j]->m_pPairEdge->GetEPATriangle());
+		}
+#endif
+
+		m_Triangles.push_back(pTri[i]);
+		std::push_heap(m_Triangles.begin(), m_Triangles.end(), compare);
+	}
 
 	return true;
 }
@@ -210,10 +307,21 @@ bool CEPAPolytope::ExpandPolytopeWithNewPoint(const CVector3D& w, CEPATriangle* 
 
 	pTriangleUsedToObtainW->SetObsolete(true);
 
-	// 'Flood Fill Silhouette' algorithm to detect visible triangles from w and edges in loop.
+#ifdef _DEBUG	
+	for ( int i = 0; i < m_Triangles.size(); i++ )
+	{
+		if ( m_Triangles[i]->IsObsolete() )
+			continue;
+
+		int index = m_Triangles[i]->m_Index;
+		bool b = m_Triangles[i]->IsVisibleFromPoint(w);
+	}
+#endif
+
+	// 'Flood Fill Silhouette' algorithm to detect visible triangles and silhouette loop of edges from w.
 	for ( int i = 0; i < 3; i++ )
 		pTriangleUsedToObtainW->m_Edges[i]->m_pPairEdge->m_pEPATriangle->DoSilhouette(w, pTriangleUsedToObtainW->m_Edges[i], *this);
-
+	
 	assert(m_SilhouetteVertices.size() >= 3);
 	assert(m_SilhouetteTriangles.size() >= 3);
 

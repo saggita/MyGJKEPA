@@ -23,7 +23,7 @@ void CGJKSimplex::AddPoint(const CVector3D& point, const CVector3D& suppPointA, 
 
     // Look for the bit corresponding to one of the four point that is not in
     // the current simplex
-    while ( overlap(m_CurBits, m_LastBit) ) 
+	while ( (m_CurBits & m_LastBit) != 0 )
 	{
         m_LastFound++;
         m_LastBit <<= 1;
@@ -50,7 +50,7 @@ bool CGJKSimplex::IsDegenerate(const CVector3D& point) const
 
     for ( int i = 0, bit = 0x1; i < 4; i++, bit <<= 1 ) 
 	{
-        if ( overlap(m_AllBits, bit) && point == m_Points[i] ) 
+        if ( ( (m_AllBits & bit) != 0 ) && point == m_Points[i] ) 
 			return true;
     }
 
@@ -64,7 +64,7 @@ void CGJKSimplex::UpdateDiffLengths()
 
     for ( i=0, bit = 0x1; i < 4; i++, bit <<= 1 ) 
 	{
-        if ( overlap(m_CurBits, bit) ) 
+		if ( (m_CurBits & bit) != 0 )
 		{
             m_DiffLength[i][m_LastFound] = m_Points[i] - m_Points[m_LastFound];
             m_DiffLength[m_LastFound][i] = -m_DiffLength[i][m_LastFound];
@@ -85,7 +85,7 @@ int CGJKSimplex::GetPoints(std::vector<CVector3D>& suppPointsA, std::vector<CVec
 
 	for ( i = 0, bit = 0x1; i < 4; i++, bit <<= 1 ) 
 	{
-		if ( overlap(m_CurBits, bit) ) 
+		if ( (m_CurBits & bit) != 0 )
 		{
 			suppPointsA.push_back(m_SuppPointsA[count]);
 			suppPointsB.push_back(m_SuppPointsB[count]);
@@ -109,7 +109,7 @@ void CGJKSimplex::CalcDeterminants()
 
     for ( int i = 0, bitI = 0x1; i < 4; i++, bitI <<= 1 ) 
 	{
-        if ( overlap(m_CurBits, bitI) ) 
+		if ( (m_CurBits & bitI) != 0 )
 		{
             Bits bit2 = bitI | m_LastBit;
 
@@ -118,7 +118,7 @@ void CGJKSimplex::CalcDeterminants()
 
             for ( int j=0, bitJ = 0x1; j<i; j++, bitJ <<= 1 ) 
 			{
-                if ( overlap(m_CurBits, bitJ) ) 
+                if ( (m_CurBits & bitJ) != 0 )
 				{
                     int k;
                     Bits bit3 = bitJ | bit2;
@@ -173,7 +173,7 @@ bool CGJKSimplex::IsAffinelyIndependent() const
 
     for ( i=0, bit = 0x1; i < 4; i++, bit <<= 1 ) 
 	{
-        if ( overlap(m_AllBits, bit) ) 
+		if ( (m_AllBits & bit) != 0 )
 		{
             sum += m_Det[m_AllBits][i];
         }
@@ -191,9 +191,9 @@ bool CGJKSimplex::IsValidSubset(Bits subset) const
 
     for ( i = 0, bit = 0x1; i < 4; i++, bit <<= 1 ) 
 	{
-        if ( overlap(m_AllBits, bit) ) 
+		if ( (m_AllBits & bit) != 0 )		
 		{
-            if ( overlap(subset, bit) ) 
+			if ( (subset & bit) != 0 )
 			{
                 if ( m_Det[subset][i] <= 0.0 )
                     return false;
@@ -217,7 +217,7 @@ void CGJKSimplex::ClosestPointAandB(CVector3D& pA, CVector3D& pB) const {
 
     for ( i=0, bit=0x1; i<4; i++, bit <<= 1 ) 
 	{
-        if ( overlap(m_CurBits, bit) ) 
+		if ( (m_CurBits & bit) != 0 )
 		{
             sum += m_Det[m_CurBits][i];
             pA += m_Det[m_CurBits][i] * m_SuppPointsA[i];
@@ -251,7 +251,7 @@ bool CGJKSimplex::RunJohnsonAlgorithm(CVector3D& v)
 
 			for ( int i=0, bit = 0x1; i < 4; i++, bit <<= 1 ) 
 			{
-				if ( overlap(m_CurBits, bit) ) 
+				if ( (m_CurBits & bit) != 0 )
 				{
 					sum += m_Det[m_CurBits][i];
 					v += m_Det[m_CurBits][i] * m_Points[i];
@@ -294,7 +294,7 @@ CVector3D CGJKSimplex::computeClosestPointForSubset(Bits subset)
     for (i=0, bit=0x1; i<4; i++, bit <<= 1) 
 	{
         // If the current point is in the subset
-        if (overlap(subset, bit)) 
+		if ( (subset & bit) != 0 )
 		{
             // deltaX = sum of all m_Det[subset][i]
             sum += m_Det[subset][i];

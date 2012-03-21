@@ -9,6 +9,11 @@ CEPATriangle::CEPATriangle() : m_bObsolete(false)
 {
 	for ( int i = 0; i < 3; i++ )
 		m_Edges[i] = NULL;
+
+#ifdef _DEBUG
+	m_Index = 0;
+	m_bVisible = false;
+#endif
 }
 
 // vertex 0, 1 and 2 should be formed in counter clockwise

@@ -26,7 +26,6 @@ private:
 	Bits m_LastBit; // m_LastBit = 1 << m_LastFound
 	Bits m_AllBits; // m_AllBits = m_CurBits | m_LastBit
 
-    bool overlap(Bits a, Bits b) const;                         
     bool IsSubset(Bits a, Bits b) const;                        
     bool IsValidSubset(Bits subset) const;                      
     void UpdateDiffLengths();                                   
@@ -45,11 +44,6 @@ public:
     bool RunJohnsonAlgorithm(CVector3D& v);                                                 
 };
 
-// Return true if some bits of "a" overlap with bits of "b"
-inline bool CGJKSimplex::overlap(Bits a, Bits b) const 
-{
-    return ((a & b) != 0x0);
-}
 
 // Return true if the bits of "b" is a subset of the bits of "a"
 inline bool CGJKSimplex::IsSubset(Bits containerSet, Bits subSet) const 

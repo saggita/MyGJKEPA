@@ -16,7 +16,6 @@ CEPAAlgorithm::~CEPAAlgorithm(void)
 
 bool CEPAAlgorithm::ComputePenetrationDepthAndContactPoints(const CGJKSimplex& simplex, CCollisionObject& objA, CCollisionObject& objB, CVector3D& v, CNarrowCollisionInfo* pCollisionInfo, int maxIteration /*= 30*/)
 {
-	// As we start, we only need maximum four points. Because the simplex will be a tetrahedron as maximum. 
 	std::vector<CVector3D> suppPointsA;       
     std::vector<CVector3D> suppPointsB;    
     std::vector<CVector3D> points;   
@@ -45,6 +44,7 @@ bool CEPAAlgorithm::ComputePenetrationDepthAndContactPoints(const CGJKSimplex& s
 	m_Polytope.Clear();
 
 	assert(numVertices == points.size());
+	assert(m_Polytope.GetTriangles().size() == 0);
 
 	switch ( numVertices )
 	{
@@ -62,8 +62,8 @@ bool CEPAAlgorithm::ComputePenetrationDepthAndContactPoints(const CGJKSimplex& s
 				// The origin lies in a triangle. 
 				// Add two new vertices to create a hexahedron. It is explained in Geno's book. 
 				CVector3D n = (points[1] - points[0]).Cross(points[2] - points[0]);
-				CVector3D w0 =  objA.GetLocalSupportPoint(-n) - transB2A * objB.GetLocalSupportPoint(rotA2B * n);
-				CVector3D w1 =  objA.GetLocalSupportPoint(n) - transB2A * objB.GetLocalSupportPoint(rotA2B * (-n));
+				CVector3D w0 =  objA.GetLocalSupportPoint(n) - transB2A * objB.GetLocalSupportPoint(rotA2B * (-n));
+				CVector3D w1 =  objA.GetLocalSupportPoint(-n) - transB2A * objB.GetLocalSupportPoint(rotA2B * n);
 
 				m_Polytope.AddHexahedron(points[0], points[1], points[2], w0, w1);
 			}
@@ -71,7 +71,6 @@ bool CEPAAlgorithm::ComputePenetrationDepthAndContactPoints(const CGJKSimplex& s
 		case 4:
 			{
 				// In this cae, simplex computed from GJK is a tetrahedron. 
-				//assert(CEPAPolytope::IsOriginInTetrahedron(points[0], points[1], points[2], points[3]));
 				m_Polytope.AddTetrahedron(points[0], points[1], points[2], points[3]);
 			}
 			break;
@@ -95,19 +94,24 @@ bool CEPAAlgorithm::ComputePenetrationDepthAndContactPoints(const CGJKSimplex& s
 
 		CVector3D supportPointA = objA.GetLocalSupportPoint(v, objA.GetMargin());
 		CVector3D supportPointB = transB2A * objB.GetLocalSupportPoint(rotA2B * (-v), objB.GetMargin());
+
+		/*CVector3D supportPointA = objA.GetLocalSupportPoint(v);
+		CVector3D supportPointB = transB2A * objB.GetLocalSupportPoint(rotA2B * (-v));*/
+
 		CVector3D w = supportPointA - supportPointB;
 
 		// Compute upper and lower bounds
 		upperBound = std::min(upperBound, w * v.NormalizeOther());
 
 #ifdef _DEBUG
-		lowerBound = std::max(lowerBound, v.Length());
-		assert(lowerBound == v.Length());
+ 		//lowerBound = std::max(lowerBound, v.Length());
+		//assert(lowerBound == v.Length());
 #endif
 
-		lowerBound = v.Length();
+		//lowerBound = v.Length();
+		lowerBound = std::max(lowerBound, v.Length());
 
-		if ( upperBound - lowerBound < 1e-6 )
+		if ( upperBound - lowerBound < 1e-4 || numIter == maxIteration - 1 )
 		{
 			pCollisionInfo->bIntersect = true;
 			pCollisionInfo->penetrationDepth = 0.5 * (upperBound + lowerBound);

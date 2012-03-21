@@ -52,11 +52,11 @@ void CClothSim3D::Create()
 
 	// Object 1
 	CCollisionObject* pPointObj = new CCollisionObject();
-	pPointObj->SetCollisionObjectType(CCollisionObject::Box);
+	pPointObj->SetCollisionObjectType(CCollisionObject::Sphere);
 	pPointObj->SetSize(3.0, 4.0, 5.0);
 	pPointObj->SetColor(0.5, 0.5, 0.5);
 	pPointObj->GetTransform().GetRotation().SetRotation(CQuaternion(CVector3D(1.0, 0.0, 0).Normalize(), 0));
-	pPointObj->GetTransform().GetTranslation().Set(2.0, 7.0, 0.0);
+	pPointObj->GetTransform().GetTranslation().Set(2.0, 5.0, 0.0);
 	//pPointObj->GetTransform().GetTranslation().Set(2.0, 10.0, 0.0);
 
 	m_pNarrorPhase->m_CollisionObjectList.push_back(pColObj);

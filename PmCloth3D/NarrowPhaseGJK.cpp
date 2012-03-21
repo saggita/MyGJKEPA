@@ -150,8 +150,9 @@ bool CNarrowPhaseGJK::CheckCollision(CCollisionObject& objA, CCollisionObject& o
 		// a simplex containing origin. In this case, the simplex could be a vertex, a line segment, a triangle or a tetrahedron. 
 		// We stop iterating and pass this simplex to EPA to find penetration depth and closest points.
 		// TODO: FreeSolid is using 'approxZero(v)'. Do I need to use it rather than a line below?
-		if ( distSqr <= DBL_EPSILON * simplex.MaxLengthSqr() ) 
-			break;
+		//if ( distSqr <= DBL_EPSILON * simplex.MaxLengthSqr() ) 
+		if ( distSqr <= 1e-6 ) 
+			return false; // TODO:break or return false?
 				
 		++numIter;
 	} 
@@ -159,34 +160,9 @@ bool CNarrowPhaseGJK::CheckCollision(CCollisionObject& objA, CCollisionObject& o
 	// TODO: Need to invesgate hybrid method metioned in Geno's book.
 	// TODO: Need to use GJK to compute the shallow penetration depth.
 
-	//return RunEPAAlgorithmWithMargins(objA, objB, v);
-	
 	return m_EPAAlgorithm.ComputePenetrationDepthAndContactPoints(simplex, objA, objB, v, pCollisionInfo);
 }
 
 
-bool CNarrowPhaseGJK::RunEPAAlgorithmWithMargins(const CCollisionObject& objA, const CCollisionObject& objB, const CVector3D& v) const
-{
-	//CVector3D suppPntA; // support point from object A
-	//CVector3D suppPntB; // support point from object B
-	//CVector3D w; // support point of Minkowski difference(A-B)
-	//double vw; // v dot w
-	//double margin = objA.GetMargin() + objB.GetMargin();
-	//double marginSqr = margin * margin;
-	//CGJKSimplex simplex;
-
-	//// transform a local position in objB space to local position in objA space
-	//CTransform transB2A = objA.GetTransform().InverseOther() * objB.GetTransform();
-
-	//// rotate matrix which transform a local vector in objA space to local vector in objB space
-	//CMatrix33 rotA2B = objB.GetTransform().GetRotation().GetMatrix33().TransposeOther() * objA.GetTransform().GetRotation().GetMatrix33();
-
-	//double distSqr = DBL_MAX;
-	//double distSqrPrev = distSqr;
-
-	//int numIter = 0;
-
-	return true;	
-}
 
 
