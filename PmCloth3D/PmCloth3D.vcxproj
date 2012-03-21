@@ -19,69 +19,38 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="aabb.h" />
-    <ClInclude Include="BVHMasterNode.h" />
-    <ClInclude Include="BVHMasterTree.h" />
-    <ClInclude Include="BVHNode.h" />
-    <ClInclude Include="BVHTree.h" />
-    <ClInclude Include="CGSolver.h" />
-    <ClInclude Include="Cloth3D.h" />
     <ClInclude Include="ClothSim3D.h" />
-    <ClInclude Include="CollisionDetections.h" />
-    <ClInclude Include="BoundingVolume.h" />
     <ClInclude Include="CollisionObject.h" />
     <ClInclude Include="EPAAlgorithm.h" />
     <ClInclude Include="EPAEdge.h" />
     <ClInclude Include="EPAPolytope.h" />
     <ClInclude Include="EPATriangle.h" />
-    <ClInclude Include="kDOP.h" />
     <ClInclude Include="mathUtil.h" />
     <ClInclude Include="Matrix33.h" />
     <ClInclude Include="Matrix44.h" />
-    <ClInclude Include="MINRESSolver.h" />
     <ClInclude Include="NarrowPhaseGJK.h" />
-    <ClInclude Include="Point2D.h" />
     <ClInclude Include="Point3D.h" />
     <ClInclude Include="Quaternion.h" />
-    <ClInclude Include="resource.h" />
-    <ClInclude Include="RigidBody.h" />
     <ClInclude Include="Simplex.h" />
-    <ClInclude Include="SparseMatrix.h" />
-    <ClInclude Include="StringTokenizer.h" />
     <ClInclude Include="Transform.h" />
-    <ClInclude Include="TriangleCloth3D.h" />
     <ClInclude Include="Vector2D.h" />
     <ClInclude Include="Vector3D.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="aabb.cpp" />
-    <ClCompile Include="BVHMasterNode.cpp" />
-    <ClCompile Include="BVHMasterTree.cpp" />
-    <ClCompile Include="BVHNode.cpp" />
-    <ClCompile Include="BVHTree.cpp" />
-    <ClCompile Include="CGSolver.cpp" />
-    <ClCompile Include="Cloth3D.cpp" />
     <ClCompile Include="ClothSim3D.cpp" />
-    <ClCompile Include="CollisionDetections.cpp" />
     <ClCompile Include="CollisionObject.cpp" />
     <ClCompile Include="EPAAlgorithm.cpp" />
     <ClCompile Include="EPAEdge.cpp" />
     <ClCompile Include="EPAPolytope.cpp" />
     <ClCompile Include="EPATriangle.cpp" />
-    <ClCompile Include="kDOP.cpp" />
     <ClCompile Include="mathUtil.cpp" />
     <ClCompile Include="Matrix33.cpp" />
     <ClCompile Include="Matrix44.cpp" />
     <ClCompile Include="NarrowPhaseGJK.cpp" />
-    <ClCompile Include="Point2D.cpp" />
     <ClCompile Include="Point3D.cpp" />
     <ClCompile Include="Quaternion.cpp" />
-    <ClCompile Include="RigidBody.cpp" />
     <ClCompile Include="Simplex.cpp" />
-    <ClCompile Include="SparseMatrix.cpp" />
-    <ClCompile Include="StringTokenizer.cpp" />
     <ClCompile Include="Transform.cpp" />
-    <ClCompile Include="TriangleCloth3D.cpp" />
     <ClCompile Include="Vector2D.cpp" />
     <ClCompile Include="Vector3D.cpp" />
   </ItemGroup>

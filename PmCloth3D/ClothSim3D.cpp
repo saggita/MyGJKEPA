@@ -13,19 +13,11 @@
 #include <algorithm>
 
 #include "ClothSim3D.h"
-#include "BVHTree.h"
-#include "BVHMasterTree.h"
 #include "mathUtil.h"
-#include "CollisionDetections.h"
-#include "MINRESSolver.h"
 
 CClothSim3D::CClothSim3D(void)
 { 
-	m_Gravity= CVector3D(0, 0, -9.82);
-
 	m_Substeps = 1;
-	m_pBVHMasterTree = NULL; 
-	m_BroadPhaseTolerance = 1e-8;
 }
 
 CClothSim3D::~CClothSim3D(void)
@@ -68,31 +60,11 @@ void CClothSim3D::Create()
 	g_MarkerB.SetColor(1.0, 1.0, 0.0);
 	g_MarkerA.SetCollisionObjectType(CCollisionObject::Sphere);
 	g_MarkerB.SetCollisionObjectType(CCollisionObject::Sphere);		
-	
-	m_pBVHMasterTree = new CBVHMasterTree();
-
-	for ( int i = 0; i < (int)m_ClothList.size(); i++ )
-		m_pBVHMasterTree->AddBVHTree(&m_ClothList[i]->GetBVHTree());
-
-	m_pBVHMasterTree->Build();
 }
 
 // TODO:possible memory leak or access violation. Need to do check this code..
 void CClothSim3D::ClearAll()
 {
-	for ( unsigned int i = 0; i < m_ClothList.size(); i++ )
-	{		
-		if ( m_ClothList[i] )
-		{
-			delete m_ClothList[i];
-			m_ClothList[i] = NULL;
-		}
-	}
-
-	m_ClothList.clear();
-	
-	delete m_pBVHMasterTree;
-
 	if ( m_pNarrorPhase )
 	{
 		for ( std::vector<CCollisionObject*>::iterator iter = m_pNarrorPhase->m_CollisionObjectList.begin(); iter != m_pNarrorPhase->m_CollisionObjectList.end(); iter++ )
@@ -106,37 +78,6 @@ void CClothSim3D::ClearAll()
 		delete m_pNarrorPhase;
 }
 
-void CClothSim3D::SetGravity(const CVector3D& gravity)
-{
-	m_Gravity = gravity;
-
-	for ( unsigned int i = 0; i < m_ClothList.size(); i++ )
-	{		
-		m_ClothList[i]->SetGravity(m_Gravity);		
-	}
-}
-
-const CVector3D& CClothSim3D:: GetGravity() const
-{
-	return m_Gravity;
-}
-
-void CClothSim3D::AddCloth(CCloth3D* pCloth)
-{	
-	m_ClothList.push_back(pCloth);
-
-	if ( m_pBVHMasterTree )
-		delete m_pBVHMasterTree;
-
-	m_pBVHMasterTree = new CBVHMasterTree();
-
-	for ( int i = 0; i < (int)m_ClothList.size(); i++ )
-		m_pBVHMasterTree->AddBVHTree(&m_ClothList[i]->GetBVHTree());
-
-	m_pBVHMasterTree->Build();
-
-	return;
-}
 
 unsigned int CClothSim3D::Update(double dt)
 {
@@ -156,10 +97,7 @@ unsigned int CClothSim3D::SubsUpdate(double dt)
 	m_dt = dt;
 
 	unsigned int numIter = 0;
-	m_NumOfUnresolvedCols = 0;
-	m_NumOfTriTriCols = 0;
-	m_NumIterForGlobalCol = 0;
-	
+
 	CNarrowCollisionInfo collisionInfo;
 	bool bCollision = m_pNarrorPhase->CheckCollision(*m_pNarrorPhase->m_CollisionObjectList[0], *m_pNarrorPhase->m_CollisionObjectList[1], &collisionInfo, true);
 
@@ -187,19 +125,8 @@ unsigned int CClothSim3D::SubsUpdate(double dt)
 
 void CClothSim3D::Render() const
 {	
-	//glScalef(5.0f, 5.0f, 5.0f);
-	for ( std::vector<CCloth3D*>::const_iterator iter = m_ClothList.begin(); iter != m_ClothList.end(); iter++ )
-	{
-		(**iter).Render();
-	}
-
 	glEnable(GL_POLYGON_OFFSET_FILL);
 	glPolygonOffset(1,1);
-
-	/*for ( std::vector<CCollisionObject*>::const_iterator iter = m_pNarrorPhase->m_CollisionObjectList.begin(); iter != m_pNarrorPhase->m_CollisionObjectList.end(); iter++ )
-	{
-		(**iter).Render();
-	}*/
 
 	for ( int i = m_pNarrorPhase->m_CollisionObjectList.size()-1; i >= 0; i-- )
 	{

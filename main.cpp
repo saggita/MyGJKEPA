@@ -15,8 +15,6 @@
 #include "HGLCamera.h"
 #include "PmCloth3D\ClothSim3D.h"
 
-#define MY_CLOTH 1 
-
 using namespace std;
 
 const int width = 1024, height = 800;
@@ -32,12 +30,7 @@ double g_dt = 0.001;
 
 void InitSimulation()
 {
-	if ( MY_CLOTH )
-	{
-		g_Cloth.Create();
-		g_Cloth.SetGravity(CVector3D(0, -9.82, 0));
-		g_Cloth.SetSubsteps(1);
-	}	
+	g_Cloth.Create();
 }
 
 void InitGL()
@@ -110,22 +103,12 @@ void OnRender()
 	glLightfv(GL_LIGHT0, GL_POSITION, lightPosition);
 	glEnable(GL_LIGHT0);
 
-	//-------
-	// Cloth
-	//-------
-	if ( MY_CLOTH )
-	{
-		if ( !bPause )
-			g_Cloth.Update(g_dt);
+	if ( !bPause )
+		g_Cloth.Update(g_dt);
 	
-		int NumIterGlobalCol = g_Cloth.m_NumIterForGlobalCol;
-		int NumOfUnresolvedCols = g_Cloth.m_NumOfUnresolvedCols;
-		int NumOfTriTriCols = g_Cloth.m_NumOfTriTriCols;
-
-		glEnable(GL_LIGHTING);
-		glEnable(GL_LIGHT0);
-		g_Cloth.Render();
-	}
+	glEnable(GL_LIGHTING);
+	glEnable(GL_LIGHT0);
+	g_Cloth.Render();
 			
 	glutSwapBuffers();
 }
