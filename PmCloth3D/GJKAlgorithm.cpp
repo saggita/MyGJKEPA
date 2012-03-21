@@ -1,18 +1,19 @@
 #include <cassert>
-#include "NarrowPhaseGJK.h"
+#include "GJKAlgorithm.h"
 #include "EPAAlgorithm.h"
-#include "Simplex.h"
+#include "GJKSimplex.h"
+#include "NarrowPhaseCollisionDetection.h"
 
-CNarrowPhaseGJK::CNarrowPhaseGJK() 
+CGJKAlgorithm::CGJKAlgorithm() 
 {
 	
 }
 
-CNarrowPhaseGJK::~CNarrowPhaseGJK(void)
+CGJKAlgorithm::~CGJKAlgorithm(void)
 {
 }
 
-bool CNarrowPhaseGJK::GenerateCollisionInfo(const CCollisionObject& objA, const CCollisionObject& objB, const CTransform &transB2A, const CGJKSimplex& simplex, CVector3D v, double distSqr, CNarrowCollisionInfo* pCollisionInfo) const
+bool CGJKAlgorithm::GenerateCollisionInfo(const CCollisionObject& objA, const CCollisionObject& objB, const CTransform &transB2A, const CGJKSimplex& simplex, CVector3D v, double distSqr, CNarrowCollisionInfo* pCollisionInfo) const
 {
 	CVector3D closestPntA;
 	CVector3D closestPntB;
@@ -52,7 +53,7 @@ bool CNarrowPhaseGJK::GenerateCollisionInfo(const CCollisionObject& objA, const 
 	return pCollisionInfo->bIntersect;
 }
 
-bool CNarrowPhaseGJK::CheckCollision(CCollisionObject& objA, CCollisionObject& objB, CNarrowCollisionInfo* pCollisionInfo, bool bProximity/* = false*/) 
+bool CGJKAlgorithm::CheckCollision(CCollisionObject& objA, CCollisionObject& objB, CNarrowCollisionInfo* pCollisionInfo, bool bProximity/* = false*/) 
 {
 	CVector3D suppPntA; // support point from object A
 	CVector3D suppPntB; // support point from object B

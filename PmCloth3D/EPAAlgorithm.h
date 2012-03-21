@@ -1,7 +1,7 @@
 #pragma once
 
 #include "CollisionObject.h"
-#include "Simplex.h"
+#include "GJKSimplex.h"
 #include "EPAEdge.h"
 #include "EPATriangle.h"
 #include "EPAPolytope.h"

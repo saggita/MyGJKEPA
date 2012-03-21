@@ -1,6 +1,6 @@
 #include <cfloat>
 #include <cassert>
-#include "Simplex.h"
+#include "GJKSimplex.h"
 
 // Constructor
 CGJKSimplex::CGJKSimplex() : m_CurBits(0x0), m_AllBits(0x0) 
@@ -46,8 +46,6 @@ void CGJKSimplex::AddPoint(const CVector3D& point, const CVector3D& suppPointA, 
 
 bool CGJKSimplex::IsDegenerate(const CVector3D& point) const 
 {
-	Bits bit;
-
     for ( int i = 0, bit = 0x1; i < 4; i++, bit <<= 1 ) 
 	{
         if ( ( (m_AllBits & bit) != 0 ) && point == m_Points[i] ) 
@@ -103,9 +101,6 @@ void CGJKSimplex::CalcDeterminants()
 
 	if ( isEmpty() )
 		return;
-
-    Bits bitI;
-	Bits bitJ;
 
     for ( int i = 0, bitI = 0x1; i < 4; i++, bitI <<= 1 ) 
 	{
@@ -247,7 +242,6 @@ bool CGJKSimplex::RunJohnsonAlgorithm(CVector3D& v)
 			v.Set(0, 0, 0);
 			m_MaxLengthSqr = 0.0;
 			double sum = 0.0;
-			Bits bit;
 
 			for ( int i=0, bit = 0x1; i < 4; i++, bit <<= 1 ) 
 			{

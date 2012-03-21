@@ -57,7 +57,8 @@ DAMAGE.
 #include <glm/gtc/matrix_transform.hpp> //for matrices
 #include <glm/gtc/type_ptr.hpp>
 #include "../PmCloth3D/CollisionObject.h"
-#include "../PmCloth3D/NarrowPhaseGJK.h"
+#include "../PmCloth3D/GJKAlgorithm.h"
+#include "../PmCloth3D/NarrowPhaseCollisionDetection.h"
  
 //undefine if u want to use the default bending constraint of pbd
 #define USE_TRIANGLE_BENDING_CONSTRAINT
@@ -146,7 +147,7 @@ float radius = 1;					 //object space radius of ellipsoid
 //--------------------
 // GJK/EPA stuffs
 //--------------------
-CNarrowPhaseGJK* g_pGJK = NULL;
+CGJKAlgorithm* g_pGJK = NULL;
 CCollisionObject* g_pConvexObj = NULL;
 std::vector<CCollisionObject*> clothVertices;
 
@@ -472,9 +473,9 @@ void InitGL() {
 	inverse_ellipsoid = glm::inverse(ellipsoid);
 
 	//------------------------------------------------
-	// GJK/EPA collision detectin and a convex object
+	// GJK/EPA collision detection and a convex object
 	//------------------------------------------------
-	g_pGJK = new CNarrowPhaseGJK();
+	g_pGJK = new CGJKAlgorithm();
 	g_pConvexObj = new CCollisionObject();
 	g_pConvexObj->SetCollisionObjectType(CCollisionObject::Sphere);
 	g_pConvexObj->GetTransform().GetTranslation().Set(0.0, 2.0, 0.0); 

@@ -1,6 +1,6 @@
 #include <cassert>
 #include "EPAEdge.h"
-#include "NarrowPhaseGJK.h"
+
 
 CEPAEdge::CEPAEdge()
 {

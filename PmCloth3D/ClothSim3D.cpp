@@ -14,6 +14,8 @@
 
 #include "ClothSim3D.h"
 #include "mathUtil.h"
+#include "NarrowPhaseCollisionDetection.h"
+#include "CollisionObject.h"
 
 CClothSim3D::CClothSim3D(void)
 { 
@@ -32,27 +34,26 @@ void CClothSim3D::Create()
 {	
 	ClearAll();
 
-	m_pNarrorPhase = new CNarrowPhaseGJK();
+	m_pNarrorPhase = new CNarrowPhaseCollisionDetection();
 	
 	// Object 0
-	CCollisionObject* pColObj = new CCollisionObject();
-	pColObj->SetCollisionObjectType(CCollisionObject::Box);
-	pColObj->GetTransform().GetTranslation().Set(0.0, 2.0, 0.0);
-	pColObj->SetSize(6.0, 3.0, 5.0);
-	pColObj->SetColor(1.0, 0.0, 0.0);
-	pColObj->GetTransform().GetRotation().SetRotation(CQuaternion(CVector3D(1.0, 1.0, 0).Normalize(), 3.141592/3.0));
+	CCollisionObject* pObjectA = new CCollisionObject();
+	pObjectA->SetCollisionObjectType(CCollisionObject::Box);
+	pObjectA->GetTransform().GetTranslation().Set(0.0, 2.0, 0.0);
+	pObjectA->SetSize(6.0, 3.0, 5.0);
+	pObjectA->SetColor(1.0f, 0.0f, 0.0f);
+	pObjectA->GetTransform().GetRotation().SetRotation(CQuaternion(CVector3D(1.0, 1.0, 0).Normalize(), 3.141592/3.0));
 
 	// Object 1
-	CCollisionObject* pPointObj = new CCollisionObject();
-	pPointObj->SetCollisionObjectType(CCollisionObject::ConvexHull);
-	pPointObj->SetSize(3.0, 4.0, 5.0);
-	pPointObj->SetColor(0.7, 0.7, 0.0);
-	pPointObj->GetTransform().GetRotation().SetRotation(CQuaternion(CVector3D(1.0, 0.0, 0).Normalize(), 0));
-	pPointObj->GetTransform().GetTranslation().Set(2.0, 5.0, 0.0);
-	//pPointObj->GetTransform().GetTranslation().Set(2.0, 10.0, 0.0);
+	CCollisionObject* pObjectB = new CCollisionObject();
+	pObjectB->SetCollisionObjectType(CCollisionObject::ConvexHull);
+	pObjectB->SetSize(3.0, 4.0, 5.0);
+	pObjectB->SetColor(0.7f, 0.7f, 0.0f);
+	pObjectB->GetTransform().GetRotation().SetRotation(CQuaternion(CVector3D(1.0, 0.0, 0).Normalize(), 0));
+	pObjectB->GetTransform().GetTranslation().Set(2.0, 5.0, 0.0);
+	//pObjectB->GetTransform().GetTranslation().Set(2.0, 10.0, 0.0);
 
-	m_pNarrorPhase->m_CollisionObjectList.push_back(pColObj);
-	m_pNarrorPhase->m_CollisionObjectList.push_back(pPointObj);
+	m_pNarrorPhase->AddPair(CNarrowCollisionInfo(pObjectA, pObjectB));
 
 	g_MarkerA.SetSize(0.05, 1.5, 1.5);
 	g_MarkerA.SetColor(1.0, 1.0, 0.0);
@@ -66,10 +67,10 @@ void CClothSim3D::ClearAll()
 {
 	if ( m_pNarrorPhase )
 	{
-		for ( std::vector<CCollisionObject*>::iterator iter = m_pNarrorPhase->m_CollisionObjectList.begin(); iter != m_pNarrorPhase->m_CollisionObjectList.end(); iter++ )
+		for ( std::vector<CNarrowCollisionInfo>::iterator iter = m_pNarrorPhase->GetPairs().begin(); iter != m_pNarrorPhase->GetPairs().end(); iter++ )
 		{
-			if ( *iter )
-				delete (*iter);
+			delete (*iter).pObjA;
+			delete (*iter).pObjB;
 		}
 	}
 
@@ -96,13 +97,11 @@ unsigned int CClothSim3D::SubsUpdate(double dt)
 
 	unsigned int numIter = 0;
 
-	CNarrowCollisionInfo collisionInfo;
-	bool bCollision = m_pNarrorPhase->CheckCollision(*m_pNarrorPhase->m_CollisionObjectList[0], *m_pNarrorPhase->m_CollisionObjectList[1], &collisionInfo, true);
-
-	g_MarkerA.GetTransform().GetTranslation() = m_pNarrorPhase->m_CollisionObjectList[0]->GetTransform() * collisionInfo.witnessPntA;
-	g_MarkerB.GetTransform().GetTranslation() = m_pNarrorPhase->m_CollisionObjectList[1]->GetTransform() * collisionInfo.witnessPntB;
-
-	//double dist = (g_MarkerA.GetTransform().GetTranslation() - g_MarkerB.GetTransform().GetTranslation()).Length();
+	if ( m_pNarrorPhase && m_pNarrorPhase->GetPairs().size() > 0 )
+	{
+		g_MarkerA.GetTransform().GetTranslation() = m_pNarrorPhase->GetPairs()[0].pObjA->GetTransform() * m_pNarrorPhase->GetPairs()[0].witnessPntA;
+		g_MarkerB.GetTransform().GetTranslation() = m_pNarrorPhase->GetPairs()[0].pObjB->GetTransform() * m_pNarrorPhase->GetPairs()[0].witnessPntB;
+	}
 
 	CVector3D axis;
 	static double angleRad = 0;
@@ -115,9 +114,14 @@ unsigned int CClothSim3D::SubsUpdate(double dt)
 	CMatrix33 rot;
 	rot.SetRotation(CVector3D(1.0, 1.0, 1.0).Normalize(), angleRad);
 
-	m_pNarrorPhase->m_CollisionObjectList[0]->GetTransform().GetRotation().SetRotation(CVector3D(-1.0, 1.0, 1.0).Normalize(), angleRad);
-	m_pNarrorPhase->m_CollisionObjectList[1]->GetTransform().GetRotation().SetRotation(CVector3D(1.0, 1.0, 0.0).Normalize(), angleRad);
-		
+	if ( m_pNarrorPhase && m_pNarrorPhase->GetPairs().size() > 0 )
+	{
+		m_pNarrorPhase->GetPairs()[0].pObjA->GetTransform().GetRotation().SetRotation(CVector3D(-1.0, 1.0, 1.0).Normalize(), angleRad);
+		m_pNarrorPhase->GetPairs()[0].pObjB->GetTransform().GetRotation().SetRotation(CVector3D(1.0, 1.0, 0.0).Normalize(), angleRad);
+	}
+
+	m_pNarrorPhase->CheckCollisions();
+
 	return 0;
 }
 
@@ -126,9 +130,13 @@ void CClothSim3D::Render() const
 	glEnable(GL_POLYGON_OFFSET_FILL);
 	glPolygonOffset(1,1);
 
-	for ( int i = m_pNarrorPhase->m_CollisionObjectList.size()-1; i >= 0; i-- )
+	if ( m_pNarrorPhase )
 	{
-		m_pNarrorPhase->m_CollisionObjectList[i]->Render();
+		for ( int i = m_pNarrorPhase->GetPairs().size()-1; i >= 0; i-- )
+		{
+			m_pNarrorPhase->GetPairs()[i].pObjA->Render();
+			m_pNarrorPhase->GetPairs()[i].pObjB->Render();
+		}
 	}
 
 	glDisable(GL_DEPTH_TEST);

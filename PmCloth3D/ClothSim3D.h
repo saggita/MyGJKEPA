@@ -1,7 +1,6 @@
 #pragma once
 
-#include "NarrowPhaseGJK.h"
-
+class CNarrowPhaseCollisionDetection;
 
 class CClothSim3D
 {
@@ -14,7 +13,7 @@ private:
 	CClothSim3D(const CClothSim3D& other) {}; // private copy constructor
 
 public:
-	CNarrowPhaseGJK* m_pNarrorPhase;
+	CNarrowPhaseCollisionDetection* m_pNarrorPhase;
 
 	double m_dt;
 	int m_Substeps; // = 1

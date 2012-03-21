@@ -3,7 +3,7 @@
 #include <cassert>
 #include <algorithm>
 #include "EPAAlgorithm.h"
-#include "NarrowPhaseGJK.h"
+#include "NarrowPhaseCollisionDetection.h"
 
 CEPAAlgorithm::CEPAAlgorithm(void)
 {

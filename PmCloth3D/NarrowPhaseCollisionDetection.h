@@ -1,13 +1,9 @@
 #pragma once
 
 #include <vector>
-#include "CollisionObject.h"
-#include "EPAEdge.h"
-#include "Simplex.h"
-#include "EPAAlgorithm.h"
+#include "Vector3D.h"
 
-
-class CClothSim3D;
+class CCollisionObject;
 
 class CNarrowCollisionInfo
 {
@@ -21,6 +17,9 @@ public:
 																				  witnessPntA(witnessPntA), witnessPntB(witnessPntB), 
 																				  penetrationDepth(penetrationDepth) {}
 
+	CNarrowCollisionInfo(CCollisionObject* pObjA, CCollisionObject* pObjB) : pObjA(pObjA), pObjB(pObjB), bIntersect(false), 																				  
+																				  penetrationDepth(0), proximityDistance(0) {}
+
 	CCollisionObject* pObjA;
 	CCollisionObject* pObjB;
 	bool bIntersect;
@@ -29,26 +28,23 @@ public:
 	double proximityDistance; 
 	double penetrationDepth; // must be positive in case bIntersect is true.
 
-	// Compiler provided assigne operator(=) will be good enough.
+	// Compiler provided assign operator(=) will be good enough.
 };
 
-
-class CNarrowPhaseGJK
+class CNarrowPhaseCollisionDetection
 {
-protected:
-	CEPAAlgorithm m_EPAAlgorithm;
+public:
+	CNarrowPhaseCollisionDetection(void);
+	virtual ~CNarrowPhaseCollisionDetection(void);
 
 protected:
-	// helper function to generate CollisionInfo
-	bool GenerateCollisionInfo(const CCollisionObject& objA, const CCollisionObject& objB, const CTransform &transB2A, const CGJKSimplex& simplex, CVector3D v, double distSqr, CNarrowCollisionInfo* pCollisionInfo) const;
+	std::vector<CNarrowCollisionInfo> m_CollisionPairs;
 
 public:
-	CNarrowPhaseGJK();
-	virtual ~CNarrowPhaseGJK(void);
+	std::vector<CNarrowCollisionInfo>& GetPairs() { return m_CollisionPairs; }
+	const std::vector<CNarrowCollisionInfo>& GetPairs() const { return m_CollisionPairs; }
 
-	std::vector<CCollisionObject*> m_CollisionObjectList;
-	
-	bool CheckCollision(CCollisionObject& objA, CCollisionObject& objB, CNarrowCollisionInfo* pCollisionInfo, bool bProximity = false);
-
+	void AddPair(const CNarrowCollisionInfo pair) { m_CollisionPairs.push_back(pair); }
+	void CheckCollisions();
 };
 
