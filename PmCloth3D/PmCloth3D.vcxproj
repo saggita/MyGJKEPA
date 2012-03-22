@@ -20,6 +20,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BIMAlgorithm.h" />
+    <ClInclude Include="CollisionDetections.h" />
     <ClInclude Include="CollisionObject.h" />
     <ClInclude Include="EPAAlgorithm.h" />
     <ClInclude Include="EPAEdge.h" />
@@ -41,6 +42,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="BIMAlgorithm.cpp" />
+    <ClCompile Include="CollisionDetections.cpp" />
     <ClCompile Include="CollisionObject.cpp" />
     <ClCompile Include="EPAAlgorithm.cpp" />
     <ClCompile Include="EPAEdge.cpp" />

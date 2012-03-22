@@ -4,6 +4,7 @@
 #include "CollisionObject.h"
 #include "mathUtil.h"
 #include "NarrowPhaseCollisionDetection.h"
+#include "CollisionDetections.h"
 
 CBIMAlgorithm::CBIMAlgorithm(void)
 {
@@ -46,8 +47,11 @@ bool CBIMAlgorithm::CheckCollision(CCollisionObject& objA, CCollisionObject& obj
 		if ( dot >= 0 )
 			return false;
 
-		CVector3D pntA;
-		double dist = DistanceFromPointToTriangle(point, *vert[0], *vert[1], *vert[2], &pntA);
+		double a, b, c;
+		CVector3D n;
+		double dist =DistancePointToTriangle(point, *vert[0], *vert[1], *vert[2], a, b, c, n, true);
+
+		CVector3D pntA = a*(*vert[0]) + b*(*vert[1]) + c*(*vert[2]);
 
 		if ( dist < minDist )
 		{
