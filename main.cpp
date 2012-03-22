@@ -13,7 +13,7 @@
 
 #include <vector>
 #include "HGLCamera.h"
-#include "PmCloth3D\ClothSim3D.h"
+#include "PmCloth3D\WorldSimulation.h"
 
 using namespace std;
 
@@ -25,7 +25,7 @@ int mouseButton = -1;
 bool bMousePressed = false;
 bool bPause = true;
 
-CClothSim3D g_Cloth;
+CWorldSimulation g_Cloth;
 double g_dt = 0.001;
 
 void InitSimulation()

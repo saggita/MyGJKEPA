@@ -460,8 +460,7 @@ void CCollisionObject::Render() const
 		glMultMatrixd(rotMatrix);
 
 		glPushAttrib(GL_LIGHTING_BIT);
-		//glDisable(GL_LIGHTING);
-
+		
 		glColor3f(0,0,1);
 		glLineWidth(1.0f);
 		
@@ -479,6 +478,34 @@ void CCollisionObject::Render() const
 				glNormal3d(normal.m_X, normal.m_Y, normal.m_Z);
 				glVertex3d(vertex.m_X, vertex.m_Y, vertex.m_Z);
 			}
+		}
+
+		glEnd();
+
+		glDisable(GL_LIGHTING);
+		glBegin(GL_LINES);
+
+		for ( int i = 0; i < (int)m_Faces.size(); i++ )
+		{
+			const TriangleFace& face = m_Faces[i];
+
+			for ( int j = 0; j < 3; j++ )
+			{
+				const CVector3D& vertex = m_Vertices[face.indices[j]];
+				glVertex3d(vertex.m_X, vertex.m_Y, vertex.m_Z);
+			}
+
+			const CVector3D& vertex = m_Vertices[face.indices[0]];
+			glVertex3d(vertex.m_X, vertex.m_Y, vertex.m_Z);
+
+			// normal
+			/*const CVector3D& v0 = m_Vertices[face.indices[0]];
+			const CVector3D& v1 = m_Vertices[face.indices[1]];
+			const CVector3D& v2 = m_Vertices[face.indices[2]];
+
+			const CVector3D& normal = (v1-v0).Cross(v2-v0).Normalize();
+			CVector3D n = vertex + normal;
+			glVertex3d(n.m_X, n.m_Y, n.m_Z);*/
 		}
 
 		glEnd();

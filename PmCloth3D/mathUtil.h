@@ -6,6 +6,7 @@
 #define EPSILON 1e-8
 #define EPSILON1 1e-6
 
+#include <cstdlib>
 #include "Vector2D.h"
 
 #define Sqr(a) ((a)*(a))
@@ -129,5 +130,11 @@ inline double average4(double a, double b, double c, double d)
 {
 	return 0.25 * (a + b + c + d);
 }
+
+double DistanceFromPointToTriangle(const CVector3D& point, const CVector3D& p0, const CVector3D& p1, const CVector3D& p2, CVector3D* closestPointInTriangle = NULL);
+
+// If point is in the side of normal direction, returns positive closest distance. Otherwise, it returns negative closest distance.
+// normal direction of triangle is (p1-p0).Cross(p2-p0).Normalize(). So p0, p1 and p2 forms counter-clockwise.
+//double SignedDistanceFromPointToTriangle(const CVector3D& point, const CVector3D& p0, const CVector3D& p1, const CVector3D& p2, CVector3D* closestPointInTriangle = NULL);
 
 #endif // __MATH_H__

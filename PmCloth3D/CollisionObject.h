@@ -42,6 +42,15 @@ public:
 	void SetSize(double x, double y, double z) { m_HalfExtent.Set(x/2.0, y/2.0, z/2.0); }
 	void SetColor(float r, float g, float b) { m_Color[0] = r; m_Color[1] = g; m_Color[2] = b; m_Color[3] = 1.0; }
 
+	std::vector<CVector3D>& GetVertices() { return m_Vertices; }
+	const std::vector<CVector3D>& GetVertices() const { return m_Vertices; }
+
+	std::vector<CVector3D>& GetNormals() { return m_Normals; }
+	const std::vector<CVector3D>& GetNormals() const { return m_Normals; }
+
+	std::vector<TriangleFace>& GetFaces() { return m_Faces; }
+	const std::vector<TriangleFace>& GetFaces() const { return m_Faces; }
+
 	const CTransform& GetTransform() const;
 	CTransform& GetTransform();
 

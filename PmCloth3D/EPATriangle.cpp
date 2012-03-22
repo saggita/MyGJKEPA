@@ -64,10 +64,7 @@ bool CEPATriangle::ComputeClosestPointToOrigin(const CEPAPolytope& EPAPolytope)
 
     if ( m_Det > 0.0 ) 
 	{
-        // Compute the closest point v
         m_ClosestPointToOrigin = p0 + 1.0 / m_Det * (m_Lambda1 * v1 + m_Lambda2 * v2);
-
-		// Compute the square distance of closest point to the origin
 		m_DistSqr = m_ClosestPointToOrigin.LengthSqr();
 
         return true;

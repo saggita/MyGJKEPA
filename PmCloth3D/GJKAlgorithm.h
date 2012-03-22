@@ -6,7 +6,7 @@
 #include "GJKSimplex.h"
 #include "EPAAlgorithm.h"
 
-class CClothSim3D;
+class CWorldSimulation;
 
 class CGJKAlgorithm
 {

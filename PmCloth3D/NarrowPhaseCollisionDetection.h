@@ -4,6 +4,8 @@
 #include "Vector3D.h"
 
 class CCollisionObject;
+class CGJKAlgorithm;
+class CBIMAlgorithm;
 
 class CNarrowCollisionInfo
 {
@@ -38,6 +40,8 @@ public:
 	virtual ~CNarrowPhaseCollisionDetection(void);
 
 protected:
+	//CGJKAlgorithm* m_pAlgorithm;
+	CBIMAlgorithm* m_pAlgorithm;
 	std::vector<CNarrowCollisionInfo> m_CollisionPairs;
 
 public:
@@ -45,6 +49,6 @@ public:
 	const std::vector<CNarrowCollisionInfo>& GetPairs() const { return m_CollisionPairs; }
 
 	void AddPair(const CNarrowCollisionInfo pair) { m_CollisionPairs.push_back(pair); }
-	void CheckCollisions();
+	int CheckCollisions();
 };
 

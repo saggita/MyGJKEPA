@@ -20,7 +20,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BIMAlgorithm.h" />
-    <ClInclude Include="ClothSim3D.h" />
     <ClInclude Include="CollisionObject.h" />
     <ClInclude Include="EPAAlgorithm.h" />
     <ClInclude Include="EPAEdge.h" />
@@ -38,10 +37,10 @@
     <ClInclude Include="Transform.h" />
     <ClInclude Include="Vector2D.h" />
     <ClInclude Include="Vector3D.h" />
+    <ClInclude Include="WorldSimulation.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="BIMAlgorithm.cpp" />
-    <ClCompile Include="ClothSim3D.cpp" />
     <ClCompile Include="CollisionObject.cpp" />
     <ClCompile Include="EPAAlgorithm.cpp" />
     <ClCompile Include="EPAEdge.cpp" />
@@ -59,6 +58,7 @@
     <ClCompile Include="Transform.cpp" />
     <ClCompile Include="Vector2D.cpp" />
     <ClCompile Include="Vector3D.cpp" />
+    <ClCompile Include="WorldSimulation.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{D5E2412C-9AA6-41FA-922F-05450EF6912C}</ProjectGuid>

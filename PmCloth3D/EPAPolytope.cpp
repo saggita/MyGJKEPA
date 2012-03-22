@@ -308,7 +308,7 @@ bool CEPAPolytope::ExpandPolytopeWithNewPoint(const CVector3D& w, CEPATriangle* 
 	pTriangleUsedToObtainW->SetObsolete(true);
 
 #ifdef _DEBUG	
-	for ( int i = 0; i < m_Triangles.size(); i++ )
+	for ( int i = 0; i < (int)m_Triangles.size(); i++ )
 	{
 		if ( m_Triangles[i]->IsObsolete() )
 			continue;
@@ -329,7 +329,7 @@ bool CEPAPolytope::ExpandPolytopeWithNewPoint(const CVector3D& w, CEPATriangle* 
 	int silhouetteSize = (int)m_SilhouetteVertices.size();
 
 #ifdef _DEBUG
-	for ( int i = 0; i < m_Triangles.size(); i++ )
+	for ( int i = 0; i < (int)m_Triangles.size(); i++ )
 	{
 		if ( m_Triangles[i]->IsObsolete() )
 			continue;
@@ -340,7 +340,7 @@ bool CEPAPolytope::ExpandPolytopeWithNewPoint(const CVector3D& w, CEPATriangle* 
 			assert(m_Triangles[i]->IsVisibleFromPoint(w) == false);
 	}
 	
-	for ( unsigned int i = 0; i < silhouetteSize; i++ )
+	for ( int i = 0; i < (int)silhouetteSize; i++ )
 	{
 		assert(m_SilhouetteTriangles[i]->IsVisibleFromPoint(w) == false);
 	}

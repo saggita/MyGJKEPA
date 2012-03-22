@@ -58,7 +58,7 @@ public:
 	bool ComputeClosestPointToOrigin(const CEPAPolytope& EPAPolytope);
 	CVector3D GetClosestPointToOriginInSupportPntSpace(const std::vector<CVector3D>& supportPoints) const;
 	bool DoSilhouette(const CVector3D& w, CEPAEdge* edge, CEPAPolytope& EPAPolytope);
-	
+		
 	bool operator<(const CEPATriangle& other) const;
 };
 
