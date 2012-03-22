@@ -40,8 +40,8 @@ public:
 	virtual ~CNarrowPhaseCollisionDetection(void);
 
 protected:
-	CGJKAlgorithm* m_pAlgorithm;
-	//CBIMAlgorithm* m_pAlgorithm;
+	//CGJKAlgorithm* m_pAlgorithm;
+	CBIMAlgorithm* m_pAlgorithm;
 	std::vector<CNarrowCollisionInfo> m_CollisionPairs;
 
 public:

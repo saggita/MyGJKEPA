@@ -46,11 +46,11 @@ void CWorldSimulation::Create()
 
 	// Object 1
 	CCollisionObject* pObjectB = new CCollisionObject();
-	pObjectB->SetCollisionObjectType(CCollisionObject::Box);
+	pObjectB->SetCollisionObjectType(CCollisionObject::Point);
 	pObjectB->SetSize(3.0, 4.0, 5.0);
 	pObjectB->SetColor(0.7f, 0.7f, 0.0f);
 	pObjectB->GetTransform().GetRotation().SetRotation(CQuaternion(CVector3D(1.0, 0.0, 0).Normalize(), 0));
-	pObjectB->GetTransform().GetTranslation().Set(2.0, 15.0, 0.0);
+	pObjectB->GetTransform().GetTranslation().Set(2.0, 12.0, 0.0);
 	//pObjectB->GetTransform().GetTranslation().Set(2.0, 10.0, 0.0);
 
 	m_pNarrowPhase->AddPair(CNarrowCollisionInfo(pObjectA, pObjectB));

@@ -187,7 +187,7 @@ void CCollisionObject::SetCollisionObjectType(CollisionObjectType collisionObjec
 
 	if ( m_CollisionObjectType == ConvexHull )
 	{
-		Load("./model/code.obj");
+		Load("./model/geoSphere.obj");
 
 		/*for ( int i = 0; i < BarrelVtxCount2; i++ )
 		{
