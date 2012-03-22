@@ -59,6 +59,8 @@ public:
 
 	CVector3D GetLocalSupportPoint(const CVector3D& dir, double margin = 0) const;
 
+	bool Load(const char* filename);
+
 	//btCollisionObject* GetBulletObject() { return m_pBulletColObj; }
 
 	void Render() const;

@@ -14,7 +14,7 @@ CBIMAlgorithm::~CBIMAlgorithm(void)
 }
 
 // The normal vector of plane formed by p0, p1 and p2 is (p1-p0).Cross(p2-p0).Normalize().
-// If point is on the positive side of plane, it returns positive distance. Otherwise, it returns negative distance. 
+// If 'point' is on the positive side of plane, it returns positive distance. Otherwise, it returns negative distance. 
 double SignedDistanceFromPointToPlane(const CVector3D& point, const CVector3D& p0, const CVector3D& p1, const CVector3D& p2, CVector3D* closestPointInTriangle = NULL)
 {
 	CVector3D n = (p1-p0).Cross(p2-p0).Normalize();
@@ -31,7 +31,6 @@ double SignedDistanceFromPointToPlane(const CVector3D& point, const CVector3D& p
 		return dist;
 	}
 }
-
 
 bool CBIMAlgorithm::CheckCollision(CCollisionObject& objA, CCollisionObject& objB, CNarrowCollisionInfo* pCollisionInfo, bool bProximity/* = false*/)
 {
@@ -50,11 +49,11 @@ bool CBIMAlgorithm::CheckCollision(CCollisionObject& objA, CCollisionObject& obj
 	CVector3D point = transW2A * objB.GetTransform().GetTranslation();
 	double minDist = -DBL_MAX;
 	CVector3D closestPointA;
+	CVector3D* vert[3];
 
 	for ( int i = 0; i < (int)objA.GetFaces().size(); i++ )
 	{
 		TriangleFace& tri = objA.GetFaces()[i];
-		CVector3D* vert[3];
 
 		for ( int j = 0; j < 3; j++ )
 			vert[j] = &objA.GetVertices()[tri.indices[j]]; 

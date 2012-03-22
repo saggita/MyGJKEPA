@@ -4,8 +4,11 @@
 
 #include <GL/glut.h>
 #include <cassert>
+#include <iostream>
+#include <fstream>
 #include <memory.h>
 #include "CollisionObject.h"
+#include "StringTokenizer.h"
 
 #define BarrelVtxCount2 57
 #define BarrelIndexCount 60
@@ -184,7 +187,9 @@ void CCollisionObject::SetCollisionObjectType(CollisionObjectType collisionObjec
 
 	if ( m_CollisionObjectType == ConvexHull )
 	{
-		for ( int i = 0; i < BarrelVtxCount2; i++ )
+		Load("./model/code.obj");
+
+		/*for ( int i = 0; i < BarrelVtxCount2; i++ )
 		{
 			CVector3D vertex, normal;
 			vertex[0] = BarrelVtx2[i*6];
@@ -212,7 +217,7 @@ void CCollisionObject::SetCollisionObjectType(CollisionObjectType collisionObjec
 				face.indices[i] = indices[i];
 
 			m_Faces.push_back(face);
-		}
+		}*/
 	}
 }
 
@@ -464,7 +469,7 @@ void CCollisionObject::Render() const
 		glColor3f(0,0,1);
 		glLineWidth(1.0f);
 		
-		glBegin(GL_TRIANGLES);
+		/*glBegin(GL_TRIANGLES);
 
 		for ( int i = 0; i < (int)m_Faces.size(); i++ )
 		{
@@ -480,7 +485,7 @@ void CCollisionObject::Render() const
 			}
 		}
 
-		glEnd();
+		glEnd();*/
 
 		glDisable(GL_LIGHTING);
 		glBegin(GL_LINES);
@@ -516,4 +521,108 @@ void CCollisionObject::Render() const
 	}
 }
 
+bool CCollisionObject::Load(const char* filename)
+{
+	// Loading wavefront obj file.
+	ifstream inFile(filename);
+	string sLine;
+	vector<string> sTokens;
 
+	if ( !inFile.is_open() )
+		return false;
+
+	m_Vertices.clear();
+	m_Normals.clear();
+	m_Faces.clear();
+
+	while (!inFile.eof() )
+	{
+		getline(inFile, sLine);
+		sTokens.clear(); 
+		int numFound = StringTokenizer(sLine, string(" "), sTokens, false);
+
+		if ( numFound == 0 )
+			continue;
+
+		vector <string>::iterator iter;
+		string sToken; 
+
+		iter = sTokens.begin();
+		sToken = *(iter);
+		
+		if ( sToken == "#" ) // comment
+			continue;
+		else if ( sToken == "v" ) // vertex
+		{
+			CVector3D pnt;
+			
+			// x
+			++iter;
+			sToken = (*iter);			
+			pnt.m_X = (double)atof(sToken.c_str());
+
+			// y
+			++iter;
+			sToken = (*iter);			
+			pnt.m_Y = (double)atof(sToken.c_str());
+
+			// z
+			++iter;
+			sToken = (*iter);			
+			pnt.m_Z = (double)atof(sToken.c_str());
+
+			m_Vertices.push_back(pnt);
+		}
+		else if ( sToken == "vn" ) // vertex normal
+		{
+			CVector3D n;
+			
+			// x
+			++iter;
+			sToken = (*iter);			
+			n.m_X = (float)atof(sToken.c_str());
+
+			// y
+			++iter;
+			sToken = (*iter);			
+			n.m_Y = (float)atof(sToken.c_str());
+
+			// z
+			++iter;
+			sToken = (*iter);			
+			n.m_Z = (float)atof(sToken.c_str());
+
+			m_Normals.push_back(n);
+		}
+		else if ( sToken == "f" ) // face
+		{
+			TriangleFace tri;
+			vector<string> sTokens2;
+
+			int i = 0;
+
+			for ( iter = sTokens.begin() + 1; iter != sTokens.end(); iter++ )
+			{
+				sToken = (*iter);
+				sTokens2.clear();
+				numFound = StringTokenizer(sToken, string("/"), sTokens2, false);
+
+				if ( numFound > 0 )
+				{
+					tri.indices[i++] = atoi(sTokens2[0].c_str())-1;
+
+					//if ( numFound == 3 )
+					//	tri.m_IndexNormalVec = atoi(sTokens2[2].c_str());
+				}
+				else if ( numFound == 0 && sToken != "" )
+				{
+					tri.indices[i++] = atoi(sToken.c_str())-1;
+				}
+			}		
+
+			m_Faces.push_back(tri);	
+		}		
+	}
+
+	inFile.close();
+}
