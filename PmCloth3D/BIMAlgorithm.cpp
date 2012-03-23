@@ -15,7 +15,7 @@ CBIMAlgorithm::~CBIMAlgorithm(void)
 
 // The normal vector of plane formed by p0, p1 and p2 is (p1-p0).Cross(p2-p0).Normalize().
 // If 'point' is on the positive side of plane, it returns positive distance. Otherwise, it returns negative distance. 
-double SignedDistanceFromPointToPlane(const CVector3D& point, const CVector3D& p0, const CVector3D& p1, const CVector3D& p2, CVector3D* closestPointInTriangle = NULL)
+btScalar SignedDistanceFromPointToPlane(const CVector3D& point, const CVector3D& p0, const CVector3D& p1, const CVector3D& p2, CVector3D* closestPointInTriangle = NULL)
 {
 	CVector3D n = (p1-p0).Cross(p2-p0).Normalize();
 
@@ -23,7 +23,7 @@ double SignedDistanceFromPointToPlane(const CVector3D& point, const CVector3D& p
 		return 0;
 	else
 	{
-		double dist = (point-p0).Dot(n);
+		btScalar dist = (point-p0).Dot(n);
 
 		if ( closestPointInTriangle )
 			*closestPointInTriangle = point - dist * n;
@@ -47,7 +47,7 @@ bool CBIMAlgorithm::CheckCollision(CCollisionObject& objA, CCollisionObject& obj
 	CTransform transW2A = objA.GetTransform().InverseOther();
 
 	CVector3D point = transW2A * objB.GetTransform().GetTranslation();
-	double minDist = -DBL_MAX;
+	btScalar minDist = -DBL_MAX;
 	CVector3D closestPointA;
 	CVector3D* vert[3];
 
@@ -59,7 +59,7 @@ bool CBIMAlgorithm::CheckCollision(CCollisionObject& objA, CCollisionObject& obj
 			vert[j] = &objA.GetVertices()[tri.indices[j]]; 
 		
 		CVector3D pntA;
-		double dist =SignedDistanceFromPointToPlane(point, *vert[0], *vert[1], *vert[2], &pntA);
+		btScalar dist =SignedDistanceFromPointToPlane(point, *vert[0], *vert[1], *vert[2], &pntA);
 
 		// If the distance is positive, the plane is a separating plane. 
 		if ( dist > 0 )

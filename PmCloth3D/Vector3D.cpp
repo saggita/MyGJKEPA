@@ -32,7 +32,7 @@ CVector3D::CVector3D(const CVector3D& begin, const CVector3D& end)
 
 CVector3D& CVector3D::Normalize()
 {
-	double d = sqrt(m_X * m_X + m_Y * m_Y + m_Z * m_Z);
+	btScalar d = sqrt(m_X * m_X + m_Y * m_Y + m_Z * m_Z);
 
 	if ( d == 0 )
 		return *this;
@@ -61,12 +61,12 @@ CMatrix33 CVector3D::Out(const CVector3D& v) const
 	return m;
 }
 
-void CVector3D::TranslateW(double x, double y, double z)
+void CVector3D::TranslateW(btScalar x, btScalar y, btScalar z)
 {
 	// No effect on 3D vector
 }
 
-void CVector3D::RotateW(const CVector3D& axis, double ang)
+void CVector3D::RotateW(const CVector3D& axis, btScalar ang)
 {
 	CMatrix44 mat44;
 	mat44.SetIdentity();
@@ -95,7 +95,7 @@ CVector3D CVector3D::operator+(const CVector3D& other) const
 	return CVector3D(m_X + other.m_X, m_Y + other.m_Y, m_Z + other.m_Z); 
 }
 
-CVector3D CVector3D::operator/(double val) const
+CVector3D CVector3D::operator/(btScalar val) const
 { 
 	if ( val != 0.0f )
 		return CVector3D(m_X / val, m_Y / val, m_Z / val); 
@@ -121,7 +121,7 @@ CVector3D& CVector3D::operator=(const CPoint3D& other)
 	return *this; 
 }
 
-CVector3D& CVector3D::operator=(double val)
+CVector3D& CVector3D::operator=(btScalar val)
 {
 	m_X = val; 
 	m_Y = val; 
@@ -130,22 +130,22 @@ CVector3D& CVector3D::operator=(double val)
 	return *this; 
 }
 
-bool CVector3D::operator<(double val) const
+bool CVector3D::operator<(btScalar val) const
 {
 	return (LengthSqr() < val*val);
 }
 
-bool CVector3D::operator>(double val) const
+bool CVector3D::operator>(btScalar val) const
 {
 	return (LengthSqr() > val*val);
 }
 
-bool CVector3D::operator!=(double val) const
+bool CVector3D::operator!=(btScalar val) const
 {
 	return (m_X != val || m_Y != val || m_Z != val );
 }
 
-bool CVector3D::operator==(double val) const
+bool CVector3D::operator==(btScalar val) const
 {
 	return (m_X == val && m_Y == val && m_Z == val );
 }
@@ -173,7 +173,7 @@ CVector3D& CVector3D::operator+=(const CVector3D& other)
 	return *this; 
 }
 
-CVector3D& CVector3D::operator*=(double val)
+CVector3D& CVector3D::operator*=(btScalar val)
 {
 	m_X *= val; 
 	m_Y *= val; 
@@ -182,7 +182,7 @@ CVector3D& CVector3D::operator*=(double val)
 	return *this; 
 }
 
-CVector3D CVector3D::operator*(double val) const
+CVector3D CVector3D::operator*(btScalar val) const
 {
 	CVector3D vec(*this);
 
@@ -193,7 +193,7 @@ CVector3D CVector3D::operator*(double val) const
 	return vec;
 }
 
-double CVector3D::operator*(const CVector3D& other) const
+btScalar CVector3D::operator*(const CVector3D& other) const
 {
 	return Dot(other);
 }
@@ -202,11 +202,11 @@ CVector3D CVector3D::operator/(const CVector3D& other) const
 {
 	CVector3D vec;
 
-	double e = 1e-10;
+	btScalar e = 1e-10;
 
-	double x = 0;
-	double y = 0;
-	double z = 0;
+	btScalar x = 0;
+	btScalar y = 0;
+	btScalar z = 0;
 
 	if ( 0 <= other.m_X && other.m_X <= e )
 		x = other.m_X + e;
@@ -236,7 +236,7 @@ CVector3D CVector3D::operator/(const CVector3D& other) const
 	return vec;
 }
 
-CVector3D operator*(double val, const CVector3D& other)
+CVector3D operator*(btScalar val, const CVector3D& other)
 {
 	return other * val;
 }

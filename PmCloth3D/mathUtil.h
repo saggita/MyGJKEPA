@@ -12,16 +12,16 @@
 #define Sqr(a) ((a)*(a))
 #define Cube(a) ((a)*(a)*(a))
 
-inline bool IsZero(double x) { return ( ( x < EPSILON ) && ( x > -EPSILON ) ? true : false ); }
-inline bool IsEqual(double a, double b) { return ( ( ( a - b ) < EPSILON1 ) && ( ( a - b ) > -EPSILON1 ) ? true : false ); }
+inline bool IsZero(btScalar x) { return ( ( x < EPSILON ) && ( x > -EPSILON ) ? true : false ); }
+inline bool IsEqual(btScalar a, btScalar b) { return ( ( ( a - b ) < EPSILON1 ) && ( ( a - b ) > -EPSILON1 ) ? true : false ); }
 
 // linear interpolation dividing a, b with t : (1-t)
-inline double lerp(double a, double b, double t)
+inline btScalar lerp(btScalar a, btScalar b, btScalar t)
 {
 	return a * (1.0 - t) + b * t;
 }
 
-inline CVector2D lerp(const CVector2D& a, const CVector2D& b, double t)
+inline CVector2D lerp(const CVector2D& a, const CVector2D& b, btScalar t)
 {
 	return a * (1.0 - t) + b * t;
 }
@@ -53,12 +53,12 @@ inline CVector2D lerp(const CVector2D& a, const CVector2D& b, double t)
 	  = lerp(lerp(a, b, p), lerp(c, d, p), q)
 */
 
-inline double bilerp(double a, double b, double c, double d, double p, double q)
+inline btScalar bilerp(btScalar a, btScalar b, btScalar c, btScalar d, btScalar p, btScalar q)
 {
 	return lerp(lerp(a, b, p), lerp(c, d, p), q);
 }
 
-inline CVector2D bilerp(const CVector2D& a, const CVector2D& b, const CVector2D& c, const CVector2D& d, double p, double q)
+inline CVector2D bilerp(const CVector2D& a, const CVector2D& b, const CVector2D& c, const CVector2D& d, btScalar p, btScalar q)
 {
 	return lerp(lerp(a, b, p), lerp(c, d, p), q);
 }
@@ -98,14 +98,14 @@ inline CVector2D bilerp(const CVector2D& a, const CVector2D& b, const CVector2D&
 		  = lerp(bilerp(a, b, c, d, p, q), bilerp(e, f, g, h, p, q), r)
 
 */
-inline double trilerp(double a, double b, double c, double d, double e, double f, double g, double h, double p, double q, double r)
+inline btScalar trilerp(btScalar a, btScalar b, btScalar c, btScalar d, btScalar e, btScalar f, btScalar g, btScalar h, btScalar p, btScalar q, btScalar r)
 {
 	return lerp(bilerp(a, b, c, d, p, q), bilerp(e, f, g, h, p, q), r);
 }
 
 inline CVector2D trilerp(const CVector2D& a, const CVector2D& b, const CVector2D& c, const CVector2D& d, 
 						 const CVector2D& e, const CVector2D& f, const CVector2D& g, const CVector2D& h, 
-						 double p, double q, double r)
+						 btScalar p, btScalar q, btScalar r)
 {
 	return lerp(bilerp(a, b, c, d, p, q), bilerp(e, f, g, h, p, q), r);
 }
@@ -116,7 +116,7 @@ inline CVector2D trilerp(const CVector2D& a, const CVector2D& b, const CVector2D
 	-------
 	   2
 */
-inline double average2(double a, double b)
+inline btScalar average2(btScalar a, btScalar b)
 {
 	return 0.5 * (a + b);
 }
@@ -126,15 +126,15 @@ inline double average2(double a, double b)
 	---------------
 	       4
 */
-inline double average4(double a, double b, double c, double d)
+inline btScalar average4(btScalar a, btScalar b, btScalar c, btScalar d)
 {
 	return 0.25 * (a + b + c + d);
 }
 
-double DistanceFromPointToTriangle(const CVector3D& point, const CVector3D& p0, const CVector3D& p1, const CVector3D& p2, CVector3D* closestPointInTriangle = NULL);
+btScalar DistanceFromPointToTriangle(const CVector3D& point, const CVector3D& p0, const CVector3D& p1, const CVector3D& p2, CVector3D* closestPointInTriangle = NULL);
 
 // If point is in the side of normal direction, returns positive closest distance. Otherwise, it returns negative closest distance.
 // normal direction of triangle is (p1-p0).Cross(p2-p0).Normalize(). So p0, p1 and p2 forms counter-clockwise.
-//double SignedDistanceFromPointToTriangle(const CVector3D& point, const CVector3D& p0, const CVector3D& p1, const CVector3D& p2, CVector3D* closestPointInTriangle = NULL);
+//btScalar SignedDistanceFromPointToTriangle(const CVector3D& point, const CVector3D& p0, const CVector3D& p1, const CVector3D& p2, CVector3D* closestPointInTriangle = NULL);
 
 #endif // __MATH_H__

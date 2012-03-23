@@ -78,11 +78,11 @@ void CWorldSimulation::ClearAll()
 		delete m_pNarrowPhase;
 }
 
-unsigned int CWorldSimulation::Update(double dt)
+unsigned int CWorldSimulation::Update(btScalar dt)
 {
 	int numIter = 0;
 
-	double sub_dt = dt / m_Substeps;
+	btScalar sub_dt = dt / m_Substeps;
 	m_dt = sub_dt;
 
 	for ( int i = 0; i < m_Substeps; i++ )
@@ -91,14 +91,14 @@ unsigned int CWorldSimulation::Update(double dt)
 	return numIter;
 }
 
-unsigned int CWorldSimulation::SubsUpdate(double dt)
+unsigned int CWorldSimulation::SubsUpdate(btScalar dt)
 {
 	m_dt = dt;
 
 	unsigned int numIter = 0;
 
 	CVector3D axis;
-	static double angleRad = 0;
+	static btScalar angleRad = 0;
 
 	angleRad += 2*3.141592 / 15000;
 

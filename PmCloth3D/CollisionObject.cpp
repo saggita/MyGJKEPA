@@ -13,7 +13,7 @@
 #define BarrelVtxCount2 57
 #define BarrelIndexCount 60
 
-static float BarrelVtx2[] = {
+static btScalar BarrelVtx2[] = {
 0.0f,-0.5f,0.0f,				0.0f,-1.0f,0.0f,
 0.282362f,-0.5f,-0.205148f,     0.0f,-1.0f,0.0f,
 0.349018f,-0.5f,0.0f,           0.0f,-1.0f,0.0f,
@@ -221,7 +221,7 @@ void CCollisionObject::SetCollisionObjectType(CollisionObjectType collisionObjec
 	}
 }
 
-CVector3D CCollisionObject::GetLocalSupportPoint(const CVector3D& dir, double margin/* = 0*/) const
+CVector3D CCollisionObject::GetLocalSupportPoint(const CVector3D& dir, btScalar margin/* = 0*/) const
 {
 	assert(margin >= 0.0);
 
@@ -240,7 +240,7 @@ CVector3D CCollisionObject::GetLocalSupportPoint(const CVector3D& dir, double ma
 	}
 	else if ( m_CollisionObjectType == Sphere )
 	{
-		double radius = m_HalfExtent.m_X;
+		btScalar radius = m_HalfExtent.m_X;
 
 		if ( dir.LengthSqr() > 0.0 )
 			supportPoint = (radius + margin) * dir.NormalizeOther();
@@ -255,19 +255,19 @@ CVector3D CCollisionObject::GetLocalSupportPoint(const CVector3D& dir, double ma
 	}
 	else if ( m_CollisionObjectType == Cone )
 	{
-		double radius = m_HalfExtent.m_X;
-		double halfHeight = 2.0*m_HalfExtent.m_Y;
-		double sinTheta = radius / (sqrt(radius * radius + 4 * halfHeight * halfHeight));
+		btScalar radius = m_HalfExtent.m_X;
+		btScalar halfHeight = 2.0*m_HalfExtent.m_Y;
+		btScalar sinTheta = radius / (sqrt(radius * radius + 4 * halfHeight * halfHeight));
 		const CVector3D& v = dir;
-		double sinThetaTimesLengthV = sinTheta * v.Length();
+		btScalar sinThetaTimesLengthV = sinTheta * v.Length();
 
 		if ( v.m_Y >= sinThetaTimesLengthV) {
 			supportPoint = CVector3D(0.0, halfHeight, 0.0);
 		}
 		else {
-			double projectedLength = sqrt(v.m_X * v.m_X + v.m_Z * v.m_Z);
+			btScalar projectedLength = sqrt(v.m_X * v.m_X + v.m_Z * v.m_Z);
 			if (projectedLength > 1e-10) {
-				double d = radius / projectedLength;
+				btScalar d = radius / projectedLength;
 				supportPoint = CVector3D(v.m_X * d, -halfHeight, v.m_Z * d);
 			}
 			else {
@@ -286,12 +286,12 @@ CVector3D CCollisionObject::GetLocalSupportPoint(const CVector3D& dir, double ma
 	}
 	else if ( m_CollisionObjectType == ConvexHull )
 	{
-		double maxDot = -DBL_MAX;
+		btScalar maxDot = -DBL_MAX;
 	
 		for ( int i = 0; i < (int)m_Vertices.size(); i++ )
 		{
 			const CVector3D& vertex = m_Vertices[i];
-			double dot = vertex.Dot(dir);
+			btScalar dot = vertex.Dot(dir);
 
 			if ( dot > maxDot )
 			{
@@ -320,7 +320,7 @@ void CCollisionObject::Render() const
 		GLdouble val[16];
 		memset(val, 0, sizeof(GLdouble)*16);
 		
-		double x, y, z;
+		btScalar x, y, z;
 		x = m_HalfExtent.m_X;
 		y = x;
 		z = y;
@@ -371,7 +371,7 @@ void CCollisionObject::Render() const
 		GLdouble val[16];
 		memset(val, 0, sizeof(GLdouble)*16);
 		
-		double x, y, z;
+		btScalar x, y, z;
 		x = 2.0* m_HalfExtent.m_X;
 		y = 2.0* m_HalfExtent.m_Y;
 		z = 2.0* m_HalfExtent.m_Z;
@@ -419,7 +419,7 @@ void CCollisionObject::Render() const
 		GLdouble val[16];
 		memset(val, 0, sizeof(GLdouble)*16);
 		
-		double x, y, z;
+		btScalar x, y, z;
 		x = 1.0;
 		y = 1.0;
 		z = 1.0;
@@ -448,7 +448,7 @@ void CCollisionObject::Render() const
 		GLdouble val[16];
 		memset(val, 0, sizeof(GLdouble)*16);
 		
-		double x, y, z;
+		btScalar x, y, z;
 		x = 1.0;
 		y = 1.0;
 		z = 1.0;
@@ -559,17 +559,17 @@ bool CCollisionObject::Load(const char* filename)
 			// x
 			++iter;
 			sToken = (*iter);			
-			pnt.m_X = (double)atof(sToken.c_str());
+			pnt.m_X = (btScalar)atof(sToken.c_str());
 
 			// y
 			++iter;
 			sToken = (*iter);			
-			pnt.m_Y = (double)atof(sToken.c_str());
+			pnt.m_Y = (btScalar)atof(sToken.c_str());
 
 			// z
 			++iter;
 			sToken = (*iter);			
-			pnt.m_Z = (double)atof(sToken.c_str());
+			pnt.m_Z = (btScalar)atof(sToken.c_str());
 
 			m_Vertices.push_back(pnt);
 		}
@@ -580,17 +580,17 @@ bool CCollisionObject::Load(const char* filename)
 			// x
 			++iter;
 			sToken = (*iter);			
-			n.m_X = (float)atof(sToken.c_str());
+			n.m_X = (btScalar)atof(sToken.c_str());
 
 			// y
 			++iter;
 			sToken = (*iter);			
-			n.m_Y = (float)atof(sToken.c_str());
+			n.m_Y = (btScalar)atof(sToken.c_str());
 
 			// z
 			++iter;
 			sToken = (*iter);			
-			n.m_Z = (float)atof(sToken.c_str());
+			n.m_Z = (btScalar)atof(sToken.c_str());
 
 			m_Normals.push_back(n);
 		}

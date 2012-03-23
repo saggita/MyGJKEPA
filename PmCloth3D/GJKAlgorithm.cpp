@@ -13,13 +13,13 @@ CGJKAlgorithm::~CGJKAlgorithm(void)
 {
 }
 
-bool CGJKAlgorithm::GenerateCollisionInfo(const CCollisionObject& objA, const CCollisionObject& objB, const CTransform &transB2A, const CGJKSimplex& simplex, CVector3D v, double distSqr, CNarrowCollisionInfo* pCollisionInfo) const
+bool CGJKAlgorithm::GenerateCollisionInfo(const CCollisionObject& objA, const CCollisionObject& objB, const CTransform &transB2A, const CGJKSimplex& simplex, CVector3D v, btScalar distSqr, CNarrowCollisionInfo* pCollisionInfo) const
 {
 	CVector3D closestPntA;
 	CVector3D closestPntB;
 	simplex.ClosestPointAandB(closestPntA, closestPntB);
 
-	double dist = sqrt(distSqr);
+	btScalar dist = sqrt(distSqr);
 	pCollisionInfo->proximityDistance = dist;
 
 	assert(dist > 0.0);
@@ -34,8 +34,8 @@ bool CGJKAlgorithm::GenerateCollisionInfo(const CCollisionObject& objA, const CC
 	CVector3D normalCollision = objA.GetTransform().GetRotation() * (-n);
 			
 	// penetration depth
-	double margin = objA.GetMargin() + objB.GetMargin();
-	double penetrationDepth = margin - dist;
+	btScalar margin = objA.GetMargin() + objB.GetMargin();
+	btScalar penetrationDepth = margin - dist;
 
 	// TODO: const is a problem..
 	/*pCollisionInfo->pObjA = &objA;
@@ -60,9 +60,9 @@ bool CGJKAlgorithm::CheckCollision(CCollisionObject& objA, CCollisionObject& obj
 	CVector3D closestPntA;
 	CVector3D closestPntB;
 	CVector3D w; // support point of Minkowski difference(A-B)
-	double vw; // v dot w
-	const double margin = objA.GetMargin() + objB.GetMargin();
-	const double marginSqr = margin * margin;
+	btScalar vw; // v dot w
+	const btScalar margin = objA.GetMargin() + objB.GetMargin();
+	const btScalar marginSqr = margin * margin;
 	CGJKSimplex simplex;
 
 	// transform a local position in objB space to local position in objA space
@@ -76,8 +76,8 @@ bool CGJKAlgorithm::CheckCollision(CCollisionObject& objA, CCollisionObject& obj
 	// TODO:Need to use cached one to exploit frame coherence. 
 	CVector3D v(1.0, 0.0, 0.0);
 
-	double distSqr = DBL_MAX;
-	double distSqrPrev = distSqr;
+	btScalar distSqr = DBL_MAX;
+	btScalar distSqrPrev = distSqr;
 
 	int numIter = 0;
 	

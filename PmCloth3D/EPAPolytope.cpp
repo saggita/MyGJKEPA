@@ -65,7 +65,7 @@ CEPATriangle* CEPAPolytope::PopAClosestTriangleToOriginFromHeap()
 	//	}
 	//} 
 
-	double minDistSqr = DBL_MAX;
+	btScalar minDistSqr = DBL_MAX;
 
 	for ( int i = 0; i < (int)m_Triangles.size(); i++ )
 	{

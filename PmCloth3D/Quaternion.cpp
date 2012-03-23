@@ -2,7 +2,7 @@
 #include <cassert>
 #include "Quaternion.h"
 
-CQuaternion::CQuaternion(double x/* = 0.0*/, double y/* = 0.0*/, double z/* = 0.0*/, double w/* = 1.0*/) : m_X(x), m_Y(y), m_Z(z), m_W(w)
+CQuaternion::CQuaternion(btScalar x/* = 0.0*/, btScalar y/* = 0.0*/, btScalar z/* = 0.0*/, btScalar w/* = 1.0*/) : m_X(x), m_Y(y), m_Z(z), m_W(w)
 {
 }
 
@@ -23,14 +23,14 @@ CQuaternion::CQuaternion(const CMatrix33& rotMat)
 	SetRotation(rotMat);
 }
 
-CQuaternion::CQuaternion(const CVector3D& axis, double angle_radian)
+CQuaternion::CQuaternion(const CVector3D& axis, btScalar angle_radian)
 {
 	SetRotation(axis, angle_radian);
 }
 
 CQuaternion& CQuaternion::Normalize()
 {
-	double n = m_W * m_W + m_X * m_X + m_Y * m_Y + m_Z * m_Z;
+	btScalar n = m_W * m_W + m_X * m_X + m_Y * m_Y + m_Z * m_Z;
 
 	if ( n == 0 ) 
 	{
@@ -48,11 +48,11 @@ CQuaternion& CQuaternion::Normalize()
 	return (*this);
 }
 
-void CQuaternion::SetRotation(const CVector3D& axis, double angle_radian)
+void CQuaternion::SetRotation(const CVector3D& axis, btScalar angle_radian)
 {
 	// This function assumes that the axis vector has been normalized.
-	double halfAng = 0.5 * angle_radian;
-    double sinHalf = sin(halfAng);
+	btScalar halfAng = 0.5 * angle_radian;
+    btScalar sinHalf = sin(halfAng);
 	m_W = cos(halfAng);
 
     m_X = sinHalf * axis.m_X;
@@ -62,8 +62,8 @@ void CQuaternion::SetRotation(const CVector3D& axis, double angle_radian)
 
 void CQuaternion::SetRotation(const CMatrix33& rotMat)
 {
-	double fTrace = rotMat.e[0][0]+rotMat.e[1][1]+rotMat.e[2][2];
-	double fRoot;
+	btScalar fTrace = rotMat.e[0][0]+rotMat.e[1][1]+rotMat.e[2][2];
+	btScalar fRoot;
 
 	if ( fTrace > 0.0f )
 	{
@@ -88,7 +88,7 @@ void CQuaternion::SetRotation(const CMatrix33& rotMat)
 		size_t k = s_iNext[j];
 
 		fRoot = sqrt(rotMat.e[i][i]-rotMat.e[j][j]-rotMat.e[k][k] + 1.0f);
-		double* apkQuat[3] = { &m_X, &m_Y, &m_Z };
+		btScalar* apkQuat[3] = { &m_X, &m_Y, &m_Z };
 		*apkQuat[i] = 0.5f*fRoot;
 		fRoot = 0.5f/fRoot;
 		m_W = (rotMat.e[k][j]-rotMat.e[j][k])*fRoot;
@@ -102,11 +102,11 @@ void CQuaternion::SetRotation(const CQuaternion& quaternion)
 	*this = quaternion;
 }
 
-void CQuaternion::GetRotation(CVector3D* pAxis, double* pAngle_radian) const
+void CQuaternion::GetRotation(CVector3D* pAxis, btScalar* pAngle_radian) const
 {
 	*pAngle_radian= 2.0f * acos(m_W);
 
-	 double scale = sqrt(m_X * m_X + m_Y * m_Y + m_Z * m_Z);
+	 btScalar scale = sqrt(m_X * m_X + m_Y * m_Y + m_Z * m_Z);
 
 	 if ( scale > 0 )
 	 {
@@ -124,25 +124,25 @@ void CQuaternion::GetRotation(CVector3D* pAxis, double* pAngle_radian) const
 
 void CQuaternion::GetRotation(CMatrix33* pMat33) const
 {
-    double nQ = m_X*m_X + m_Y*m_Y + m_Z*m_Z + m_W*m_W;
-    double s = 0.0;
+    btScalar nQ = m_X*m_X + m_Y*m_Y + m_Z*m_Z + m_W*m_W;
+    btScalar s = 0.0;
 
     if (nQ > 0.0) {
         s = 2.0/nQ;
     }
 
-	double xs = m_X*s;
-    double ys = m_Y*s;
-    double zs = m_Z*s;
-    double wxs = m_W*xs;
-    double wys = m_W*ys;
-    double wzs = m_W*zs;
-    double xxs = m_X*xs;
-    double xys = m_X*ys;
-    double xzs = m_X*zs;
-    double yys = m_Y*ys;
-    double yzs = m_Y*zs;
-    double zzs = m_Z*zs;
+	btScalar xs = m_X*s;
+    btScalar ys = m_Y*s;
+    btScalar zs = m_Z*s;
+    btScalar wxs = m_W*xs;
+    btScalar wys = m_W*ys;
+    btScalar wzs = m_W*zs;
+    btScalar xxs = m_X*xs;
+    btScalar xys = m_X*ys;
+    btScalar xzs = m_X*zs;
+    btScalar yys = m_Y*ys;
+    btScalar yzs = m_Y*zs;
+    btScalar zzs = m_Z*zs;
 
 	pMat33->Set(1.0-yys-zzs, xys-wzs, xzs + wys,
                 xys + wzs, 1.0-xxs-zzs, yzs-wxs,
@@ -156,7 +156,7 @@ CMatrix33 CQuaternion::GetMatrix33() const
 	return mat;
 }
 
-double CQuaternion::Length() const
+btScalar CQuaternion::Length() const
 {
 	return sqrt(m_X*m_X + m_Y*m_Y + m_Z*m_Z + m_W*m_W);
 }
@@ -169,7 +169,7 @@ void CQuaternion::SetIdentity()
 
 void CQuaternion::Inverse()
 {
-	double lengthSqr = m_X*m_X + m_Y*m_Y + m_Z*m_Z + m_W*m_W;
+	btScalar lengthSqr = m_X*m_X + m_Y*m_Y + m_Z*m_Z + m_W*m_W;
 
 	assert(lengthSqr != 0.0);
 
@@ -251,15 +251,15 @@ CVector3D CQuaternion::operator* (const CVector3D& vec) const
 	return mat * vec;
 */	
 /*
-	double xxzz = m_X*m_X - m_Z*m_Z;
-	double wwyy = m_W*m_W - m_Y*m_Y;
+	btScalar xxzz = m_X*m_X - m_Z*m_Z;
+	btScalar wwyy = m_W*m_W - m_Y*m_Y;
 
-	double xw2 = m_X*m_W*2.0f;
-	double xy2 = m_X*m_Y*2.0f;
-	double xz2 = m_X*m_Z*2.0f;
-	double yw2 = m_Y*m_W*2.0f;
-	double yz2 = m_Y*m_Z*2.0f;
-	double zw2 = m_Z*m_W*2.0f;
+	btScalar xw2 = m_X*m_W*2.0f;
+	btScalar xy2 = m_X*m_Y*2.0f;
+	btScalar xz2 = m_X*m_Z*2.0f;
+	btScalar yw2 = m_Y*m_W*2.0f;
+	btScalar yz2 = m_Y*m_Z*2.0f;
+	btScalar zw2 = m_Z*m_W*2.0f;
 
 	return CVector3D(
 		(xxzz + wwyy)*vec.m_X		+ (xy2 + zw2)*vec.m_Y		+ (xz2 - yw2)*vec.m_Z,

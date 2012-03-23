@@ -1,7 +1,7 @@
 #include "mathUtil.h"
 #include "Vector3D.h"
 
-inline double clamp(double val, double low, double high)
+inline btScalar clamp(btScalar val, btScalar low, btScalar high)
 {
 	if ( val < low )
 		return low;
@@ -12,21 +12,21 @@ inline double clamp(double val, double low, double high)
 }
 
 // http://www.gamedev.net/topic/552906-closest-point-on-triangle/
-double DistanceFromPointToTriangle(const CVector3D& p, const CVector3D& p0, const CVector3D& p1, const CVector3D& p2, CVector3D* closestPointInTriangle/* = NULL*/)
+btScalar DistanceFromPointToTriangle(const CVector3D& p, const CVector3D& p0, const CVector3D& p1, const CVector3D& p2, CVector3D* closestPointInTriangle/* = NULL*/)
 {
 	CVector3D edge0 = p1 - p0;
     CVector3D edge1 = p2 - p0;
     CVector3D v0 = p0 - p;
 
-    double a = edge0.Dot( edge0 );
-    double b = edge0.Dot( edge1 );
-    double c = edge1.Dot( edge1 );
-    double d = edge0.Dot( v0 );
-    double e = edge1.Dot( v0 );
+    btScalar a = edge0.Dot( edge0 );
+    btScalar b = edge0.Dot( edge1 );
+    btScalar c = edge1.Dot( edge1 );
+    btScalar d = edge0.Dot( v0 );
+    btScalar e = edge1.Dot( v0 );
 
-    double det = a*c - b*b;
-    double s = b*e - c*d;
-    double t = b*d - a*e;
+    btScalar det = a*c - b*b;
+    btScalar s = b*e - c*d;
+    btScalar t = b*d - a*e;
 
     if ( s + t < det )
     {
@@ -58,7 +58,7 @@ double DistanceFromPointToTriangle(const CVector3D& p, const CVector3D& p0, cons
         }
         else
         {
-            double invDet = 1.f / det;
+            btScalar invDet = 1.f / det;
             s *= invDet;
             t *= invDet;
         }
@@ -67,12 +67,12 @@ double DistanceFromPointToTriangle(const CVector3D& p, const CVector3D& p0, cons
     {
         if ( s < 0.f )
         {
-            double tmp0 = b+d;
-            double tmp1 = c+e;
+            btScalar tmp0 = b+d;
+            btScalar tmp1 = c+e;
             if ( tmp1 > tmp0 )
             {
-                double numer = tmp1 - tmp0;
-                double denom = a-2*b+c;
+                btScalar numer = tmp1 - tmp0;
+                btScalar denom = a-2*b+c;
                 s = clamp( numer/denom, 0.f, 1.f );
                 t = 1-s;
             }
@@ -86,8 +86,8 @@ double DistanceFromPointToTriangle(const CVector3D& p, const CVector3D& p0, cons
         {
             if ( a+d > b+e )
             {
-                double numer = c+e-b-d;
-                double denom = a-2*b+c;
+                btScalar numer = c+e-b-d;
+                btScalar denom = a-2*b+c;
                 s = clamp( numer/denom, 0.f, 1.f );
                 t = 1-s;
             }
@@ -99,8 +99,8 @@ double DistanceFromPointToTriangle(const CVector3D& p, const CVector3D& p0, cons
         }
         else
         {
-            double numer = c+e-b-d;
-            double denom = a-2*b+c;
+            btScalar numer = c+e-b-d;
+            btScalar denom = a-2*b+c;
             s = clamp( numer/denom, 0.f, 1.f );
             t = 1.f - s;
         }

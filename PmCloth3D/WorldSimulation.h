@@ -1,5 +1,7 @@
 #pragma once
 
+#include "../btBulletCollisionCommon.h"
+
 class CNarrowPhaseCollisionDetection;
 
 class CWorldSimulation
@@ -15,17 +17,17 @@ private:
 public:
 	CNarrowPhaseCollisionDetection* m_pNarrowPhase;
 
-	double m_dt;
+	btScalar m_dt;
 	int m_Substeps; // = 1
 
 public:
 	void Create();
 	void ClearAll();
-	unsigned int Update(double dt);
+	unsigned int Update(btScalar dt);
 	void Render() const;
 
 protected:
-	unsigned int SubsUpdate(double dt);
+	unsigned int SubsUpdate(btScalar dt);
 	
 private:
 	CWorldSimulation& operator=(const CWorldSimulation& other) { return *this; }; // private assign operator. This means you cannot use assign operator.

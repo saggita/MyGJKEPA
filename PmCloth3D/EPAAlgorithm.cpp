@@ -79,8 +79,8 @@ bool CEPAAlgorithm::ComputePenetrationDepthAndContactPoints(const CGJKSimplex& s
 	assert(m_Polytope.GetVertices().size() > 0);
 
 	// Now we can expand the polytope which contains the origin to get the penetration depth and contact points. 
-	double upperBound = DBL_MAX;
-	double lowerBound = -DBL_MAX;
+	btScalar upperBound = DBL_MAX;
+	btScalar lowerBound = -DBL_MAX;
 		
 	int numIter = 0;
 

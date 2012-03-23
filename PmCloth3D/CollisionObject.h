@@ -2,8 +2,7 @@
 
 #include <vector>
 #include "Transform.h"
-
-//#include "btBulletCollisionCommon.h"
+#include "../btBulletCollisionCommon.h"
 
 struct TriangleFace
 {
@@ -24,8 +23,8 @@ protected:
 	CTransform m_Transform;
 
 	CVector3D m_HalfExtent;
-	double m_Margin;
-	float m_Color[4];
+	btScalar m_Margin;
+	btScalar m_Color[4];
 
 	// For ConvexHull or PolyMesh
 	std::vector<CVector3D> m_Vertices;
@@ -39,8 +38,8 @@ public:
 	CollisionObjectType GetCollisionObjectType() { return m_CollisionObjectType; }
 	void SetCollisionObjectType(CollisionObjectType collisionObjectType);
 	
-	void SetSize(double x, double y, double z) { m_HalfExtent.Set(x/2.0, y/2.0, z/2.0); }
-	void SetColor(float r, float g, float b) { m_Color[0] = r; m_Color[1] = g; m_Color[2] = b; m_Color[3] = 1.0; }
+	void SetSize(btScalar x, btScalar y, btScalar z) { m_HalfExtent.Set(x/2.0, y/2.0, z/2.0); }
+	void SetColor(btScalar r, btScalar g, btScalar b) { m_Color[0] = r; m_Color[1] = g; m_Color[2] = b; m_Color[3] = 1.0; }
 
 	std::vector<CVector3D>& GetVertices() { return m_Vertices; }
 	const std::vector<CVector3D>& GetVertices() const { return m_Vertices; }
@@ -54,10 +53,10 @@ public:
 	const CTransform& GetTransform() const;
 	CTransform& GetTransform();
 
-	double GetMargin() const { return m_Margin; }
+	btScalar GetMargin() const { return m_Margin; }
 	CVector3D GetSize() const { return 2.0 * m_HalfExtent; }
 
-	CVector3D GetLocalSupportPoint(const CVector3D& dir, double margin = 0) const;
+	CVector3D GetLocalSupportPoint(const CVector3D& dir, btScalar margin = 0) const;
 
 	bool Load(const char* filename);
 

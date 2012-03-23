@@ -7,8 +7,8 @@
 #define EPSILON 1e-8
 #define EPSILON1 0.00001f
 
-inline bool IsZero(double x) { return ( ( x < EPSILON ) && ( x > -EPSILON ) ? true : false ); }
-inline bool IsEqual(double a, double b) { return ( ( ( a - b ) < EPSILON1 ) && ( ( a - b ) > -EPSILON1 ) ? true : false ); }
+inline bool IsZero(btScalar x) { return ( ( x < EPSILON ) && ( x > -EPSILON ) ? true : false ); }
+inline bool IsEqual(btScalar a, btScalar b) { return ( ( ( a - b ) < EPSILON1 ) && ( ( a - b ) > -EPSILON1 ) ? true : false ); }
 */
 
 CPoint2D::CPoint2D()
@@ -17,7 +17,7 @@ CPoint2D::CPoint2D()
 	m_Y = 0; 
 }
 
-CPoint2D::CPoint2D(double x, double y)
+CPoint2D::CPoint2D(btScalar x, btScalar y)
 {
 	m_X = x; 
 	m_Y = y; 
@@ -35,19 +35,19 @@ CPoint2D::CPoint2D(const CVector2D& other)
 	m_Y = other.m_Y;
 }
 
-void CPoint2D::Set(double x, double y)
+void CPoint2D::Set(btScalar x, btScalar y)
 {
 	m_X = x;
 	m_Y = y;
 }
 
-void CPoint2D::TranslateW(double x, double y)
+void CPoint2D::TranslateW(btScalar x, btScalar y)
 {
 	m_X = m_X + x;
 	m_Y = m_Y + y;
 }
 
-//void CPoint2D::RotateW(const CVector3D& axis, double ang)
+//void CPoint2D::RotateW(const CVector3D& axis, btScalar ang)
 //{
 //	CMatrix44 mat44;
 //	mat44.SetIdentity();
@@ -100,7 +100,7 @@ bool CPoint2D::operator!=(const CPoint2D& other)
 	return !( IsEqual(m_X, other.m_X) && IsEqual(m_Y, other.m_Y));
 }
 
-CPoint2D CPoint2D::operator*(double val) const
+CPoint2D CPoint2D::operator*(btScalar val) const
 {
 	CPoint2D vec(*this);
 
@@ -110,7 +110,7 @@ CPoint2D CPoint2D::operator*(double val) const
 	return vec;
 }
 
-CPoint2D operator*(double val, const CPoint2D& other)
+CPoint2D operator*(btScalar val, const CPoint2D& other)
 {
 	return other * val;
 }

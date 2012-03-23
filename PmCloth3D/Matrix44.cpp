@@ -30,7 +30,7 @@ CMatrix44::CMatrix44(const CMatrix44& other)
 	}
 }
 
-CMatrix44::CMatrix44(double R1[4], double R2[4], double R3[4], double R4[4])
+CMatrix44::CMatrix44(btScalar R1[4], btScalar R2[4], btScalar R3[4], btScalar R4[4])
 {
 	int i;
 
@@ -67,11 +67,11 @@ void CMatrix44::SetIdentity()
 	Row[3][0] = 0.0f; Row[3][1] = 0.0f; Row[3][2] = 0.0f; Row[3][3] = 1.0f;
 }
 
-void CMatrix44::SetRotation(const CVector3D& axis, double ang)
+void CMatrix44::SetRotation(const CVector3D& axis, btScalar ang)
 {
-	double nx = axis.m_X; 
-	double ny = axis.m_Y;
-	double nz = axis.m_Z;
+	btScalar nx = axis.m_X; 
+	btScalar ny = axis.m_Y;
+	btScalar nz = axis.m_Z;
 
 	Row[0][0] = nx*nx*vsin(ang) + cos(ang);
 	Row[0][1] = nx*ny*vsin(ang) - nz*sin(ang);
@@ -91,14 +91,14 @@ void CMatrix44::SetRotation(const CVector3D& axis, double ang)
 	Row[3][3] = 1.0f;
 }
 
-void CMatrix44::SetTranslate(double x, double y, double z)
+void CMatrix44::SetTranslate(btScalar x, btScalar y, btScalar z)
 {
 	Row[0][3] = x;
 	Row[1][3] = y;
 	Row[2][3] = z;
 }
 
-double CMatrix44::GetElement(int nRow, int nCol) const 
+btScalar CMatrix44::GetElement(int nRow, int nCol) const 
 { 
 	if ( nRow < 0 || nRow > 3 )
 		throw 0; // needs to be rewriten

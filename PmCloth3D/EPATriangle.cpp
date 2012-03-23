@@ -52,11 +52,11 @@ bool CEPATriangle::ComputeClosestPointToOrigin(const CEPAPolytope& EPAPolytope)
 	CVector3D v1 = p1 - p0;
 	CVector3D v2 = p2 - p0;
 	
-	double v1Dotv1 = v1.Dot(v1);
-    double v1Dotv2 = v1.Dot(v2);
-    double v2Dotv2 = v2.Dot(v2);
-    double p0Dotv1 = p0.Dot(v1);
-    double p0Dotv2 = p0.Dot(v2);
+	btScalar v1Dotv1 = v1.Dot(v1);
+    btScalar v1Dotv2 = v1.Dot(v2);
+    btScalar v2Dotv2 = v2.Dot(v2);
+    btScalar p0Dotv1 = p0.Dot(v1);
+    btScalar p0Dotv2 = p0.Dot(v2);
 
     m_Det = v1Dotv1 * v2Dotv2 - v1Dotv2 * v1Dotv2;
     m_Lambda1 = p0Dotv2 * v1Dotv2 - p0Dotv1 * v2Dotv2;

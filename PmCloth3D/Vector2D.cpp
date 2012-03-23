@@ -27,7 +27,7 @@ CVector2D::CVector2D(const CVector2D& begin, const CVector2D& end)
 
 CVector2D& CVector2D::Normalize()
 {
-	double d = sqrt(m_X * m_X + m_Y * m_Y);
+	btScalar d = sqrt(m_X * m_X + m_Y * m_Y);
 
 	if ( d == 0 )
 		return *this;
@@ -38,12 +38,12 @@ CVector2D& CVector2D::Normalize()
 	return *this;
 }
 
-//void CVector2D::TranslateW(double x, double y)
+//void CVector2D::TranslateW(btScalar x, btScalar y)
 //{
 //	// No effect on 3D vector
 //}
 
-//void CVector2D::RotateW(const CVector2D& axis, double ang)
+//void CVector2D::RotateW(const CVector2D& axis, btScalar ang)
 //{
 //	CMatrix44 mat44;
 //	mat44.SetIdentity();
@@ -72,7 +72,7 @@ CVector2D CVector2D::operator+(const CVector2D& other) const
 	return CVector2D(m_X + other.m_X, m_Y + other.m_Y); 
 }
 
-CVector2D CVector2D::operator/(double val) const
+CVector2D CVector2D::operator/(btScalar val) const
 { 
 	if ( val != 0 )
 		return CVector2D(m_X / val, m_Y / val); 
@@ -112,7 +112,7 @@ CVector2D& CVector2D::operator+=(const CVector2D& other)
 	return *this; 
 }
 
-CVector2D& CVector2D::operator*=(double val)
+CVector2D& CVector2D::operator*=(btScalar val)
 {
 	m_X *= val; 
 	m_Y *= val; 
@@ -120,7 +120,7 @@ CVector2D& CVector2D::operator*=(double val)
 	return *this; 
 }
 
-CVector2D CVector2D::operator*(double val) const
+CVector2D CVector2D::operator*(btScalar val) const
 {
 	CVector2D vec(*this);
 
@@ -130,7 +130,7 @@ CVector2D CVector2D::operator*(double val) const
 	return vec;
 }
 
-CVector2D operator*(double val, const CVector2D& other)
+CVector2D operator*(btScalar val, const CVector2D& other)
 {
 	return other * val;
 }

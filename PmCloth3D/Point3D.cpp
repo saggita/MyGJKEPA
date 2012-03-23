@@ -7,8 +7,8 @@
 #define EPSILON 1e-8
 #define EPSILON1 0.00001f
 
-inline bool IsZero(double x) { return ( ( x < EPSILON ) && ( x > -EPSILON ) ? true : false ); }
-inline bool IsEqual(double a, double b) { return ( ( ( a - b ) < EPSILON1 ) && ( ( a - b ) > -EPSILON1 ) ? true : false ); }
+inline bool IsZero(btScalar x) { return ( ( x < EPSILON ) && ( x > -EPSILON ) ? true : false ); }
+inline bool IsEqual(btScalar a, btScalar b) { return ( ( ( a - b ) < EPSILON1 ) && ( ( a - b ) > -EPSILON1 ) ? true : false ); }
 */
 
 CPoint3D::CPoint3D()
@@ -18,7 +18,7 @@ CPoint3D::CPoint3D()
 	m_Z = 0.0f;
 }
 
-CPoint3D::CPoint3D(double x, double y, double z)
+CPoint3D::CPoint3D(btScalar x, btScalar y, btScalar z)
 {
 	m_X = x; 
 	m_Y = y; 
@@ -39,21 +39,21 @@ CPoint3D::CPoint3D(const CVector3D& other)
 	m_Z = other.m_Z;
 }
 
-void CPoint3D::Set(double x, double y, double z)
+void CPoint3D::Set(btScalar x, btScalar y, btScalar z)
 {
 	m_X = x;
 	m_Y = y;
 	m_Z = z;
 }
 
-void CPoint3D::TranslateW(double x, double y, double z)
+void CPoint3D::TranslateW(btScalar x, btScalar y, btScalar z)
 {
 	m_X = m_X + x;
 	m_Y = m_Y + y;
 	m_Z = m_Z + z;
 }
 
-void CPoint3D::RotateW(const CVector3D& axis, double ang)
+void CPoint3D::RotateW(const CVector3D& axis, btScalar ang)
 {
 	CMatrix44 mat44;
 	mat44.SetIdentity();
@@ -107,7 +107,7 @@ bool CPoint3D::operator!=(const CPoint3D& other)
 	return !( IsEqual(m_X, other.m_X) && IsEqual(m_Y, other.m_Y) && IsEqual(m_Z, other.m_Z) );
 }
 
-CPoint3D CPoint3D::operator*(double val) const
+CPoint3D CPoint3D::operator*(btScalar val) const
 {
 	CPoint3D vec(*this);
 
@@ -118,7 +118,7 @@ CPoint3D CPoint3D::operator*(double val) const
 	return vec;
 }
 
-CPoint3D operator*(double val, const CPoint3D& other)
+CPoint3D operator*(btScalar val, const CPoint3D& other)
 {
 	return other * val;
 }
