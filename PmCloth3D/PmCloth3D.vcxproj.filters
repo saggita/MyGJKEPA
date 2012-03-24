@@ -1,0 +1,224 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="BIMAlgorithm.cpp" />
+    <ClCompile Include="CollisionDetections.cpp" />
+    <ClCompile Include="CollisionObject.cpp" />
+    <ClCompile Include="EPAAlgorithm.cpp" />
+    <ClCompile Include="EPAEdge.cpp" />
+    <ClCompile Include="EPAPolytope.cpp" />
+    <ClCompile Include="EPATriangle.cpp" />
+    <ClCompile Include="GJKAlgorithm.cpp" />
+    <ClCompile Include="GJKSimplex.cpp" />
+    <ClCompile Include="NarrowPhaseCollisionDetection.cpp" />
+    <ClCompile Include="WorldSimulation.cpp" />
+    <ClCompile Include="ConvexHeightField\ConvexHeightFieldShape.cpp">
+      <Filter>ConvexHeightField</Filter>
+    </ClCompile>
+    <ClCompile Include="CHFAlgorithm.cpp" />
+    <ClCompile Include="mathUtil.cpp">
+      <Filter>math</Filter>
+    </ClCompile>
+    <ClCompile Include="Matrix33.cpp">
+      <Filter>math</Filter>
+    </ClCompile>
+    <ClCompile Include="Matrix44.cpp">
+      <Filter>math</Filter>
+    </ClCompile>
+    <ClCompile Include="Point2D.cpp">
+      <Filter>math</Filter>
+    </ClCompile>
+    <ClCompile Include="Point3D.cpp">
+      <Filter>math</Filter>
+    </ClCompile>
+    <ClCompile Include="Quaternion.cpp">
+      <Filter>math</Filter>
+    </ClCompile>
+    <ClCompile Include="Transform.cpp">
+      <Filter>math</Filter>
+    </ClCompile>
+    <ClCompile Include="Vector2D.cpp">
+      <Filter>math</Filter>
+    </ClCompile>
+    <ClCompile Include="Vector3D.cpp">
+      <Filter>math</Filter>
+    </ClCompile>
+    <ClCompile Include="StringTokenizer.cpp">
+      <Filter>util</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="BIMAlgorithm.h" />
+    <ClInclude Include="CollisionDetections.h" />
+    <ClInclude Include="CollisionObject.h" />
+    <ClInclude Include="EPAAlgorithm.h" />
+    <ClInclude Include="EPAEdge.h" />
+    <ClInclude Include="EPAPolytope.h" />
+    <ClInclude Include="EPATriangle.h" />
+    <ClInclude Include="GJKAlgorithm.h" />
+    <ClInclude Include="GJKSimplex.h" />
+    <ClInclude Include="NarrowPhaseCollisionDetection.h" />
+    <ClInclude Include="WorldSimulation.h" />
+    <ClInclude Include="ConvexHeightField\ChNarrowphase.h">
+      <Filter>ConvexHeightField</Filter>
+    </ClInclude>
+    <ClInclude Include="ConvexHeightField\CollideUtils.h">
+      <Filter>ConvexHeightField</Filter>
+    </ClInclude>
+    <ClInclude Include="ConvexHeightField\CollisionShape.h">
+      <Filter>ConvexHeightField</Filter>
+    </ClInclude>
+    <ClInclude Include="ConvexHeightField\ConvexHeightFieldShape.h">
+      <Filter>ConvexHeightField</Filter>
+    </ClInclude>
+    <ClInclude Include="ConvexHeightField\Demo.h">
+      <Filter>ConvexHeightField</Filter>
+    </ClInclude>
+    <ClInclude Include="ConvexHeightField\MathCL.h">
+      <Filter>ConvexHeightField</Filter>
+    </ClInclude>
+    <ClInclude Include="ConvexHeightField\RigidBody.h">
+      <Filter>ConvexHeightField</Filter>
+    </ClInclude>
+    <ClInclude Include="ConvexHeightField\TypeDefinition.h">
+      <Filter>ConvexHeightField</Filter>
+    </ClInclude>
+    <ClInclude Include="Adl\Adl\Adl.h">
+      <Filter>Adl\Adl</Filter>
+    </ClInclude>
+    <ClInclude Include="Adl\Adl\AdlConfig.h">
+      <Filter>Adl\Adl</Filter>
+    </ClInclude>
+    <ClInclude Include="Adl\Adl\AdlError.h">
+      <Filter>Adl\Adl</Filter>
+    </ClInclude>
+    <ClInclude Include="Adl\Adl\AdlKernel.h">
+      <Filter>Adl\Adl</Filter>
+    </ClInclude>
+    <ClInclude Include="Adl\Adl\AdlStopwatch.h">
+      <Filter>Adl\Adl</Filter>
+    </ClInclude>
+    <ClInclude Include="Adl\AdlPrimitives\Math\Array.h">
+      <Filter>Adl\AdlPrimitives\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Adl\AdlPrimitives\Math\Math.h">
+      <Filter>Adl\AdlPrimitives\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Adl\AdlPrimitives\Math\MathCL.h">
+      <Filter>Adl\AdlPrimitives\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Adl\AdlPrimitives\Math\Matrix3x3.h">
+      <Filter>Adl\AdlPrimitives\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Adl\AdlPrimitives\Math\Quaternion.h">
+      <Filter>Adl\AdlPrimitives\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="CHFAlgorithm.h" />
+    <ClInclude Include="mathUtil.h">
+      <Filter>math</Filter>
+    </ClInclude>
+    <ClInclude Include="Matrix33.h">
+      <Filter>math</Filter>
+    </ClInclude>
+    <ClInclude Include="Matrix44.h">
+      <Filter>math</Filter>
+    </ClInclude>
+    <ClInclude Include="Point2D.h">
+      <Filter>math</Filter>
+    </ClInclude>
+    <ClInclude Include="Point3D.h">
+      <Filter>math</Filter>
+    </ClInclude>
+    <ClInclude Include="Quaternion.h">
+      <Filter>math</Filter>
+    </ClInclude>
+    <ClInclude Include="Transform.h">
+      <Filter>math</Filter>
+    </ClInclude>
+    <ClInclude Include="Vector2D.h">
+      <Filter>math</Filter>
+    </ClInclude>
+    <ClInclude Include="Vector3D.h">
+      <Filter>math</Filter>
+    </ClInclude>
+    <ClInclude Include="StringTokenizer.h">
+      <Filter>util</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="ConvexHeightField">
+      <UniqueIdentifier>{8579cb44-4bc4-4bd1-a4bd-32d76ff2b8a3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Adl">
+      <UniqueIdentifier>{3599c4b1-02fa-4846-8130-5b752d81c345}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Adl\Adl">
+      <UniqueIdentifier>{5114e76a-be75-4a1d-83a7-ec3ab2d0c199}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Adl\AdlDemos">
+      <UniqueIdentifier>{d3a46110-22fe-45f6-9bc3-e7cc51c98ec3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Adl\AdlGraphics">
+      <UniqueIdentifier>{2e557d38-09fd-4314-afae-4ba414200162}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Adl\AdlPrimitives">
+      <UniqueIdentifier>{8299c432-637c-4905-b9f7-4ad0fdc046d7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Adl\Adl\CL">
+      <UniqueIdentifier>{6b6cf022-c7f3-4927-b257-8d8eaae26765}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Adl\Adl\DX11">
+      <UniqueIdentifier>{ed87c94f-9af5-4022-8c69-9f219d544b7a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Adl\Adl\Host">
+      <UniqueIdentifier>{fdfc8875-c1c6-4926-8e84-a7ddb53e847d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Adl\AdlPrimitives\Math">
+      <UniqueIdentifier>{c1c01a26-b009-4352-82d3-48384fddff58}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="math">
+      <UniqueIdentifier>{be654d18-3b82-4785-9264-6673c16b1448}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="util">
+      <UniqueIdentifier>{f86aea9f-9c7c-4eda-b478-357b7f87386d}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="ConvexHeightField\ChNarrowphase.inl">
+      <Filter>ConvexHeightField</Filter>
+    </None>
+    <None Include="ConvexHeightField\ChNarrowphaseKernels.cl">
+      <Filter>ConvexHeightField</Filter>
+    </None>
+    <None Include="Adl\Adl\Adl.inl">
+      <Filter>Adl\Adl</Filter>
+    </None>
+    <None Include="Adl\Adl\AdlKernel.inl">
+      <Filter>Adl\Adl</Filter>
+    </None>
+    <None Include="Adl\Adl\AdlStopwatch.inl">
+      <Filter>Adl\Adl</Filter>
+    </None>
+    <None Include="Adl\Adl\CL\AdlCL.inl">
+      <Filter>Adl\Adl\CL</Filter>
+    </None>
+    <None Include="Adl\Adl\CL\AdlKernelUtilsCL.inl">
+      <Filter>Adl\Adl\CL</Filter>
+    </None>
+    <None Include="Adl\Adl\CL\AdlStopwatchCL.inl">
+      <Filter>Adl\Adl\CL</Filter>
+    </None>
+    <None Include="Adl\Adl\Host\AdlHost.inl">
+      <Filter>Adl\Adl\Host</Filter>
+    </None>
+    <None Include="Adl\Adl\Host\AdlStopwatchHost.inl">
+      <Filter>Adl\Adl\Host</Filter>
+    </None>
+    <None Include="Adl\AdlPrimitives\Math\Float2.inl">
+      <Filter>Adl\AdlPrimitives\Math</Filter>
+    </None>
+    <None Include="Adl\AdlPrimitives\Math\Float4.inl">
+      <Filter>Adl\AdlPrimitives\Math</Filter>
+    </None>
+  </ItemGroup>
+</Project>
