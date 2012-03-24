@@ -219,7 +219,7 @@ CMatrix33 CMatrix33::operator/(btScalar val) const
 
 	//assert(val != 0);
 
-	btScalar eps = 1e-10;
+	btScalar eps = 1e-10f;
 
 	if ( 0 <= val && val <= eps )
 		val += eps;

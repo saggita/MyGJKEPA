@@ -76,7 +76,7 @@ bool CGJKAlgorithm::CheckCollision(CCollisionObject& objA, CCollisionObject& obj
 	// TODO:Need to use cached one to exploit frame coherence. 
 	CVector3D v(1.0, 0.0, 0.0);
 
-	btScalar distSqr = DBL_MAX;
+	btScalar distSqr = SIMD_INFINITY;
 	btScalar distSqrPrev = distSqr;
 
 	int numIter = 0;

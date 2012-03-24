@@ -79,8 +79,8 @@ bool CEPAAlgorithm::ComputePenetrationDepthAndContactPoints(const CGJKSimplex& s
 	assert(m_Polytope.GetVertices().size() > 0);
 
 	// Now we can expand the polytope which contains the origin to get the penetration depth and contact points. 
-	btScalar upperBound = DBL_MAX;
-	btScalar lowerBound = -DBL_MAX;
+	btScalar upperBound = SIMD_INFINITY;
+	btScalar lowerBound = -SIMD_INFINITY;
 		
 	int numIter = 0;
 
@@ -101,7 +101,7 @@ bool CEPAAlgorithm::ComputePenetrationDepthAndContactPoints(const CGJKSimplex& s
 		CVector3D w = supportPointA - supportPointB;
 
 		// Compute upper and lower bounds
-		upperBound = std::min(upperBound, w * v.NormalizeOther());
+		upperBound = min(upperBound, w * v.NormalizeOther());
 
 #ifdef _DEBUG
  		//lowerBound = std::max(lowerBound, v.Length());
@@ -109,12 +109,12 @@ bool CEPAAlgorithm::ComputePenetrationDepthAndContactPoints(const CGJKSimplex& s
 #endif
 
 		//lowerBound = v.Length();
-		lowerBound = std::max(lowerBound, v.Length());
+		lowerBound = max(lowerBound, v.Length());
 
 		if ( upperBound - lowerBound < 1e-4 || numIter == maxIteration - 1 )
 		{
 			pCollisionInfo->bIntersect = true;
-			pCollisionInfo->penetrationDepth = 0.5 * (upperBound + lowerBound);
+			pCollisionInfo->penetrationDepth = 0.5f * (upperBound + lowerBound);
 			pCollisionInfo->witnessPntA = pClosestTriangle->GetClosestPointToOriginInSupportPntSpace(suppPointsA);
 			pCollisionInfo->witnessPntB = transA2B * pClosestTriangle->GetClosestPointToOriginInSupportPntSpace(suppPointsB);
 			pCollisionInfo->proximityDistance = 0;

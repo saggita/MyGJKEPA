@@ -18,12 +18,12 @@ inline bool IsEqual(btScalar a, btScalar b) { return ( ( ( a - b ) < EPSILON1 ) 
 // linear interpolation dividing a, b with t : (1-t)
 inline btScalar lerp(btScalar a, btScalar b, btScalar t)
 {
-	return a * (1.0 - t) + b * t;
+	return a * (1.0f - t) + b * t;
 }
 
 inline CVector2D lerp(const CVector2D& a, const CVector2D& b, btScalar t)
 {
-	return a * (1.0 - t) + b * t;
+	return a * (1.0f - t) + b * t;
 }
 
 // bilinear interpolation
@@ -118,7 +118,7 @@ inline CVector2D trilerp(const CVector2D& a, const CVector2D& b, const CVector2D
 */
 inline btScalar average2(btScalar a, btScalar b)
 {
-	return 0.5 * (a + b);
+	return 0.5f * (a + b);
 }
 
 /*
@@ -128,7 +128,7 @@ inline btScalar average2(btScalar a, btScalar b)
 */
 inline btScalar average4(btScalar a, btScalar b, btScalar c, btScalar d)
 {
-	return 0.25 * (a + b + c + d);
+	return 0.25f * (a + b + c + d);
 }
 
 btScalar DistanceFromPointToTriangle(const CVector3D& point, const CVector3D& p0, const CVector3D& p1, const CVector3D& p2, CVector3D* closestPointInTriangle = NULL);
@@ -136,5 +136,12 @@ btScalar DistanceFromPointToTriangle(const CVector3D& point, const CVector3D& p0
 // If point is in the side of normal direction, returns positive closest distance. Otherwise, it returns negative closest distance.
 // normal direction of triangle is (p1-p0).Cross(p2-p0).Normalize(). So p0, p1 and p2 forms counter-clockwise.
 //btScalar SignedDistanceFromPointToTriangle(const CVector3D& point, const CVector3D& p0, const CVector3D& p1, const CVector3D& p2, CVector3D* closestPointInTriangle = NULL);
+
+// The normal vector of plane formed by p0, p1 and p2 is (p1-p0).Cross(p2-p0).Normalize().
+// If 'point' is on the positive side of plane, it returns positive distance. Otherwise, it returns negative distance. 
+btScalar SignedDistanceFromPointToPlane(const CVector3D& point, const CVector3D& p0, const CVector3D& p1, const CVector3D& p2, CVector3D* closestPointInTriangle = NULL);
+
+// Assumes planeEqn[0], planeEqn[1] and planeEqn[2] forms unit normal vector.
+btScalar SignedDistanceFromPointToPlane(const CVector3D& point, const btScalar* planeEqn, CVector3D* closestPointInTriangle = NULL);
 
 #endif // __MATH_H__

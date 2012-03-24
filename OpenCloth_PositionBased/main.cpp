@@ -59,6 +59,7 @@ DAMAGE.
 #include "../PmCloth3D/CollisionObject.h"
 #include "../PmCloth3D/GJKAlgorithm.h"
 #include "../PmCloth3D/BIMAlgorithm.h"
+#include "../PmCloth3D/CHFAlgorithm.h"
 #include "../PmCloth3D/NarrowPhaseCollisionDetection.h"
  
 //undefine if u want to use the default bending constraint of pbd
@@ -69,7 +70,10 @@ DAMAGE.
 using namespace std;  
 const int width = 1024, height = 1024;
 
+#ifndef PI
 #define PI 3.1415926536f
+#endif
+
 #define EPSILON  0.0000001f
  
 int numX = 20, numY=20; //these ar the number of quads
@@ -150,6 +154,7 @@ float radius = 1;					 //object space radius of ellipsoid
 //--------------------
 CGJKAlgorithm* g_pGJK = NULL;
 CBIMAlgorithm* g_pBIM = NULL;
+CCHFAlgorithm* g_pCHF = NULL;
 CCollisionObject* g_pConvexObj = NULL;
 std::vector<CCollisionObject*> clothVertices;
 
@@ -479,9 +484,10 @@ void InitGL() {
 	//------------------------------------------------
 	g_pGJK = new CGJKAlgorithm();
 	g_pBIM = new CBIMAlgorithm();
+	g_pCHF = new CCHFAlgorithm();
 	g_pConvexObj = new CCollisionObject();
-	g_pConvexObj->SetCollisionObjectType(CCollisionObject::ConvexHull);
-	g_pConvexObj->Load("cone.obj");
+	g_pConvexObj->SetCollisionObjectType(CCollisionObject::ConvexHF);
+	g_pConvexObj->Load("smallGeoSphere.obj");
 	g_pConvexObj->GetTransform().GetTranslation().Set(0.0, 0.0, -0.5); 
 	g_pConvexObj->SetSize(3.0, 2.0, 1.0);
 	g_pConvexObj->SetColor(1.0, 0.0, 0.0);
@@ -637,6 +643,7 @@ void OnShutdown() {
 
 	delete g_pGJK;
 	delete g_pBIM;
+	delete g_pCHF;
 	delete g_pConvexObj;
 
 	for ( int i = 0; i < (int)clothVertices.size(); i++ )
@@ -924,7 +931,8 @@ void UpdateExternalConstraints() {
 		CNarrowCollisionInfo info;
 		
 		//if ( g_pGJK->CheckCollision(*g_pConvexObj, *clothVertices[i], &info, false) )
-		if ( g_pBIM->CheckCollision(*g_pConvexObj, *clothVertices[i], &info, false) )
+		//if ( g_pBIM->CheckCollision(*g_pConvexObj, *clothVertices[i], &info, false) )
+		if ( g_pCHF->CheckCollision(*g_pConvexObj, *clothVertices[i], &info, false) )
 		{
 			CVector3D pointW = g_pConvexObj->GetTransform() * info.witnessPntA;
 			glm::vec3 dP(pointW.m_X, pointW.m_Y, pointW.m_Z); 

@@ -3,20 +3,18 @@
 #include <vector>
 #include "Transform.h"
 #include "../btBulletCollisionCommon.h"
+#include "ConvexHeightField\ConvexHeightFieldShape.h"
 
 struct TriangleFace
 {
 	int indices[3];
+	btScalar planeEqn[4];
 };
 
 class CCollisionObject
 {
 public:
-	CCollisionObject(void);
-	virtual ~CCollisionObject(void);
-
-	enum CollisionObjectType { None, Point, Box, Sphere, Cone, Capsule, Cylinder, ConvexHull, PolyMesh };
-
+	enum CollisionObjectType { None, Point, Box, Sphere, Cone, Capsule, Cylinder, ConvexHull, ConvexHF, PolyMesh };
 
 protected:
 	CollisionObjectType m_CollisionObjectType; 
@@ -29,16 +27,23 @@ protected:
 	// For ConvexHull or PolyMesh
 	std::vector<CVector3D> m_Vertices;
 	std::vector<CVector3D> m_Normals;
-	std::vector<TriangleFace> m_Faces;
+	std::vector<TriangleFace> m_Faces; 
 
 	// bullet
 	//btCollisionObject* m_pBulletColObj;
+
+	// Convex HeightField
+	ConvexHeightField* m_pConvexHeightField;
+
+public:
+	CCollisionObject(void);
+	virtual ~CCollisionObject(void);
 
 public:
 	CollisionObjectType GetCollisionObjectType() { return m_CollisionObjectType; }
 	void SetCollisionObjectType(CollisionObjectType collisionObjectType);
 	
-	void SetSize(btScalar x, btScalar y, btScalar z) { m_HalfExtent.Set(x/2.0, y/2.0, z/2.0); }
+	void SetSize(btScalar x, btScalar y, btScalar z) { m_HalfExtent.Set(x/2.0f, y/2.0f, z/2.0f); }
 	void SetColor(btScalar r, btScalar g, btScalar b) { m_Color[0] = r; m_Color[1] = g; m_Color[2] = b; m_Color[3] = 1.0; }
 
 	std::vector<CVector3D>& GetVertices() { return m_Vertices; }
@@ -57,6 +62,9 @@ public:
 	CVector3D GetSize() const { return 2.0 * m_HalfExtent; }
 
 	CVector3D GetLocalSupportPoint(const CVector3D& dir, btScalar margin = 0) const;
+
+	ConvexHeightField* GetConvexHFObject() { return m_pConvexHeightField; }
+	const ConvexHeightField* GetConvexHFObject() const { return m_pConvexHeightField; }
 
 	bool Load(const char* filename);
 

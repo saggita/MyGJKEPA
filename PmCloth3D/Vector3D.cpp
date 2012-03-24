@@ -202,7 +202,7 @@ CVector3D CVector3D::operator/(const CVector3D& other) const
 {
 	CVector3D vec;
 
-	btScalar e = 1e-10;
+	btScalar e = 1e-10f;
 
 	btScalar x = 0;
 	btScalar y = 0;

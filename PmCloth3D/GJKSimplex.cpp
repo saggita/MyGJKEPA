@@ -221,7 +221,7 @@ void CGJKSimplex::ClosestPointAandB(CVector3D& pA, CVector3D& pB) const {
     }
 
     assert(sum > 0.0);
-    btScalar factor = 1.0 / sum;
+    btScalar factor = 1.0f / sum;
     pA *= factor;
     pB *= factor;
 }

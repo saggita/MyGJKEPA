@@ -137,7 +137,7 @@ static int BarrelIdx[] = {
 44,26,47,
 };
 
-CCollisionObject::CCollisionObject(void) : m_HalfExtent(1.0), m_Margin(0.01)
+CCollisionObject::CCollisionObject(void) : m_HalfExtent(1.0), m_Margin(0.01), m_pConvexHeightField(NULL)
 {
 	//m_pBulletColObj = new btCollisionObject();	
 
@@ -147,6 +147,8 @@ CCollisionObject::CCollisionObject(void) : m_HalfExtent(1.0), m_Margin(0.01)
 CCollisionObject::~CCollisionObject(void)
 {
 	//delete m_pBulletColObj;
+
+	delete m_pConvexHeightField;
 }
 
 const CTransform& CCollisionObject::GetTransform() const 
@@ -219,6 +221,10 @@ void CCollisionObject::SetCollisionObjectType(CollisionObjectType collisionObjec
 			m_Faces.push_back(face);
 		}*/
 	}
+	else if ( m_CollisionObjectType == ConvexHF )
+	{
+		Load("./model/geoSphere.obj");		
+	}
 }
 
 CVector3D CCollisionObject::GetLocalSupportPoint(const CVector3D& dir, btScalar margin/* = 0*/) const
@@ -284,9 +290,9 @@ CVector3D CCollisionObject::GetLocalSupportPoint(const CVector3D& dir, btScalar 
 			supportPoint += unitVec * margin;
 		}
 	}
-	else if ( m_CollisionObjectType == ConvexHull )
+	else if ( m_CollisionObjectType == ConvexHull || m_CollisionObjectType == ConvexHF )
 	{
-		btScalar maxDot = -DBL_MAX;
+		btScalar maxDot = -SIMD_INFINITY;
 	
 		for ( int i = 0; i < (int)m_Vertices.size(); i++ )
 		{
@@ -443,7 +449,7 @@ void CCollisionObject::Render() const
 		glPopAttrib();
 		glPopMatrix();
 	}
-	else if ( m_CollisionObjectType == ConvexHull )
+	else if ( m_CollisionObjectType == ConvexHull || m_CollisionObjectType == ConvexHF )
 	{
 		GLdouble val[16];
 		memset(val, 0, sizeof(GLdouble)*16);
@@ -619,10 +625,47 @@ bool CCollisionObject::Load(const char* filename)
 					tri.indices[i++] = atoi(sToken.c_str())-1;
 				}
 			}		
-
+			
 			m_Faces.push_back(tri);	
 		}		
 	}
 
 	inFile.close();
+
+	// Compute plane equation for faces.
+	for ( int i = 0; i < (int)m_Faces.size(); i++ )
+	{
+		TriangleFace& face = m_Faces[i];
+
+		const CVector3D& p0 = m_Vertices[face.indices[0]];
+		const CVector3D& p1 = m_Vertices[face.indices[1]];
+		const CVector3D& p2 = m_Vertices[face.indices[2]];
+
+		CVector3D n = (p1-p0).Cross(p2-p0).Normalize();
+		double d = -n.Dot(p0);
+
+		face.planeEqn[0] = n.m_X;
+		face.planeEqn[1] = n.m_Y;
+		face.planeEqn[2] = n.m_Z;
+		face.planeEqn[3] = d;
+	}
+
+	if ( m_pConvexHeightField )
+		delete m_pConvexHeightField;
+
+	float4* eqn = new float4[m_Faces.size()];
+
+	for ( int i=0; i < (int)m_Faces.size();i++ )
+	{
+		eqn[i].x = m_Faces[i].planeEqn[0];
+		eqn[i].y = m_Faces[i].planeEqn[1];
+		eqn[i].z = m_Faces[i].planeEqn[2];
+		eqn[i].w = m_Faces[i].planeEqn[3];
+	}
+	
+	m_pConvexHeightField = new ConvexHeightField(eqn, m_Faces.size());
+
+	delete [] eqn;
+
+	return true;
 }

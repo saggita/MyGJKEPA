@@ -64,7 +64,7 @@ bool CEPATriangle::ComputeClosestPointToOrigin(const CEPAPolytope& EPAPolytope)
 
     if ( m_Det > 0.0 ) 
 	{
-        m_ClosestPointToOrigin = p0 + 1.0 / m_Det * (m_Lambda1 * v1 + m_Lambda2 * v2);
+        m_ClosestPointToOrigin = p0 + 1.0f / m_Det * (m_Lambda1 * v1 + m_Lambda2 * v2);
 		m_DistSqr = m_ClosestPointToOrigin.LengthSqr();
 
         return true;
@@ -80,7 +80,7 @@ CVector3D CEPATriangle::GetClosestPointToOriginInSupportPntSpace(const std::vect
 	for (int i = 0; i < 3; i++ )
 		sp[i] = &supportPoints[m_IndicesVertex[i]];
 
-	return (*sp[0]) + (1.0/m_Det) * (m_Lambda1 * ((*sp[1]) - (*sp[0])) + m_Lambda2 * ((*sp[2]) - (*sp[0])));
+	return (*sp[0]) + (1.0f/m_Det) * (m_Lambda1 * ((*sp[1]) - (*sp[0])) + m_Lambda2 * ((*sp[2]) - (*sp[0])));
 }
 
 // Please note that edge doesn't belong to this triangle. It is from the neighbor triangle.

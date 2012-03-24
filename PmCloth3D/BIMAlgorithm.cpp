@@ -13,25 +13,6 @@ CBIMAlgorithm::~CBIMAlgorithm(void)
 {
 }
 
-// The normal vector of plane formed by p0, p1 and p2 is (p1-p0).Cross(p2-p0).Normalize().
-// If 'point' is on the positive side of plane, it returns positive distance. Otherwise, it returns negative distance. 
-btScalar SignedDistanceFromPointToPlane(const CVector3D& point, const CVector3D& p0, const CVector3D& p1, const CVector3D& p2, CVector3D* closestPointInTriangle = NULL)
-{
-	CVector3D n = (p1-p0).Cross(p2-p0).Normalize();
-
-	if ( n.LengthSqr() < 1e-6 )
-		return 0;
-	else
-	{
-		btScalar dist = (point-p0).Dot(n);
-
-		if ( closestPointInTriangle )
-			*closestPointInTriangle = point - dist * n;
-
-		return dist;
-	}
-}
-
 bool CBIMAlgorithm::CheckCollision(CCollisionObject& objA, CCollisionObject& objB, CNarrowCollisionInfo* pCollisionInfo, bool bProximity/* = false*/)
 {
 	assert(objB.GetCollisionObjectType() == CCollisionObject::Point);
@@ -47,19 +28,16 @@ bool CBIMAlgorithm::CheckCollision(CCollisionObject& objA, CCollisionObject& obj
 	CTransform transW2A = objA.GetTransform().InverseOther();
 
 	CVector3D point = transW2A * objB.GetTransform().GetTranslation();
-	btScalar minDist = -DBL_MAX;
+	btScalar minDist = -SIMD_INFINITY;
+	btScalar maxDist = SIMD_INFINITY;
 	CVector3D closestPointA;
-	CVector3D* vert[3];
 
 	for ( int i = 0; i < (int)objA.GetFaces().size(); i++ )
 	{
 		TriangleFace& tri = objA.GetFaces()[i];
-
-		for ( int j = 0; j < 3; j++ )
-			vert[j] = &objA.GetVertices()[tri.indices[j]]; 
 		
 		CVector3D pntA;
-		btScalar dist =SignedDistanceFromPointToPlane(point, *vert[0], *vert[1], *vert[2], &pntA);
+		btScalar dist =SignedDistanceFromPointToPlane(point, tri.planeEqn, &pntA);
 
 		// If the distance is positive, the plane is a separating plane. 
 		if ( dist > 0 )

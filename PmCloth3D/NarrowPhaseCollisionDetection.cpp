@@ -1,11 +1,13 @@
 #include "NarrowPhaseCollisionDetection.h"
 #include "GJKAlgorithm.h"
 #include "BIMAlgorithm.h"
+#include "CHFAlgorithm.h"
 
 CNarrowPhaseCollisionDetection::CNarrowPhaseCollisionDetection(void)
 {
 	//m_pAlgorithm = new CGJKAlgorithm;
-	m_pAlgorithm = new CBIMAlgorithm;
+	//m_pAlgorithm = new CBIMAlgorithm;
+	m_pAlgorithm = new CCHFAlgorithm;
 }
 
 

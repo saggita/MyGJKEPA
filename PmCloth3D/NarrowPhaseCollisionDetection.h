@@ -6,6 +6,7 @@
 class CCollisionObject;
 class CGJKAlgorithm;
 class CBIMAlgorithm;
+class CCHFAlgorithm;
 
 class CNarrowCollisionInfo
 {
@@ -41,7 +42,8 @@ public:
 
 protected:
 	//CGJKAlgorithm* m_pAlgorithm;
-	CBIMAlgorithm* m_pAlgorithm;
+	//CBIMAlgorithm* m_pAlgorithm;
+	CCHFAlgorithm* m_pAlgorithm;
 	std::vector<CNarrowCollisionInfo> m_CollisionPairs;
 
 public:

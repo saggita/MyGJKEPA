@@ -114,5 +114,39 @@ btScalar DistanceFromPointToTriangle(const CVector3D& p, const CVector3D& p0, co
 	return (p - closestPoint).Length();
 }
 
+// The normal vector of plane formed by p0, p1 and p2 is (p1-p0).Cross(p2-p0).Normalize().
+// If 'point' is on the positive side of plane, it returns positive distance. Otherwise, it returns negative distance. 
+btScalar SignedDistanceFromPointToPlane(const CVector3D& point, const CVector3D& p0, const CVector3D& p1, const CVector3D& p2, CVector3D* closestPointInTriangle/* = NULL*/)
+{
+	CVector3D n = (p1-p0).Cross(p2-p0).Normalize();
 
+	if ( n.LengthSqr() < 1e-6 )
+		return 0;
+	else
+	{
+		btScalar dist = (point-p0).Dot(n);
 
+		if ( closestPointInTriangle )
+			*closestPointInTriangle = point - dist * n;
+
+		return dist;
+	}
+}
+
+// Assumes planeEqn[0], planeEqn[1] and planeEqn[2] forms unit normal vector.
+btScalar SignedDistanceFromPointToPlane(const CVector3D& point, const btScalar* planeEqn, CVector3D* closestPointInTriangle/* = NULL*/)
+{
+	CVector3D n(planeEqn[0], planeEqn[1], planeEqn[2]);
+
+	if ( n.LengthSqr() < 1e-6 )
+		return 0;
+	else
+	{
+		btScalar dist = n.Dot(point) + planeEqn[3];
+
+		if ( closestPointInTriangle )
+			*closestPointInTriangle = point - dist * n;
+
+		return dist;
+	}
+}

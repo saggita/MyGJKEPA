@@ -1,6 +1,10 @@
 #include <algorithm>
 #include <limits>
 
+#pragma warning( push )
+#pragma warning( disable : 4244 )
+#pragma warning( disable : 4305 )
+
 #include "CollisionDetections.h"
 #include "mathUtil.h"
 
@@ -876,3 +880,5 @@ bool ContinuousCollisionPointToTriangle(const CVector3D& p_old, const CVector3D&
 
 	return bCollide;
 }
+
+#pragma warning( pop ) 

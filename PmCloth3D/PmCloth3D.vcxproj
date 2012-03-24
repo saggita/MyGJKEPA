@@ -19,9 +19,28 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Adl\AdlPrimitives\Math\Array.h" />
+    <ClInclude Include="Adl\AdlPrimitives\Math\Math.h" />
+    <ClInclude Include="Adl\AdlPrimitives\Math\MathCL.h" />
+    <ClInclude Include="Adl\AdlPrimitives\Math\Matrix3x3.h" />
+    <ClInclude Include="Adl\AdlPrimitives\Math\Quaternion.h" />
+    <ClInclude Include="Adl\Adl\Adl.h" />
+    <ClInclude Include="Adl\Adl\AdlConfig.h" />
+    <ClInclude Include="Adl\Adl\AdlError.h" />
+    <ClInclude Include="Adl\Adl\AdlKernel.h" />
+    <ClInclude Include="Adl\Adl\AdlStopwatch.h" />
     <ClInclude Include="BIMAlgorithm.h" />
+    <ClInclude Include="CHFAlgorithm.h" />
     <ClInclude Include="CollisionDetections.h" />
     <ClInclude Include="CollisionObject.h" />
+    <ClInclude Include="ConvexHeightField\ChNarrowphase.h" />
+    <ClInclude Include="ConvexHeightField\CollideUtils.h" />
+    <ClInclude Include="ConvexHeightField\CollisionShape.h" />
+    <ClInclude Include="ConvexHeightField\ConvexHeightFieldShape.h" />
+    <ClInclude Include="ConvexHeightField\Demo.h" />
+    <ClInclude Include="ConvexHeightField\MathCL.h" />
+    <ClInclude Include="ConvexHeightField\RigidBody.h" />
+    <ClInclude Include="ConvexHeightField\TypeDefinition.h" />
     <ClInclude Include="EPAAlgorithm.h" />
     <ClInclude Include="EPAEdge.h" />
     <ClInclude Include="EPAPolytope.h" />
@@ -43,8 +62,10 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="BIMAlgorithm.cpp" />
+    <ClCompile Include="CHFAlgorithm.cpp" />
     <ClCompile Include="CollisionDetections.cpp" />
     <ClCompile Include="CollisionObject.cpp" />
+    <ClCompile Include="ConvexHeightField\ConvexHeightFieldShape.cpp" />
     <ClCompile Include="EPAAlgorithm.cpp" />
     <ClCompile Include="EPAEdge.cpp" />
     <ClCompile Include="EPAPolytope.cpp" />
@@ -63,6 +84,20 @@
     <ClCompile Include="Vector2D.cpp" />
     <ClCompile Include="Vector3D.cpp" />
     <ClCompile Include="WorldSimulation.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Adl\AdlPrimitives\Math\Float2.inl" />
+    <None Include="Adl\AdlPrimitives\Math\Float4.inl" />
+    <None Include="Adl\Adl\Adl.inl" />
+    <None Include="Adl\Adl\AdlKernel.inl" />
+    <None Include="Adl\Adl\AdlStopwatch.inl" />
+    <None Include="Adl\Adl\CL\AdlCL.inl" />
+    <None Include="Adl\Adl\CL\AdlKernelUtilsCL.inl" />
+    <None Include="Adl\Adl\CL\AdlStopwatchCL.inl" />
+    <None Include="Adl\Adl\Host\AdlHost.inl" />
+    <None Include="Adl\Adl\Host\AdlStopwatchHost.inl" />
+    <None Include="ConvexHeightField\ChNarrowphase.inl" />
+    <None Include="ConvexHeightField\ChNarrowphaseKernels.cl" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{D5E2412C-9AA6-41FA-922F-05450EF6912C}</ProjectGuid>
@@ -119,7 +154,7 @@
       <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <OpenMPSupport>true</OpenMPSupport>
-      <AdditionalIncludeDirectories>.;../</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.;../;../../;Adl;Adl/AdlDemos/;Adl/AdlDemos/TestBed/;$(AMDAPPSDKROOT)\include;$(DXSDK_DIR)/Include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -163,7 +198,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
-      <AdditionalIncludeDirectories>.;../</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.;../;../../;Adl;Adl/AdlDemos/;Adl/AdlDemos/TestBed/;$(AMDAPPSDKROOT)\include;$(DXSDK_DIR)/Include</AdditionalIncludeDirectories>
       <OpenMPSupport>true</OpenMPSupport>
     </ClCompile>
     <Link>

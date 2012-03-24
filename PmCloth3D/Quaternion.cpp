@@ -51,7 +51,7 @@ CQuaternion& CQuaternion::Normalize()
 void CQuaternion::SetRotation(const CVector3D& axis, btScalar angle_radian)
 {
 	// This function assumes that the axis vector has been normalized.
-	btScalar halfAng = 0.5 * angle_radian;
+	btScalar halfAng = 0.5f * angle_radian;
     btScalar sinHalf = sin(halfAng);
 	m_W = cos(halfAng);
 
@@ -69,8 +69,8 @@ void CQuaternion::SetRotation(const CMatrix33& rotMat)
 	{
 		// |w| > 1/2, may as well choose w > 1/2
 		fRoot = sqrt(fTrace + 1.0f);  // 2w
-		m_W = 0.5*fRoot;
-		fRoot = 0.5/fRoot;  // 1/(4w)
+		m_W = 0.5f*fRoot;
+		fRoot = 0.5f/fRoot;  // 1/(4w)
 		m_X = (rotMat.e[2][1]-rotMat.e[1][2])*fRoot;
 		m_Y = (rotMat.e[0][2]-rotMat.e[2][0])*fRoot;
 		m_Z = (rotMat.e[1][0]-rotMat.e[0][1])*fRoot;
@@ -128,7 +128,7 @@ void CQuaternion::GetRotation(CMatrix33* pMat33) const
     btScalar s = 0.0;
 
     if (nQ > 0.0) {
-        s = 2.0/nQ;
+        s = 2.0f/nQ;
     }
 
 	btScalar xs = m_X*s;
@@ -144,9 +144,9 @@ void CQuaternion::GetRotation(CMatrix33* pMat33) const
     btScalar yzs = m_Y*zs;
     btScalar zzs = m_Z*zs;
 
-	pMat33->Set(1.0-yys-zzs, xys-wzs, xzs + wys,
-                xys + wzs, 1.0-xxs-zzs, yzs-wxs,
-                xzs-wys, yzs + wxs, 1.0-xxs-yys);
+	pMat33->Set(1.0f-yys-zzs, xys-wzs, xzs + wys,
+                xys + wzs, 1.0f-xxs-zzs, yzs-wxs,
+                xzs-wys, yzs + wxs, 1.0f-xxs-yys);
 }
 
 CMatrix33 CQuaternion::GetMatrix33() const
