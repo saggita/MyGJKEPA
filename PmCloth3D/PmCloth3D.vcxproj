@@ -154,7 +154,7 @@
       <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <OpenMPSupport>true</OpenMPSupport>
-      <AdditionalIncludeDirectories>.;../;../../;Adl;Adl/AdlDemos/;Adl/AdlDemos/TestBed/;$(AMDAPPSDKROOT)\include;$(DXSDK_DIR)/Include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.;../;../../;Adl;Adl/AdlDemos/;Adl/AdlDemos/TestBed/;$(AMDAPPSDKROOT)\include;$(DXSDK_DIR)/Include;../extern/glut/include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -198,7 +198,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
-      <AdditionalIncludeDirectories>.;../;../../;Adl;Adl/AdlDemos/;Adl/AdlDemos/TestBed/;$(AMDAPPSDKROOT)\include;$(DXSDK_DIR)/Include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.;../;../../;Adl;Adl/AdlDemos/;Adl/AdlDemos/TestBed/;$(AMDAPPSDKROOT)\include;$(DXSDK_DIR)/Include;../extern/glut/include</AdditionalIncludeDirectories>
       <OpenMPSupport>true</OpenMPSupport>
     </ClCompile>
     <Link>
