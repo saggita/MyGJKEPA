@@ -1,17 +1,17 @@
 #pragma once
 
-#include <vector>
+#include "ConvexCollisionAlgorithm.h"
 
 class CCollisionObject;
 class CNarrowCollisionInfo;
 
-class CCHFAlgorithm
+// Convex Height Field method.
+class CCHFAlgorithm : public IConvexCollisionAlgorithm
 {
 public:
 	CCHFAlgorithm(void);
 	virtual ~CCHFAlgorithm(void);
 
-	std::vector<CCollisionObject*> m_CollisionObjectList;
-	bool CheckCollision(CCollisionObject& objA, CCollisionObject& objB, CNarrowCollisionInfo* pCollisionInfo, bool bProximity = false);
+	virtual bool CheckCollision(CCollisionObject& objA, CCollisionObject& objB, CNarrowCollisionInfo* pCollisionInfo, bool bProximity = false);
 };
 

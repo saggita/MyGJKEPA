@@ -1,14 +1,14 @@
 #pragma once
 
-#include <vector>
-#include "CollisionObject.h"
-#include "EPAEdge.h"
-#include "GJKSimplex.h"
 #include "EPAAlgorithm.h"
+#include "ConvexCollisionAlgorithm.h"
 
+class CCollisionObject;
+class CEPAEdge;
+class CGJKSimplex;
 class CWorldSimulation;
 
-class CGJKAlgorithm
+class CGJKAlgorithm : public IConvexCollisionAlgorithm
 {
 protected:
 	CEPAAlgorithm m_EPAAlgorithm;
@@ -21,6 +21,6 @@ public:
 	CGJKAlgorithm();
 	virtual ~CGJKAlgorithm(void);
 	
-	bool CheckCollision(CCollisionObject& objA, CCollisionObject& objB, CNarrowCollisionInfo* pCollisionInfo, bool bProximity = false);
+	virtual bool CheckCollision(CCollisionObject& objA, CCollisionObject& objB, CNarrowCollisionInfo* pCollisionInfo, bool bProximity = false);
 };
 

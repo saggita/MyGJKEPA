@@ -14,6 +14,7 @@
 #include <vector>
 #include "HGLCamera.h"
 #include "PmCloth3D\WorldSimulation.h"
+#include "PmCloth3D\NarrowPhaseCollisionDetection.h"
 
 using namespace std;
 
@@ -25,12 +26,15 @@ int mouseButton = -1;
 bool bMousePressed = false;
 bool bPause = true;
 
-CWorldSimulation g_Cloth;
+std::string g_sWindowTitle;
+std::string g_sWindowTitleInfo;
+
+CWorldSimulation g_WorldSim;
 double g_dt = 0.001;
 
 void InitSimulation()
 {
-	g_Cloth.Create();
+	g_WorldSim.Create();
 }
 
 void InitGL()
@@ -46,7 +50,11 @@ void InitGL()
 
 void OnRender() 
 {
-	//glutSetWindowTitle(info);	
+	std::string sTitle = g_sWindowTitle;
+	sTitle.append("  ");
+	sTitle.append(g_sWindowTitleInfo);
+
+	glutSetWindowTitle(sTitle.c_str());	
 
 	static GLfloat RedSurface[]   = { 1.0f, 0.0f, 0.0f, 1.0f};
 	static GLfloat GreenSurface[] = { 0.0f, 1.0f, 0.0f, 1.0f};
@@ -104,11 +112,11 @@ void OnRender()
 	glEnable(GL_LIGHT0);
 
 	if ( !bPause )
-		g_Cloth.Update(g_dt);
+		g_WorldSim.Update(g_dt);
 	
 	glEnable(GL_LIGHTING);
 	glEnable(GL_LIGHT0);
-	g_Cloth.Render();
+	g_WorldSim.Render();
 			
 	glutSwapBuffers();
 }
@@ -179,6 +187,40 @@ void OnKeyboard(unsigned char key, int x, int y)
 	case 32: // space
 		bPause = !bPause;
 		break;
+
+	case 'a':
+	case 'A':
+		{
+			if ( g_WorldSim.m_pNarrowPhase )
+			{
+				bool bPausePrev = bPause;
+				bPause = true;
+
+				CNarrowPhaseCollisionDetection::CollisionAlgorithmType colAlgoType = g_WorldSim.m_pNarrowPhase->GetConvexCollisionAlgorithm();
+
+				if ( colAlgoType == CNarrowPhaseCollisionDetection::GJK_EPA )
+				{
+					colAlgoType = CNarrowPhaseCollisionDetection::BIM;
+					g_sWindowTitleInfo = "Brute-force Iterative method";
+				}
+				else if ( colAlgoType == CNarrowPhaseCollisionDetection::BIM )
+				{
+					colAlgoType = CNarrowPhaseCollisionDetection::CHF;
+					g_sWindowTitleInfo = "Convex Height Field method";
+				}
+				else if ( colAlgoType == CNarrowPhaseCollisionDetection::CHF )
+				{
+					colAlgoType = CNarrowPhaseCollisionDetection::GJK_EPA;
+					g_sWindowTitleInfo = "GJK/EPA method";
+				}
+
+				g_WorldSim.m_pNarrowPhase->SetConvexCollisionAlgorithm(colAlgoType);
+
+				bPause = bPausePrev;
+			}
+		}
+
+		break;
 	}
 }
 
@@ -187,7 +229,9 @@ void main(int argc, char** argv)
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH);
 	glutInitWindowSize(width, height);
-	glutCreateWindow("GJK/EPA for Cloth - Dongsoo Han");
+
+	g_sWindowTitle = "Convex collision Algorithms - Dongsoo Han";
+	glutCreateWindow(g_sWindowTitle.c_str());
 
 	glutDisplayFunc(OnRender);
 	glutReshapeFunc(OnReshape);

@@ -16,7 +16,7 @@ CBIMAlgorithm::~CBIMAlgorithm(void)
 bool CBIMAlgorithm::CheckCollision(CCollisionObject& objA, CCollisionObject& objB, CNarrowCollisionInfo* pCollisionInfo, bool bProximity/* = false*/)
 {
 	assert(objB.GetCollisionObjectType() == CCollisionObject::Point);
-	assert(objA.GetCollisionObjectType() == CCollisionObject::ConvexHull);
+	//assert(objA.GetCollisionObjectType() == CCollisionObject::ConvexHull);
 
 	// Initialize collision info
 	pCollisionInfo->bIntersect = false;

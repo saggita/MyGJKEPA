@@ -33,6 +33,7 @@
     <ClInclude Include="CHFAlgorithm.h" />
     <ClInclude Include="CollisionDetections.h" />
     <ClInclude Include="CollisionObject.h" />
+    <ClInclude Include="ConvexCollisionAlgorithm.h" />
     <ClInclude Include="ConvexHeightField\ChNarrowphase.h" />
     <ClInclude Include="ConvexHeightField\CollideUtils.h" />
     <ClInclude Include="ConvexHeightField\CollisionShape.h" />
@@ -65,6 +66,7 @@
     <ClCompile Include="CHFAlgorithm.cpp" />
     <ClCompile Include="CollisionDetections.cpp" />
     <ClCompile Include="CollisionObject.cpp" />
+    <ClCompile Include="ConvexCollisionAlgorithm.cpp" />
     <ClCompile Include="ConvexHeightField\ConvexHeightFieldShape.cpp" />
     <ClCompile Include="EPAAlgorithm.cpp" />
     <ClCompile Include="EPAEdge.cpp" />

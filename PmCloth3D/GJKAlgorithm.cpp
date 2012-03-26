@@ -1,8 +1,12 @@
+#include <vector>
 #include <cassert>
 #include "GJKAlgorithm.h"
 #include "EPAAlgorithm.h"
 #include "GJKSimplex.h"
 #include "NarrowPhaseCollisionDetection.h"
+#include "CollisionObject.h"
+#include "EPAEdge.h"
+
 
 CGJKAlgorithm::CGJKAlgorithm() 
 {

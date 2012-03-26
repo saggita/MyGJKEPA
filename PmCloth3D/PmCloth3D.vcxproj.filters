@@ -46,6 +46,7 @@
     <ClCompile Include="StringTokenizer.cpp">
       <Filter>util</Filter>
     </ClCompile>
+    <ClCompile Include="ConvexCollisionAlgorithm.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BIMAlgorithm.h" />
@@ -144,6 +145,7 @@
     <ClInclude Include="StringTokenizer.h">
       <Filter>util</Filter>
     </ClInclude>
+    <ClInclude Include="ConvexCollisionAlgorithm.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="ConvexHeightField">

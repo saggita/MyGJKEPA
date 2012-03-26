@@ -7,6 +7,7 @@ class CCollisionObject;
 class CGJKAlgorithm;
 class CBIMAlgorithm;
 class CCHFAlgorithm;
+class IConvexCollisionAlgorithm;
 
 class CNarrowCollisionInfo
 {
@@ -37,20 +38,22 @@ public:
 class CNarrowPhaseCollisionDetection
 {
 public:
+	enum CollisionAlgorithmType { GJK_EPA, BIM, CHF };
+
 	CNarrowPhaseCollisionDetection(void);
 	virtual ~CNarrowPhaseCollisionDetection(void);
 
 protected:
-	//CGJKAlgorithm* m_pAlgorithm;
-	//CBIMAlgorithm* m_pAlgorithm;
-	CCHFAlgorithm* m_pAlgorithm;
+	CollisionAlgorithmType m_AlgorithmType;
+	IConvexCollisionAlgorithm* m_pAlgorithm;
 	std::vector<CNarrowCollisionInfo> m_CollisionPairs;
 
 public:
 	std::vector<CNarrowCollisionInfo>& GetPairs() { return m_CollisionPairs; }
 	const std::vector<CNarrowCollisionInfo>& GetPairs() const { return m_CollisionPairs; }
-
 	void AddPair(const CNarrowCollisionInfo pair) { m_CollisionPairs.push_back(pair); }
+	void SetConvexCollisionAlgorithm(CollisionAlgorithmType algorithmType);
+	CollisionAlgorithmType GetConvexCollisionAlgorithm() const { return m_AlgorithmType; }
 	int CheckCollisions();
 };
 

@@ -1,19 +1,32 @@
 #include "NarrowPhaseCollisionDetection.h"
+#include "ConvexCollisionAlgorithm.h"
 #include "GJKAlgorithm.h"
 #include "BIMAlgorithm.h"
 #include "CHFAlgorithm.h"
 
-CNarrowPhaseCollisionDetection::CNarrowPhaseCollisionDetection(void)
+CNarrowPhaseCollisionDetection::CNarrowPhaseCollisionDetection(void) : m_AlgorithmType(GJK_EPA), m_pAlgorithm(NULL)
 {
-	//m_pAlgorithm = new CGJKAlgorithm;
-	//m_pAlgorithm = new CBIMAlgorithm;
-	m_pAlgorithm = new CCHFAlgorithm;
+	SetConvexCollisionAlgorithm(m_AlgorithmType);
 }
-
 
 CNarrowPhaseCollisionDetection::~CNarrowPhaseCollisionDetection(void)
 {
 	delete m_pAlgorithm;
+}
+
+void CNarrowPhaseCollisionDetection::SetConvexCollisionAlgorithm(CollisionAlgorithmType algorithmType) 
+{ 
+	if ( m_pAlgorithm )
+		delete m_pAlgorithm;
+
+	m_AlgorithmType = algorithmType; 
+
+	if ( m_AlgorithmType == GJK_EPA )
+		m_pAlgorithm = new CGJKAlgorithm;
+	else if ( m_AlgorithmType == BIM )
+		m_pAlgorithm = new CBIMAlgorithm;
+	else if ( m_AlgorithmType == CHF )
+		m_pAlgorithm = new CCHFAlgorithm;
 }
 
 int CNarrowPhaseCollisionDetection::CheckCollisions()
