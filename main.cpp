@@ -28,32 +28,138 @@ bool bPause = true;
 
 std::string g_sWindowTitle;
 std::string g_sWindowTitleInfo;
+int g_Width;
+int g_Height;
 
 CWorldSimulation g_WorldSim;
 double g_dt = 0.001;
+GLuint g_glLtAxis;
+
+static void DrawTextGlut(const char* str, float x, float y, float z);
+static void DrawTextGlut(const char* str, float x, float y);
 
 void InitSimulation()
 {
 	g_WorldSim.Create();
 }
 
+GLuint GenerateAxis(float fAxisLength)
+{
+	GLuint list = glGenLists(1);
+
+	GLfloat axisL = fAxisLength;
+	GLfloat axis_matA[] = {0.8f, 0, 0, 0.6f };
+	GLfloat axis_matB[] = {0.0, 0.0, 0.8f, 0.6f };
+
+	glNewList(list, GL_COMPILE);	
+	glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, axis_matA);
+	glEnable(GL_BLEND);
+	glDisable(GL_LIGHTING);
+	glLineWidth(4);
+	//glLineStipple(1, 0x0C0F);
+	//glEnable(GL_LINE_STIPPLE);
+
+	GLUquadricObj* quad = gluNewQuadric();
+
+	glBegin(GL_LINES);
+
+	//X Axis
+	glPushMatrix();
+	glColor3f(1.0f, 0.0f, 0.0f);
+	glVertex3f(0.0, 0.0, 0.0);
+	glVertex3f(axisL, 0.0, 0.0);
+	glTranslatef(axisL, 0.0f, 0.0f);
+	//gluCylinder(quad, 1.0, 0.0, 2.0, 5, 5);	
+	glPopMatrix();
+
+	//Y Axis
+	glColor3f(0.0f, 1.0f, 0.0f);
+	glVertex3f(0.0, 0.0, 0.0);
+	glVertex3f(0.0, axisL, 0.0);	
+
+	//Z Axis
+	glColor3f(0.0f, 0.0f, 1.0f);
+	glVertex3f(0.0, 0.0, 0.0);
+	glVertex3f(0.0, 0.0, axisL);	
+
+	glEnd();
+
+	glDisable(GL_BLEND);	
+
+	glColor3f(0.0, 0.0, 0.0);
+	DrawTextGlut("X", axisL + 0.3, 0.0, 0.0);
+	DrawTextGlut("Y", 0.0, axisL + 0.3, 0.0);
+	DrawTextGlut("Z", 0.0, 0.0, axisL + 0.3);
+
+	glEnable(GL_LIGHTING);
+
+	glLineWidth(1);
+	glEndList();
+
+	return list;
+}
+
+
 void InitGL()
 {
 	// Setting Camera Moving Sensitivity..
-	hCamera.SetMouseSensitivity(0.1f, 0.1f, 0.1f);
+	hCamera.SetMouseSensitivity(0.1f, 0.02f, 0.1f);
 
 	// Generating bottom plate...
 	GLfloat gray[4] = {0.5f, 0.5f, 0.5f, 1.0f};
 	GLfloat black[4] = {0.0f, 0.0f, 0.0f, 1.0f};
 	btmPlate = hCamera.makeBottomPlate(gray, black, 80.0f, 80.0f, 10.0f, 0.0f);	
+
+	// Generate an axis
+	g_glLtAxis = GenerateAxis(5.0f);
+}
+
+void SetWindowTitle()
+{
+	if ( g_WorldSim.m_pNarrowPhase )
+	{
+		CNarrowPhaseCollisionDetection::CollisionAlgorithmType colAlgoType = g_WorldSim.m_pNarrowPhase->GetConvexCollisionAlgorithm();
+
+		if ( colAlgoType == CNarrowPhaseCollisionDetection::BIM )
+		{
+			g_sWindowTitleInfo = "Brute-force Iterative method";
+		}
+		else if ( colAlgoType == CNarrowPhaseCollisionDetection::CHF )
+		{
+			g_sWindowTitleInfo = "Convex Height Field method";
+		}
+		else if ( colAlgoType == CNarrowPhaseCollisionDetection::GJK_EPA )
+		{
+			g_sWindowTitleInfo = "GJK/EPA method";
+		}
+	}
+}
+
+void DrawTextGlut(const char* str, float x, float y) 
+{
+	glRasterPos2f(x, y);
+	glColor3d(0.0, 0.0, 0.0);
+
+	for (int i = 0; str[i] != '\0'; i++) 
+		glutBitmapCharacter(GLUT_BITMAP_HELVETICA_12, str[i]);
+
+}
+
+void DrawTextGlut(const char* str, float x, float y, float z) 
+{
+	glRasterPos3f(x, y, z);
+	glColor3d(0.0, 0.0, 0.0);
+
+	for (int i = 0; str[i] != '\0'; i++) 
+		glutBitmapCharacter(GLUT_BITMAP_HELVETICA_12, str[i]);
+
 }
 
 void OnRender() 
 {
-	std::string sTitle = g_sWindowTitle;
-	sTitle.append("  ");
-	sTitle.append(g_sWindowTitleInfo);
+	SetWindowTitle();
 
+	std::string sTitle = g_sWindowTitle;
 	glutSetWindowTitle(sTitle.c_str());	
 
 	static GLfloat RedSurface[]   = { 1.0f, 0.0f, 0.0f, 1.0f};
@@ -87,13 +193,17 @@ void OnRender()
 	glPopMatrix();
 	glMatrixMode(GL_MODELVIEW);
 	glPopMatrix();
-
+	
 	//----------------
 	// Applying camera
 	//----------------
 	hCamera.ApplyCamera();
 	
 	glCallList(btmPlate);
+
+	glPushMatrix();
+	glCallList(g_glLtAxis);
+	glPopMatrix();
 
 	// Lights
 	GLfloat ambientLight[4] = {0.1f, 0.1f, 0.1f, 1.0f};
@@ -116,7 +226,52 @@ void OnRender()
 	
 	glEnable(GL_LIGHTING);
 	glEnable(GL_LIGHT0);
-	g_WorldSim.Render();
+	g_WorldSim.Render();	
+
+	//------------
+	// Draw texts
+	//------------
+	/* We are going to do some 2-D orthographic drawing. */
+    glMatrixMode(GL_PROJECTION);
+	glPushMatrix();
+    glLoadIdentity();
+
+	int w = g_Width;
+    int h = g_Height;
+
+    GLdouble size = (GLdouble)((w >= h) ? w : h) / 2.0;
+    GLdouble aspect;
+
+    if (w <= h) {
+        aspect = (GLdouble)h/(GLdouble)w;
+        glOrtho(-size, size, -size*aspect, size*aspect, -1000000.0, 1000000.0);
+    }
+    else {
+        aspect = (GLdouble)w/(GLdouble)h;
+        glOrtho(-size*aspect, size*aspect, -size, size, -1000000.0, 1000000.0);
+    }
+
+    /* Make the world and window coordinates coincide so that 1.0 in */
+    /* model space equals one pixel in window space.                 */
+    glScaled(aspect, aspect, 1.0);
+
+	glMatrixMode(GL_MODELVIEW);
+	glPushMatrix();
+	glLoadIdentity();	
+
+	//glDisable(GL_LIGHTING);
+	DrawTextGlut("Press space to start or stop", -g_Width/2 + 10, g_Height/2 - 20);
+
+	std::string sInfo = "Current Algorithm(press 'a' to change): ";
+	sInfo.append(g_sWindowTitleInfo);
+
+	DrawTextGlut(sInfo.c_str(), -g_Width/2 + 10, g_Height/2 - 40);
+
+	glMatrixMode(GL_PROJECTION);	
+	glPopMatrix();	
+
+	glMatrixMode(GL_MODELVIEW);	
+	glPopMatrix();
 			
 	glutSwapBuffers();
 }
@@ -128,6 +283,9 @@ void OnIdle()
 
 void OnReshape(int w, int h) 
 {
+	g_Width = w;
+	g_Height = h;
+
 	glViewport(0, 0, w, h);
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
@@ -200,18 +358,15 @@ void OnKeyboard(unsigned char key, int x, int y)
 
 				if ( colAlgoType == CNarrowPhaseCollisionDetection::GJK_EPA )
 				{
-					colAlgoType = CNarrowPhaseCollisionDetection::BIM;
-					g_sWindowTitleInfo = "Brute-force Iterative method";
+					colAlgoType = CNarrowPhaseCollisionDetection::BIM;					
 				}
 				else if ( colAlgoType == CNarrowPhaseCollisionDetection::BIM )
 				{
 					colAlgoType = CNarrowPhaseCollisionDetection::CHF;
-					g_sWindowTitleInfo = "Convex Height Field method";
 				}
 				else if ( colAlgoType == CNarrowPhaseCollisionDetection::CHF )
 				{
 					colAlgoType = CNarrowPhaseCollisionDetection::GJK_EPA;
-					g_sWindowTitleInfo = "GJK/EPA method";
 				}
 
 				g_WorldSim.m_pNarrowPhase->SetConvexCollisionAlgorithm(colAlgoType);

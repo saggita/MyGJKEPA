@@ -38,7 +38,11 @@ void CWorldSimulation::Create()
 	
 	// Object 0
 	CCollisionObject* pObjectA = new CCollisionObject();
-	pObjectA->SetCollisionObjectType(CCollisionObject::ConvexHF);
+	pObjectA->SetCollisionObjectType(CCollisionObject::ConvexHull);
+	pObjectA->Load("smallGeoSphere.obj");
+	//pObjectA->Load("cone.obj");
+	//pObjectA->Load("box.obj");
+	//pObjectA->Load("cylinder.obj");
 	pObjectA->GetTransform().GetTranslation().Set(2.0f, 4.6f, 0.0f);
 	pObjectA->SetSize(6.0f, 3.0f, 5.0f);
 	pObjectA->SetColor(1.0f, 0.0f, 0.0f);
@@ -50,7 +54,7 @@ void CWorldSimulation::Create()
 	pObjectB->SetSize(3.0f, 4.0f, 5.0f);
 	pObjectB->SetColor(0.7f, 0.7f, 0.0f);
 	pObjectB->GetTransform().GetRotation().SetRotation(CQuaternion(CVector3D(1.0f, 0.0f, 0.0f).Normalize(), 0.0f));
-	pObjectB->GetTransform().GetTranslation().Set(2.0f, 12.0f, 0.0f);
+	pObjectB->GetTransform().GetTranslation().Set(2.0f, 5.0f, 0.0f);
 	//pObjectB->GetTransform().GetTranslation().Set(2.0f, 10.0f, 0.0f);
 
 	m_pNarrowPhase->AddPair(CNarrowCollisionInfo(pObjectA, pObjectB));
@@ -94,24 +98,42 @@ unsigned int CWorldSimulation::Update(btScalar dt)
 unsigned int CWorldSimulation::SubsUpdate(btScalar dt)
 {
 	m_dt = dt;
-
-	unsigned int numIter = 0;
-
-	CVector3D axis;
-	static btScalar angleRad = 0;
-
-	angleRad += 2.0f*3.141592f / 15000.0f;
-
-	if ( angleRad > 2.0f*3.141592f )
-		angleRad -= 2.0f*3.141592f;
-
-	CMatrix33 rot;
-	rot.SetRotation(CVector3D(1.0f, 1.0f, 1.0f).Normalize(), angleRad);
-
+		
 	if ( m_pNarrowPhase && m_pNarrowPhase->GetPairs().size() > 0 )
 	{
-		m_pNarrowPhase->GetPairs()[0].pObjA->GetTransform().GetRotation().SetRotation(CVector3D(-1.0f, 1.0f, 1.0f).Normalize(), angleRad);
-		m_pNarrowPhase->GetPairs()[0].pObjB->GetTransform().GetRotation().SetRotation(CVector3D(1.0f, 1.0f, 0.0f).Normalize(), angleRad);
+		const btScalar angleRad = 0.001f;
+
+		CTransform& transA = m_pNarrowPhase->GetPairs()[0].pObjA->GetTransform();
+		CTransform& transB = m_pNarrowPhase->GetPairs()[0].pObjB->GetTransform();
+
+		//----------------------------------------------------------------------------
+		// Rotate object using global coordinate axes in the local coordinate system
+		//----------------------------------------------------------------------------
+		//transA.GetRotation() = CQuaternion(CVector3D(0.0f, 1.0f, 0.0f).Normalize(), angleRad) * transA.GetRotation();
+
+		//----------------------------------------------------------------------------
+		// Rotate object using local coordinate axes in the local coordinate system
+		//----------------------------------------------------------------------------
+		transA.GetRotation() = transA.GetRotation() * CQuaternion(CVector3D(1.0f, 0.0f, 0.0f).Normalize(), angleRad);
+		transB.GetRotation() = transB.GetRotation() * CQuaternion(CVector3D(1.0f, 0.0f, 0.0f).Normalize(), angleRad);
+
+		//-----------------------------------------------------------------------
+		// Translate using local coordinate axes in the local coordinate system
+		//-----------------------------------------------------------------------
+		//transA.GetTranslation() = transA.GetTranslation() + transA.GetRotation() * CVector3D(0.001f, 0, 0);
+
+		//----------------------------------------------------------------------------
+		// Rotate object using global coordinate axes in the global coordinate system
+		//----------------------------------------------------------------------------
+		/*CTransform transW;
+		CQuaternion rot(CVector3D(0.0f, 1.0f, 1.0f).Normalize(), angleRad);
+		transW.GetRotation() = rot;
+
+		CTransform& transA = m_pNarrowPhase->GetPairs()[0].pObjA->GetTransform();
+		transA = transW * transA;*/
+
+		/*CTransform& transB = m_pNarrowPhase->GetPairs()[0].pObjB->GetTransform();
+		transB = transW * transB;*/
 	}
 
 	m_pNarrowPhase->CheckCollisions();

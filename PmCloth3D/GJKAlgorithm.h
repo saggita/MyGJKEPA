@@ -7,6 +7,7 @@ class CCollisionObject;
 class CEPAEdge;
 class CGJKSimplex;
 class CWorldSimulation;
+class CTransform;
 
 class CGJKAlgorithm : public IConvexCollisionAlgorithm
 {

@@ -4,11 +4,14 @@
 #include <algorithm>
 #include "EPAAlgorithm.h"
 #include "NarrowPhaseCollisionDetection.h"
+#include "CollisionObject.h"
+#include "GJKSimplex.h"
+#include "EPAEdge.h"
+#include "EPATriangle.h"
 
 CEPAAlgorithm::CEPAAlgorithm(void)
 {
 }
-
 
 CEPAAlgorithm::~CEPAAlgorithm(void)
 {

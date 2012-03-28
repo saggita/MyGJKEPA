@@ -4,7 +4,7 @@
 #include "BIMAlgorithm.h"
 #include "CHFAlgorithm.h"
 
-CNarrowPhaseCollisionDetection::CNarrowPhaseCollisionDetection(void) : m_AlgorithmType(GJK_EPA), m_pAlgorithm(NULL)
+CNarrowPhaseCollisionDetection::CNarrowPhaseCollisionDetection(void) : m_AlgorithmType(CHF), m_pAlgorithm(NULL)
 {
 	SetConvexCollisionAlgorithm(m_AlgorithmType);
 }

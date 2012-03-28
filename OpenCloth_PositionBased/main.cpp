@@ -486,7 +486,7 @@ void InitGL() {
 	g_pBIM = new CBIMAlgorithm();
 	g_pCHF = new CCHFAlgorithm();
 	g_pConvexObj = new CCollisionObject();
-	g_pConvexObj->SetCollisionObjectType(CCollisionObject::ConvexHF);
+	g_pConvexObj->SetCollisionObjectType(CCollisionObject::ConvexHull);
 	g_pConvexObj->Load("smallGeoSphere.obj");
 	g_pConvexObj->GetTransform().GetTranslation().Set(0.0, 0.0, -0.5); 
 	g_pConvexObj->SetSize(3.0, 2.0, 1.0);

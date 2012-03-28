@@ -15,8 +15,9 @@ CCHFAlgorithm::~CCHFAlgorithm(void)
 
 bool CCHFAlgorithm::CheckCollision(CCollisionObject& objA, CCollisionObject& objB, CNarrowCollisionInfo* pCollisionInfo, bool bProximity/* = false*/)
 {
+	assert(objA.GetCollisionObjectType() == CCollisionObject::ConvexHull);
 	assert(objB.GetCollisionObjectType() == CCollisionObject::Point);
-	//assert(objA.GetCollisionObjectType() == CCollisionObject::ConvexHF);
+	
 
 	// Initialize collision info
 	pCollisionInfo->bIntersect = false;

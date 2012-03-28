@@ -59,7 +59,7 @@
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>./extern/glut/lib;./lib;$(AMDAPPSDKROOT)\lib\x86;$(DXSDK_DIR)/Lib/x86</AdditionalLibraryDirectories>
-      <AdditionalDependencies>PmCloth3DD.lib;BulletCollisionD.lib;LinearMathD.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>ConvexCollisionD.lib;BulletCollisionD.lib;LinearMathD.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
     </Link>
   </ItemDefinitionGroup>
@@ -81,7 +81,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalLibraryDirectories>./extern/glut/lib;./lib;$(AMDAPPSDKROOT)\lib\x86;$(DXSDK_DIR)/Lib/x86</AdditionalLibraryDirectories>
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
-      <AdditionalDependencies>PmCloth3D.lib;BulletCollision.lib;LinearMath.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>ConvexCollision.lib;BulletCollision.lib;LinearMath.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>

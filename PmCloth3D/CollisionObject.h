@@ -14,7 +14,7 @@ struct TriangleFace
 class CCollisionObject
 {
 public:
-	enum CollisionObjectType { None, Point, Box, Sphere, Cone, Capsule, Cylinder, ConvexHull, ConvexHF, PolyMesh };
+	enum CollisionObjectType { None, Point, Box, Sphere, Cone, Capsule, Cylinder, ConvexHull };
 
 protected:
 	CollisionObjectType m_CollisionObjectType; 
@@ -29,11 +29,16 @@ protected:
 	std::vector<CVector3D> m_Normals;
 	std::vector<TriangleFace> m_Faces; 
 
+	// For visualization
+	std::vector<CVector3D> m_VisualizedPoints;
+
 	// bullet
 	//btCollisionObject* m_pBulletColObj;
 
 	// Convex HeightField
 	ConvexHeightField* m_pConvexHeightField;
+
+	bool m_bLoaded;
 
 public:
 	CCollisionObject(void);
@@ -71,5 +76,8 @@ public:
 	//btCollisionObject* GetBulletObject() { return m_pBulletColObj; }
 
 	void Render() const;
+
+	// visualize convex heightfield
+	void VisualizeHF();
 };
 

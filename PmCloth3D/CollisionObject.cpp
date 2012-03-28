@@ -137,7 +137,7 @@ static int BarrelIdx[] = {
 44,26,47,
 };
 
-CCollisionObject::CCollisionObject(void) : m_HalfExtent(1.0), m_Margin(0.01), m_pConvexHeightField(NULL)
+CCollisionObject::CCollisionObject(void) : m_HalfExtent(1.0), m_Margin(0.01), m_pConvexHeightField(NULL), m_bLoaded(false)
 {
 	//m_pBulletColObj = new btCollisionObject();	
 
@@ -189,41 +189,38 @@ void CCollisionObject::SetCollisionObjectType(CollisionObjectType collisionObjec
 
 	if ( m_CollisionObjectType == ConvexHull )
 	{
-		Load("./model/geoSphere.obj");
-
-		/*for ( int i = 0; i < BarrelVtxCount2; i++ )
+		if ( !m_bLoaded )
 		{
-			CVector3D vertex, normal;
-			vertex[0] = BarrelVtx2[i*6];
-			vertex[1] = BarrelVtx2[i*6+1];
-			vertex[2] = BarrelVtx2[i*6+2];
+			for ( int i = 0; i < BarrelVtxCount2; i++ )
+			{
+				CVector3D vertex, normal;
+				vertex[0] = BarrelVtx2[i*6];
+				vertex[1] = BarrelVtx2[i*6+1];
+				vertex[2] = BarrelVtx2[i*6+2];
 
-			normal[0] = BarrelVtx2[i*6+3];
-			normal[1] = BarrelVtx2[i*6+4];
-			normal[2] = BarrelVtx2[i*6+5];
+				normal[0] = BarrelVtx2[i*6+3];
+				normal[1] = BarrelVtx2[i*6+4];
+				normal[2] = BarrelVtx2[i*6+5];
 
-			m_Normals.push_back(normal);
-			m_Vertices.push_back(vertex);
-		}
+				m_Normals.push_back(normal);
+				m_Vertices.push_back(vertex);
+			}
 
-		for ( int i = 0; i < BarrelIndexCount; i++ )
-		{
-			int indices[3];
-			indices[0] = BarrelIdx[i*3];
-			indices[1] = BarrelIdx[i*3+1];
-			indices[2] = BarrelIdx[i*3+2];
+			for ( int i = 0; i < BarrelIndexCount; i++ )
+			{
+				int indices[3];
+				indices[0] = BarrelIdx[i*3];
+				indices[1] = BarrelIdx[i*3+1];
+				indices[2] = BarrelIdx[i*3+2];
 			
-			TriangleFace face;
+				TriangleFace face;
 
-			for ( int i = 0; i < 3; i++ )
-				face.indices[i] = indices[i];
+				for ( int i = 0; i < 3; i++ )
+					face.indices[i] = indices[i];
 
-			m_Faces.push_back(face);
-		}*/
-	}
-	else if ( m_CollisionObjectType == ConvexHF )
-	{
-		Load("./model/geoSphere.obj");		
+				m_Faces.push_back(face);
+			}
+		}
 	}
 }
 
@@ -290,7 +287,7 @@ CVector3D CCollisionObject::GetLocalSupportPoint(const CVector3D& dir, btScalar 
 			supportPoint += unitVec * margin;
 		}
 	}
-	else if ( m_CollisionObjectType == ConvexHull || m_CollisionObjectType == ConvexHF )
+	else if ( m_CollisionObjectType == ConvexHull )
 	{
 		btScalar maxDot = -SIMD_INFINITY;
 	
@@ -449,7 +446,7 @@ void CCollisionObject::Render() const
 		glPopAttrib();
 		glPopMatrix();
 	}
-	else if ( m_CollisionObjectType == ConvexHull || m_CollisionObjectType == ConvexHF )
+	else if ( m_CollisionObjectType == ConvexHull )
 	{
 		GLdouble val[16];
 		memset(val, 0, sizeof(GLdouble)*16);
@@ -474,27 +471,30 @@ void CCollisionObject::Render() const
 		
 		glColor3f(0,0,1);
 		glLineWidth(1.0f);
-		
-		/*glBegin(GL_TRIANGLES);
 
-		for ( int i = 0; i < (int)m_Faces.size(); i++ )
-		{
-			const TriangleFace& face = m_Faces[i];
+		//// triangles
+		//for ( int i = 0; i < (int)m_Faces.size(); i++ )
+		//{
+		//	const TriangleFace& face = m_Faces[i];
+		//	
+		//	CVector3D normal(face.planeEqn[0], face.planeEqn[1], face.planeEqn[2]);
+		//	glNormal3d(normal.m_X, normal.m_Y, normal.m_Z);
 
-			for ( int j = 0; j < 3; j++ )
-			{
-				const CVector3D& vertex = m_Vertices[face.indices[j]];
-				const CVector3D& normal = m_Normals[face.indices[j]];
+		//	glBegin(GL_TRIANGLES);
+		//	
+		//	for ( int j = 0; j < 3; j++ )
+		//	{
+		//		const CVector3D& vertex = m_Vertices[face.indices[j]];
+		//		
+		//		glVertex3d(vertex.m_X, vertex.m_Y, vertex.m_Z);
+		//	}
 
-				glNormal3d(normal.m_X, normal.m_Y, normal.m_Z);
-				glVertex3d(vertex.m_X, vertex.m_Y, vertex.m_Z);
-			}
-		}
+		//	glEnd();
+		//}
 
-		glEnd();*/
-
+		// edges
 		glDisable(GL_LIGHTING);
-		glBegin(GL_LINES);
+		glBegin(GL_LINE_STRIP);
 
 		for ( int i = 0; i < (int)m_Faces.size(); i++ )
 		{
@@ -521,6 +521,21 @@ void CCollisionObject::Render() const
 
 		glEnd();
 
+		// convex heightfield visualization
+		glPointSize(3.0f);
+		glColor3f(1.0, 1.0, 0);
+		glBegin(GL_POINTS);
+
+		for ( int i = 0; i < (int)m_VisualizedPoints.size(); i++ )
+		{
+			const CVector3D& point = m_VisualizedPoints[i];
+			glVertex3f(point.m_X, point.m_Y, point.m_Z);
+
+
+		}
+
+		glEnd();
+
 		glPopAttrib();
 		
 		glPopMatrix();
@@ -529,6 +544,12 @@ void CCollisionObject::Render() const
 
 bool CCollisionObject::Load(const char* filename)
 {
+	m_bLoaded = false;
+
+	m_Vertices.clear();
+	m_Normals.clear();
+	m_Faces.clear();
+
 	// Loading wavefront obj file.
 	ifstream inFile(filename);
 	string sLine;
@@ -536,11 +557,7 @@ bool CCollisionObject::Load(const char* filename)
 
 	if ( !inFile.is_open() )
 		return false;
-
-	m_Vertices.clear();
-	m_Normals.clear();
-	m_Faces.clear();
-
+		
 	while (!inFile.eof() )
 	{
 		getline(inFile, sLine);
@@ -665,7 +682,61 @@ bool CCollisionObject::Load(const char* filename)
 	
 	m_pConvexHeightField = new ConvexHeightField(eqn, m_Faces.size());
 
+	//VisualizeHF();
+
 	delete [] eqn;
 
+	m_bLoaded = true;
 	return true;
+}
+
+void CCollisionObject::VisualizeHF()
+{
+	if ( !m_pConvexHeightField )
+		return;
+	
+	m_VisualizedPoints.clear();
+
+	srand(0);
+	
+	btScalar del = 0.01;
+	m_VisualizedPoints.reserve(0.5 * (1.0/(del*del)) * m_Faces.size());
+
+	for ( int i = 0; i < (int)m_Faces.size(); i++ )
+	{
+		const TriangleFace& face = m_Faces[i];
+
+		const CVector3D& p0 = m_Vertices[face.indices[0]];
+		const CVector3D& p1 = m_Vertices[face.indices[1]];
+		const CVector3D& p2 = m_Vertices[face.indices[2]];
+		
+		for ( btScalar a = 0; a <= 1.0; a += del )
+		{
+			for ( btScalar b = 0; b <= 1.0; b += del )
+			{
+				btScalar c = 1.0 - a - b;
+
+				if ( 0 <= c && c <= 1.0 )
+				{
+					CVector3D p(a*p0 + b*p1 + c*p2);
+
+					m_VisualizedPoints.push_back(p);
+				}
+			}
+		}
+	}
+
+	for ( int i = 0; i < (int)m_VisualizedPoints.size(); i++ )
+	{
+		const CVector3D& point = m_VisualizedPoints[i];
+
+		float4 normal;
+		bool bNormal = m_pConvexHeightField->queryDistanceWithNormal(make_float4(point.m_X, point.m_Y, point.m_Z), normal);
+		btScalar dist = m_pConvexHeightField->queryDistance(make_float4(point.m_X, point.m_Y, point.m_Z));
+
+		CVector3D closestPoint =  (point + CVector3D(normal.x, normal.y, normal.z) * (-dist));
+
+		m_VisualizedPoints[i] = closestPoint;
+	}
+
 }

@@ -1,11 +1,12 @@
 #pragma once
 
-#include "CollisionObject.h"
-#include "GJKSimplex.h"
-#include "EPAEdge.h"
-#include "EPATriangle.h"
+#include "ConvexCollisionAlgorithm.h"
 #include "EPAPolytope.h"
 
+class CCollisionObject;
+class CEPAEdge;
+class CGJKSimplex;
+class CWorldSimulation;
 class CNarrowCollisionInfo;
 
 // Expanding Polytope Algorithm (EPA)
