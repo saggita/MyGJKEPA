@@ -4,6 +4,7 @@
 #include "Transform.h"
 #include "../btBulletCollisionCommon.h"
 #include "ConvexHeightField\ConvexHeightFieldShape.h"
+#include "ICollidable.h"
 
 struct TriangleFace
 {
@@ -11,7 +12,7 @@ struct TriangleFace
 	btScalar planeEqn[4];
 };
 
-class CCollisionObject
+class CCollisionObject : public ICollidable
 {
 public:
 	enum CollisionObjectType { None, Point, Box, Sphere, Cone, Capsule, Cylinder, ConvexHull };
@@ -24,7 +25,7 @@ protected:
 	btScalar m_Margin;
 	btScalar m_Color[4];
 
-	// For ConvexHull or PolyMesh
+	// For ConvexHull
 	std::vector<CVector3D> m_Vertices;
 	std::vector<CVector3D> m_Normals;
 	std::vector<TriangleFace> m_Faces; 
@@ -72,6 +73,9 @@ public:
 	const ConvexHeightField* GetConvexHFObject() const { return m_pConvexHeightField; }
 
 	bool Load(const char* filename);
+
+	virtual CCollisionObject* GetCollisionObject() { return this; }
+	virtual const CCollisionObject* GetCollisionObject() const { return this; }
 
 	//btCollisionObject* GetBulletObject() { return m_pBulletColObj; }
 

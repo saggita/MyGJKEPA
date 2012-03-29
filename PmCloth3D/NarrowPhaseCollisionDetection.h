@@ -2,6 +2,7 @@
 
 #include <vector>
 #include "Vector3D.h"
+#include "ICollidable.h"
 
 class CCollisionObject;
 class CGJKAlgorithm;
@@ -16,12 +17,12 @@ public:
 
 	// Compiler provided copy constructor 'CNarrowCollisionInfo(CNarrowCollisionInfo& )' will be good enough.
 
-	CNarrowCollisionInfo(CCollisionObject* pObjA, CCollisionObject* pObjB, bool bIntersect, const CVector3D& witnessPntA, 
-						 const CVector3D& witnessPntB, btScalar penetrationDepth) : pObjA(pObjA), pObjB(pObjB), bIntersect(bIntersect), 
+	CNarrowCollisionInfo(ICollidable* pObjA, ICollidable* pObjB, bool bIntersect, const CVector3D& witnessPntA, 
+		const CVector3D& witnessPntB, btScalar penetrationDepth) : pObjA(pObjA->GetCollisionObject()), pObjB(pObjB->GetCollisionObject()), bIntersect(bIntersect), 
 																				  witnessPntA(witnessPntA), witnessPntB(witnessPntB), 
 																				  penetrationDepth(penetrationDepth) {}
 
-	CNarrowCollisionInfo(CCollisionObject* pObjA, CCollisionObject* pObjB) : pObjA(pObjA), pObjB(pObjB), bIntersect(false), 																				  
+	CNarrowCollisionInfo(ICollidable* pObjA, ICollidable* pObjB) : pObjA(pObjA->GetCollisionObject()), pObjB(pObjB->GetCollisionObject()), bIntersect(false), 																				  
 																				  penetrationDepth(0), proximityDistance(0) {}
 
 	CCollisionObject* pObjA;
@@ -52,8 +53,11 @@ public:
 	std::vector<CNarrowCollisionInfo>& GetPairs() { return m_CollisionPairs; }
 	const std::vector<CNarrowCollisionInfo>& GetPairs() const { return m_CollisionPairs; }
 	void AddPair(const CNarrowCollisionInfo pair) { m_CollisionPairs.push_back(pair); }
-	void SetConvexCollisionAlgorithm(CollisionAlgorithmType algorithmType);
-	CollisionAlgorithmType GetConvexCollisionAlgorithm() const { return m_AlgorithmType; }
+	void SetConvexCollisionAlgorithmType(CollisionAlgorithmType algorithmType);
+	CollisionAlgorithmType GetConvexCollisionAlgorithmType() const { return m_AlgorithmType; }
+	IConvexCollisionAlgorithm* GetConvexCollisionAlgorithm() { return m_pAlgorithm; }
+	const IConvexCollisionAlgorithm* GetConvexCollisionAlgorithm() const { return m_pAlgorithm; }
+
 	int CheckCollisions();
 };
 

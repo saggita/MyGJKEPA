@@ -1,21 +1,10 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <ClCompile Include="BIMAlgorithm.cpp" />
-    <ClCompile Include="CollisionDetections.cpp" />
-    <ClCompile Include="CollisionObject.cpp" />
-    <ClCompile Include="EPAAlgorithm.cpp" />
-    <ClCompile Include="EPAEdge.cpp" />
-    <ClCompile Include="EPAPolytope.cpp" />
-    <ClCompile Include="EPATriangle.cpp" />
-    <ClCompile Include="GJKAlgorithm.cpp" />
-    <ClCompile Include="GJKSimplex.cpp" />
-    <ClCompile Include="NarrowPhaseCollisionDetection.cpp" />
     <ClCompile Include="WorldSimulation.cpp" />
     <ClCompile Include="ConvexHeightField\ConvexHeightFieldShape.cpp">
       <Filter>ConvexHeightField</Filter>
     </ClCompile>
-    <ClCompile Include="CHFAlgorithm.cpp" />
     <ClCompile Include="mathUtil.cpp">
       <Filter>math</Filter>
     </ClCompile>
@@ -46,19 +35,49 @@
     <ClCompile Include="StringTokenizer.cpp">
       <Filter>util</Filter>
     </ClCompile>
-    <ClCompile Include="ConvexCollisionAlgorithm.cpp" />
+    <ClCompile Include="Cloth3D.cpp" />
+    <ClCompile Include="TriangleCloth3D.cpp" />
+    <ClCompile Include="BIMAlgorithm.cpp">
+      <Filter>NarrowPhaseCollision</Filter>
+    </ClCompile>
+    <ClCompile Include="CHFAlgorithm.cpp">
+      <Filter>NarrowPhaseCollision</Filter>
+    </ClCompile>
+    <ClCompile Include="ConvexCollisionAlgorithm.cpp">
+      <Filter>NarrowPhaseCollision</Filter>
+    </ClCompile>
+    <ClCompile Include="EPAAlgorithm.cpp">
+      <Filter>NarrowPhaseCollision</Filter>
+    </ClCompile>
+    <ClCompile Include="EPAEdge.cpp">
+      <Filter>NarrowPhaseCollision</Filter>
+    </ClCompile>
+    <ClCompile Include="EPAPolytope.cpp">
+      <Filter>NarrowPhaseCollision</Filter>
+    </ClCompile>
+    <ClCompile Include="EPATriangle.cpp">
+      <Filter>NarrowPhaseCollision</Filter>
+    </ClCompile>
+    <ClCompile Include="GJKAlgorithm.cpp">
+      <Filter>NarrowPhaseCollision</Filter>
+    </ClCompile>
+    <ClCompile Include="GJKSimplex.cpp">
+      <Filter>NarrowPhaseCollision</Filter>
+    </ClCompile>
+    <ClCompile Include="NarrowPhaseCollisionDetection.cpp">
+      <Filter>NarrowPhaseCollision</Filter>
+    </ClCompile>
+    <ClCompile Include="CollisionDetections.cpp">
+      <Filter>NarrowPhaseCollision</Filter>
+    </ClCompile>
+    <ClCompile Include="ICollidable.cpp">
+      <Filter>NarrowPhaseCollision</Filter>
+    </ClCompile>
+    <ClCompile Include="CollisionObject.cpp">
+      <Filter>NarrowPhaseCollision</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="BIMAlgorithm.h" />
-    <ClInclude Include="CollisionDetections.h" />
-    <ClInclude Include="CollisionObject.h" />
-    <ClInclude Include="EPAAlgorithm.h" />
-    <ClInclude Include="EPAEdge.h" />
-    <ClInclude Include="EPAPolytope.h" />
-    <ClInclude Include="EPATriangle.h" />
-    <ClInclude Include="GJKAlgorithm.h" />
-    <ClInclude Include="GJKSimplex.h" />
-    <ClInclude Include="NarrowPhaseCollisionDetection.h" />
     <ClInclude Include="WorldSimulation.h" />
     <ClInclude Include="ConvexHeightField\ChNarrowphase.h">
       <Filter>ConvexHeightField</Filter>
@@ -114,7 +133,6 @@
     <ClInclude Include="Adl\AdlPrimitives\Math\Quaternion.h">
       <Filter>Adl\AdlPrimitives\Math</Filter>
     </ClInclude>
-    <ClInclude Include="CHFAlgorithm.h" />
     <ClInclude Include="mathUtil.h">
       <Filter>math</Filter>
     </ClInclude>
@@ -145,7 +163,47 @@
     <ClInclude Include="StringTokenizer.h">
       <Filter>util</Filter>
     </ClInclude>
-    <ClInclude Include="ConvexCollisionAlgorithm.h" />
+    <ClInclude Include="Cloth3D.h" />
+    <ClInclude Include="TriangleCloth3D.h" />
+    <ClInclude Include="BIMAlgorithm.h">
+      <Filter>NarrowPhaseCollision</Filter>
+    </ClInclude>
+    <ClInclude Include="CHFAlgorithm.h">
+      <Filter>NarrowPhaseCollision</Filter>
+    </ClInclude>
+    <ClInclude Include="ConvexCollisionAlgorithm.h">
+      <Filter>NarrowPhaseCollision</Filter>
+    </ClInclude>
+    <ClInclude Include="EPAAlgorithm.h">
+      <Filter>NarrowPhaseCollision</Filter>
+    </ClInclude>
+    <ClInclude Include="EPAEdge.h">
+      <Filter>NarrowPhaseCollision</Filter>
+    </ClInclude>
+    <ClInclude Include="EPAPolytope.h">
+      <Filter>NarrowPhaseCollision</Filter>
+    </ClInclude>
+    <ClInclude Include="EPATriangle.h">
+      <Filter>NarrowPhaseCollision</Filter>
+    </ClInclude>
+    <ClInclude Include="GJKAlgorithm.h">
+      <Filter>NarrowPhaseCollision</Filter>
+    </ClInclude>
+    <ClInclude Include="GJKSimplex.h">
+      <Filter>NarrowPhaseCollision</Filter>
+    </ClInclude>
+    <ClInclude Include="NarrowPhaseCollisionDetection.h">
+      <Filter>NarrowPhaseCollision</Filter>
+    </ClInclude>
+    <ClInclude Include="CollisionDetections.h">
+      <Filter>NarrowPhaseCollision</Filter>
+    </ClInclude>
+    <ClInclude Include="ICollidable.h">
+      <Filter>NarrowPhaseCollision</Filter>
+    </ClInclude>
+    <ClInclude Include="CollisionObject.h">
+      <Filter>NarrowPhaseCollision</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="ConvexHeightField">
@@ -183,6 +241,9 @@
     </Filter>
     <Filter Include="util">
       <UniqueIdentifier>{f86aea9f-9c7c-4eda-b478-357b7f87386d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="NarrowPhaseCollision">
+      <UniqueIdentifier>{96aacac6-9861-4b24-bb34-3b373b464501}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

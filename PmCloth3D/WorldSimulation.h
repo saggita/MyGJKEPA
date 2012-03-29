@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../btBulletCollisionCommon.h"
+#include "Cloth3D.h"
 
 class CNarrowPhaseCollisionDetection;
 
@@ -20,11 +21,16 @@ public:
 	btScalar m_dt;
 	int m_Substeps; // = 1
 
+	CCollisionObject* pObjectA;
+	CCloth3D m_Cloth;
+	std::vector<CCollisionObject*> clothVertices;
+	CVector3D m_Gravity;
+
 public:
 	void Create();
 	void ClearAll();
 	unsigned int Update(btScalar dt);
-	void Render() const;
+	void Render();
 
 protected:
 	unsigned int SubsUpdate(btScalar dt);

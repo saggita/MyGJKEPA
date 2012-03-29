@@ -24,15 +24,18 @@ HGLCamera   hCamera(threeButtons, false, 25.0f, 0.0f, -5.0f, 30.0f, 30.0f);
 GLuint btmPlate;
 int mouseButton = -1;
 bool bMousePressed = false;
-bool bPause = true;
+
+bool g_bPause = true;
+bool g_bOneStep = false;
 
 std::string g_sWindowTitle;
 std::string g_sWindowTitleInfo;
 int g_Width;
 int g_Height;
+int g_CurFrame;
 
 CWorldSimulation g_WorldSim;
-double g_dt = 0.001;
+double g_dt = 0.0166666667; // 1 / 60 second
 GLuint g_glLtAxis;
 
 static void DrawTextGlut(const char* str, float x, float y, float z);
@@ -41,6 +44,7 @@ static void DrawTextGlut(const char* str, float x, float y);
 void InitSimulation()
 {
 	g_WorldSim.Create();
+	g_CurFrame = 0;
 }
 
 GLuint GenerateAxis(float fAxisLength)
@@ -118,7 +122,7 @@ void SetWindowTitle()
 {
 	if ( g_WorldSim.m_pNarrowPhase )
 	{
-		CNarrowPhaseCollisionDetection::CollisionAlgorithmType colAlgoType = g_WorldSim.m_pNarrowPhase->GetConvexCollisionAlgorithm();
+		CNarrowPhaseCollisionDetection::CollisionAlgorithmType colAlgoType = g_WorldSim.m_pNarrowPhase->GetConvexCollisionAlgorithmType();
 
 		if ( colAlgoType == CNarrowPhaseCollisionDetection::BIM )
 		{
@@ -193,7 +197,7 @@ void OnRender()
 	glPopMatrix();
 	glMatrixMode(GL_MODELVIEW);
 	glPopMatrix();
-	
+		
 	//----------------
 	// Applying camera
 	//----------------
@@ -221,8 +225,17 @@ void OnRender()
 	glLightfv(GL_LIGHT0, GL_POSITION, lightPosition);
 	glEnable(GL_LIGHT0);
 
-	if ( !bPause )
+	if ( !g_bPause )
+	{
+		if ( g_bOneStep )
+		{
+			g_bOneStep = false;
+			g_bPause = true;
+		}
+
 		g_WorldSim.Update(g_dt);
+		g_CurFrame++;
+	}
 	
 	glEnable(GL_LIGHTING);
 	glEnable(GL_LIGHT0);
@@ -258,14 +271,18 @@ void OnRender()
 	glMatrixMode(GL_MODELVIEW);
 	glPushMatrix();
 	glLoadIdentity();	
-
-	//glDisable(GL_LIGHTING);
-	DrawTextGlut("Press space to start or stop", -g_Width/2 + 10, g_Height/2 - 20);
-
+	
 	std::string sInfo = "Current Algorithm(press 'a' to change): ";
 	sInfo.append(g_sWindowTitleInfo);
 
+	DrawTextGlut("Press 's' to start or stop. space for one step", -g_Width/2 + 10, g_Height/2 - 20);
 	DrawTextGlut(sInfo.c_str(), -g_Width/2 + 10, g_Height/2 - 40);
+
+	char frame[10];
+	itoa(g_CurFrame, frame, 10);
+	std::string sFrame = "Frame: ";
+	sFrame.append(frame);
+	DrawTextGlut(sFrame.c_str(), -g_Width/2 + 10, g_Height/2 - 60);
 
 	glMatrixMode(GL_PROJECTION);	
 	glPopMatrix();	
@@ -342,8 +359,25 @@ void OnKeyboard(unsigned char key, int x, int y)
 		exit(0);
 		break;
 
+	case 's':
+	case 'S':
+		g_bPause = !g_bPause;
+		break;
+
+	case 'c':
+	case 'C':
+		{
+			bool bPausePrev = g_bPause;
+			g_bPause = true;
+			g_WorldSim.ClearAll();
+			g_WorldSim.Create();
+			g_bPause = bPausePrev;
+		}
+		break;
+
 	case 32: // space
-		bPause = !bPause;
+		g_bPause = false;
+		g_bOneStep = true;	
 		break;
 
 	case 'a':
@@ -351,10 +385,10 @@ void OnKeyboard(unsigned char key, int x, int y)
 		{
 			if ( g_WorldSim.m_pNarrowPhase )
 			{
-				bool bPausePrev = bPause;
-				bPause = true;
+				bool bPausePrev = g_bPause;
+				g_bPause = true;
 
-				CNarrowPhaseCollisionDetection::CollisionAlgorithmType colAlgoType = g_WorldSim.m_pNarrowPhase->GetConvexCollisionAlgorithm();
+				CNarrowPhaseCollisionDetection::CollisionAlgorithmType colAlgoType = g_WorldSim.m_pNarrowPhase->GetConvexCollisionAlgorithmType();
 
 				if ( colAlgoType == CNarrowPhaseCollisionDetection::GJK_EPA )
 				{
@@ -369,9 +403,9 @@ void OnKeyboard(unsigned char key, int x, int y)
 					colAlgoType = CNarrowPhaseCollisionDetection::GJK_EPA;
 				}
 
-				g_WorldSim.m_pNarrowPhase->SetConvexCollisionAlgorithm(colAlgoType);
+				g_WorldSim.m_pNarrowPhase->SetConvexCollisionAlgorithmType(colAlgoType);
 
-				bPause = bPausePrev;
+				g_bPause = bPausePrev;
 			}
 		}
 

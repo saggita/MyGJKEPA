@@ -472,25 +472,25 @@ void CCollisionObject::Render() const
 		glColor3f(0,0,1);
 		glLineWidth(1.0f);
 
-		//// triangles
-		//for ( int i = 0; i < (int)m_Faces.size(); i++ )
-		//{
-		//	const TriangleFace& face = m_Faces[i];
-		//	
-		//	CVector3D normal(face.planeEqn[0], face.planeEqn[1], face.planeEqn[2]);
-		//	glNormal3d(normal.m_X, normal.m_Y, normal.m_Z);
+		// triangles
+		for ( int i = 0; i < (int)m_Faces.size(); i++ )
+		{
+			const TriangleFace& face = m_Faces[i];
+			
+			CVector3D normal(face.planeEqn[0], face.planeEqn[1], face.planeEqn[2]);
+			glNormal3d(normal.m_X, normal.m_Y, normal.m_Z);
 
-		//	glBegin(GL_TRIANGLES);
-		//	
-		//	for ( int j = 0; j < 3; j++ )
-		//	{
-		//		const CVector3D& vertex = m_Vertices[face.indices[j]];
-		//		
-		//		glVertex3d(vertex.m_X, vertex.m_Y, vertex.m_Z);
-		//	}
+			glBegin(GL_TRIANGLES);
+			
+			for ( int j = 0; j < 3; j++ )
+			{
+				const CVector3D& vertex = m_Vertices[face.indices[j]];
+				
+				glVertex3d(vertex.m_X, vertex.m_Y, vertex.m_Z);
+			}
 
-		//	glEnd();
-		//}
+			glEnd();
+		}
 
 		// edges
 		glDisable(GL_LIGHTING);

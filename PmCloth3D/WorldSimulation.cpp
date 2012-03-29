@@ -15,9 +15,10 @@
 #include "WorldSimulation.h"
 #include "mathUtil.h"
 #include "NarrowPhaseCollisionDetection.h"
+#include "ConvexCollisionAlgorithm.h"
 #include "CollisionObject.h"
 
-CWorldSimulation::CWorldSimulation(void)
+CWorldSimulation::CWorldSimulation(void) : m_Gravity(0.0f, -9.87f, 0.0f)
 { 
 	m_Substeps = 1;
 }
@@ -37,7 +38,7 @@ void CWorldSimulation::Create()
 	m_pNarrowPhase = new CNarrowPhaseCollisionDetection();
 	
 	// Object 0
-	CCollisionObject* pObjectA = new CCollisionObject();
+	pObjectA = new CCollisionObject();
 	pObjectA->SetCollisionObjectType(CCollisionObject::ConvexHull);
 	pObjectA->Load("smallGeoSphere.obj");
 	//pObjectA->Load("cone.obj");
@@ -54,11 +55,34 @@ void CWorldSimulation::Create()
 	pObjectB->SetSize(3.0f, 4.0f, 5.0f);
 	pObjectB->SetColor(0.7f, 0.7f, 0.0f);
 	pObjectB->GetTransform().GetRotation().SetRotation(CQuaternion(CVector3D(1.0f, 0.0f, 0.0f).Normalize(), 0.0f));
-	pObjectB->GetTransform().GetTranslation().Set(2.0f, 5.0f, 0.0f);
+	pObjectB->GetTransform().GetTranslation().Set(2.0f, 5.5f, 0.0f);
 	//pObjectB->GetTransform().GetTranslation().Set(2.0f, 10.0f, 0.0f);
 
 	m_pNarrowPhase->AddPair(CNarrowCollisionInfo(pObjectA, pObjectB));
 
+	// cloth
+	m_Cloth.Load("circle789.obj");
+	m_Cloth.SetVertexMass(0.01f);
+	m_Cloth.TranslateW(0.0f, 10.0f, 0.0f);
+	m_Cloth.SetColor(0.0f, 0.0f, 0.8f);
+	m_Cloth.SetGravity(m_Gravity);
+	m_Cloth.SetKb(10.0f);
+	m_Cloth.SetNumIterForConstraintSolver(1);
+
+	clothVertices.reserve(m_Cloth.GetVertexArray().size());
+
+	for( int i=0; i < m_Cloth.GetVertexArray().size(); i++ ) 
+	{
+		const CVector3D& p = m_Cloth.GetVertexArray()[i].m_Pos;
+	
+		CCollisionObject* pObj = new CCollisionObject();
+		pObj->SetCollisionObjectType(CCollisionObject::Point);
+		pObj->GetTransform().GetTranslation() = p;
+		pObj->SetColor(1.0, 1.0, 0.0);
+		clothVertices.push_back(pObj);
+	}
+
+	// markers
 	g_MarkerA.SetSize(0.05f, 1.5f, 1.5f);
 	g_MarkerA.SetColor(1.0f, 1.0f, 0.0f);
 	g_MarkerB.SetSize(0.05f, 1.5f, 1.5f);
@@ -69,17 +93,26 @@ void CWorldSimulation::Create()
 
 void CWorldSimulation::ClearAll()
 {
-	if ( m_pNarrowPhase )
+	// TODO: Need to come up with a better idea since ICollidable was introduced..
+
+	/*if ( m_pNarrowPhase )
 	{
 		for ( std::vector<CNarrowCollisionInfo>::iterator iter = m_pNarrowPhase->GetPairs().begin(); iter != m_pNarrowPhase->GetPairs().end(); iter++ )
 		{
 			delete (*iter).pObjA;
 			delete (*iter).pObjB;
 		}
-	}
+	}*/
 
 	if ( m_pNarrowPhase )
 		delete m_pNarrowPhase;
+
+	m_pNarrowPhase = NULL;
+
+	for ( int i = 0; i < (int)clothVertices.size(); i++ )
+		delete clothVertices[i];
+
+	clothVertices.clear();
 }
 
 unsigned int CWorldSimulation::Update(btScalar dt)
@@ -152,10 +185,36 @@ unsigned int CWorldSimulation::SubsUpdate(btScalar dt)
 		}
 	}
 
+	// Cloth vs convex object
+	m_Cloth.IntegrateByLocalPositionContraints(m_dt);
+	for ( int i = 0; i < (int)clothVertices.size(); i++ )
+	{
+		CNarrowCollisionInfo info;
+		
+		if ( m_pNarrowPhase->GetConvexCollisionAlgorithm()->CheckCollision(*pObjectA, *clothVertices[i], &info, false) )
+		{
+			CVector3D pointAW = pObjectA->GetTransform() * info.witnessPntA;
+			CVector3D pointBW = m_Cloth.GetVertexArray()[i].m_Pos;
+
+			CVector3D v = pointBW - pointAW;
+			btScalar margin = 0.2;
+
+			m_Cloth.GetVertexArray()[i].m_Pos -= v.Normalize() * (info.penetrationDepth + margin);
+			//m_Cloth.GetVertexArray()[i].m_Vel.Set(0, 0, 0);
+		}
+	}
+
+	m_Cloth.AdvancePosition(m_dt);
+
+	for ( int i=0; i< (int)clothVertices.size();i++) 
+	{
+		clothVertices[i]->GetTransform().GetTranslation() = m_Cloth.GetVertexArray()[i].m_Pos;
+	}
+
 	return 0;
 }
 
-void CWorldSimulation::Render() const
+void CWorldSimulation::Render()
 {	
 	glEnable(GL_POLYGON_OFFSET_FILL);
 	glPolygonOffset(1,1);
@@ -169,6 +228,13 @@ void CWorldSimulation::Render() const
 		}
 	}
 
+	// cloth
+	m_Cloth.Render();
+
+	for ( int i = 0; i < (int)clothVertices.size(); i++ )
+		clothVertices[i]->Render();
+
+	// Markers
 	glDisable(GL_DEPTH_TEST);
 
 	glLineWidth(3.0f);

@@ -55,6 +55,17 @@ CMatrix44::CMatrix44(btScalar R1[4], btScalar R2[4], btScalar R3[4], btScalar R4
 	}
 }
 
+CMatrix44::CMatrix44(btScalar e00, btScalar e01, btScalar e02, btScalar e03,
+			  btScalar e10, btScalar e11, btScalar e12, btScalar e13,
+			  btScalar e20, btScalar e21, btScalar e22, btScalar e23,
+			  btScalar e30, btScalar e31, btScalar e32, btScalar e33)
+{
+	Row[0][0] = e00; Row[0][1] = e01; Row[0][2] = e02; Row[0][3] = e03;
+	Row[1][0] = e10; Row[1][1] = e11; Row[1][2] = e12; Row[1][3] = e13;
+	Row[2][0] = e20; Row[2][1] = e21; Row[2][2] = e22; Row[2][3] = 203;
+	Row[3][0] = e30; Row[3][1] = e31; Row[3][2] = e32; Row[3][3] = e33;
+}
+
 CMatrix44::~CMatrix44()
 {
 }

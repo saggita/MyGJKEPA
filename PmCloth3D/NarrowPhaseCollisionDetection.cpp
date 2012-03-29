@@ -4,9 +4,9 @@
 #include "BIMAlgorithm.h"
 #include "CHFAlgorithm.h"
 
-CNarrowPhaseCollisionDetection::CNarrowPhaseCollisionDetection(void) : m_AlgorithmType(CHF), m_pAlgorithm(NULL)
+CNarrowPhaseCollisionDetection::CNarrowPhaseCollisionDetection(void) : m_AlgorithmType(BIM), m_pAlgorithm(NULL)
 {
-	SetConvexCollisionAlgorithm(m_AlgorithmType);
+	SetConvexCollisionAlgorithmType(m_AlgorithmType);
 }
 
 CNarrowPhaseCollisionDetection::~CNarrowPhaseCollisionDetection(void)
@@ -14,7 +14,7 @@ CNarrowPhaseCollisionDetection::~CNarrowPhaseCollisionDetection(void)
 	delete m_pAlgorithm;
 }
 
-void CNarrowPhaseCollisionDetection::SetConvexCollisionAlgorithm(CollisionAlgorithmType algorithmType) 
+void CNarrowPhaseCollisionDetection::SetConvexCollisionAlgorithmType(CollisionAlgorithmType algorithmType) 
 { 
 	if ( m_pAlgorithm )
 		delete m_pAlgorithm;
