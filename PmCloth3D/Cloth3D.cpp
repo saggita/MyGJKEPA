@@ -196,7 +196,6 @@ bool CCloth3D::Load(const char* filename)
 	}
 	
 	FillSpringArray();
-
 	Initialize();
 		
 	return true;
@@ -523,9 +522,9 @@ void CCloth3D::Render()
 	/*color[0] = 0.3f;
 	color[1] = 0.5f;
 	color[2] = 0.1f;*/
-	color[0] = 1.0f;
-	color[1] = 0.0f;
-	color[2] = 0.0f;
+	color[0] = 0.3f;
+	color[1] = 0.3f;
+	color[2] = 0.3f;
 	glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, color);
 
 	glBegin(GL_TRIANGLES);
@@ -619,31 +618,13 @@ void CCloth3D::EnforceEdgeConstraints(btScalar dt)
 	for ( unsigned int i = 0; i < m_VertexArray.size(); i++ )
 	{
 		CVertexCloth3D& vert = m_VertexArray[i];
-		newPosArray[i] = vert.m_Pos;
+		//newPosArray[i] = vert.m_Pos;
+		newPosArray[i] = vert.m_Pos + vert.m_Vel * dt;
 	}
-
-	int numEdges = m_StrechSpringArray.size();
-
-	// randomize the array
-	std::vector<int> ramdomEdgeIndexArray;
-	ramdomEdgeIndexArray.reserve(numEdges);
-
-	for ( int i = 0; i < numEdges; i++ )
-		ramdomEdgeIndexArray.push_back(i);
-
-	srand(0);
-
-	for (int i = 0; i < (numEdges-1); i++ ) 
-	{
-		int a = i + (rand() % (numEdges-i)); 
-		int temp = ramdomEdgeIndexArray[i]; 
-		ramdomEdgeIndexArray[i] = ramdomEdgeIndexArray[a]; 
-		ramdomEdgeIndexArray[a] = temp;
-	}
-
+	
 	for ( int i = 0; i < (int)m_StrechSpringArray.size(); i++ )
 	{
-		int indexEdge = ramdomEdgeIndexArray[i];
+		int indexEdge = i;
 
 		bool bNeedLimiting = false;
 
@@ -683,7 +664,8 @@ void CCloth3D::EnforceEdgeConstraints(btScalar dt)
 	for ( unsigned int i = 0; i < m_VertexArray.size(); i++ )
 	{
 		CVertexCloth3D& vert = m_VertexArray[i];
-		vert.m_Pos = newPosArray[i];		
+		//vert.m_Pos = newPosArray[i];		
+		vert.m_Vel = (newPosArray[i] - vert.m_Pos)/dt;
 	}
 }
 
@@ -695,7 +677,8 @@ void CCloth3D::AdvancePosition(btScalar dt)
 	for ( int i = 0; i < (int)m_VertexArray.size(); i++ )
 	{
 		CVertexCloth3D& vert = m_VertexArray[i];	
-		vert.m_Vel = (vert.m_Pos - vert.m_PosOld) / dt;
+		//vert.m_Vel = (vert.m_Pos - vert.m_PosOld) / dt;
+		vert.m_Pos = vert.m_Pos + vert.m_Vel * dt;
 	}
 }
 
@@ -705,15 +688,7 @@ void CCloth3D::IntegrateByLocalPositionContraints(btScalar dt)
 
 	std::vector<CVertexCloth3D>::iterator iter;
 
-		#pragma omp parallel for
-	for ( int i = 0; i < (int)m_VertexArray.size(); i++ )
-	{
-		CVertexCloth3D& vert = m_VertexArray[i];
-		vert.m_Force = CVector3D(0, 0, 0);
-	}
-
 	// gravity
-	// f.y -= 9.82 * m
 	#pragma omp parallel for
 	for ( int i = 0; i < (int)m_VertexArray.size(); i++ )
 	{
@@ -750,7 +725,7 @@ void CCloth3D::IntegrateByLocalPositionContraints(btScalar dt)
 		if ( !vert.m_pPin )			
 		{ 
 			vert.m_Vel += (vert.m_Force * vert.m_InvMass) * dt;
-			vert.m_Pos += vert.m_Vel * dt;
+			//vert.m_Pos += vert.m_Vel * dt;
 		}
 	}
 
@@ -764,6 +739,90 @@ void CCloth3D::IntegrateByLocalPositionContraints(btScalar dt)
 	}
 
 	m_NumIter = numIteration;
+}
+
+void CCloth3D::IntegrateEuler(double dt)
+{
+	m_dt = dt;
+	
+	std::vector<CVertexCloth3D>::iterator iter;
+	
+	// gravity
+	// f.y -= 9.82 * m
+	for ( iter = m_VertexArray.begin(); iter != m_VertexArray.end(); iter++ )
+	{
+		CVertexCloth3D& vert = *iter;
+		
+		vert.m_Force = vert.m_Mass * m_Gravity;
+	}
+	
+	// apply stretching springs force and damping
+	std::vector<CSpringCloth3D>::const_iterator iterStrechSpring;
+	
+	for ( iterStrechSpring = m_StrechSpringArray.begin(); iterStrechSpring != m_StrechSpringArray.end(); iterStrechSpring++ )
+	{
+		const CSpringCloth3D& spring = (*iterStrechSpring);
+
+		CVertexCloth3D& vert0 = m_VertexArray[spring.GetVertexIndex(0)];
+		CVertexCloth3D& vert1 = m_VertexArray[spring.GetVertexIndex(1)];
+
+		double len = (vert0.m_Pos - vert1.m_Pos).Length();
+
+		CVector3D vec = (vert1.m_Pos - vert0.m_Pos).Normalize();
+
+		double springForce = m_Kst * (len - spring.GetRestLength());
+
+		vert0.m_Force += vec * springForce;
+		vert1.m_Force += -vec * springForce;
+
+		double dampingForce = m_Kd * (vert0.m_Vel - vert1.m_Vel).Dot(vec);
+
+		if ( abs(dampingForce) > abs(springForce) )
+			dampingForce = springForce;
+
+		vert0.m_Force += vec * dampingForce;
+		vert1.m_Force += -vec * dampingForce;	
+	}
+
+	// apply bending spring forces
+	std::vector<CSpringCloth3D>::const_iterator iterBendSpring;
+	
+	for ( iterBendSpring = m_BendSpringArray.begin(); iterBendSpring != m_BendSpringArray.end(); iterBendSpring++ )
+	{
+		const CSpringCloth3D& spring = (*iterBendSpring);
+
+		CVertexCloth3D& vert0 = m_VertexArray[spring.GetVertexIndex(0)];
+		CVertexCloth3D& vert1 = m_VertexArray[spring.GetVertexIndex(1)];
+
+		double len = (vert0.m_Pos - vert1.m_Pos).Length();
+
+		CVector3D vec = (vert1.m_Pos - vert0.m_Pos).Normalize();
+
+		double springForce = m_Kb * (len - spring.GetRestLength());
+
+		vert0.m_Force += vec * springForce;
+		vert1.m_Force += -vec * springForce;
+
+		double dampingForce = m_Kd * (vert0.m_Vel - vert1.m_Vel).Dot(vec);
+
+		if ( abs(dampingForce) > abs(springForce) )
+			dampingForce = springForce;
+
+		vert0.m_Force += vec * dampingForce;
+		vert1.m_Force += -vec * dampingForce;	
+	}
+
+	// integrate velocity
+	// v += (f/m) * dt
+	//#pragma omp parallel for
+	//for ( std::vector<CVertexCloth3D>::iterator iter = m_VertexArray.begin(); iter != m_VertexArray.end(); iter++ )
+	for ( int i = 0; i < (int)m_VertexArray.size(); i++ )
+	{
+		CVertexCloth3D& vert = m_VertexArray[i];
+
+		if ( !vert.m_pPin )
+			vert.m_Vel += (vert.m_Force * vert.m_InvMass) * dt;
+	}
 }
 
 void CCloth3D::TranslateW(btScalar x, btScalar y, btScalar z)

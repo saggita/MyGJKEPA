@@ -20,7 +20,7 @@
 
 CWorldSimulation::CWorldSimulation(void) : m_Gravity(0.0f, -9.87f, 0.0f)
 { 
-	m_Substeps = 1;
+	m_Substeps = 2;
 }
 
 CWorldSimulation::~CWorldSimulation(void)
@@ -40,10 +40,12 @@ void CWorldSimulation::Create()
 	// Object 0
 	pObjectA = new CCollisionObject();
 	pObjectA->SetCollisionObjectType(CCollisionObject::ConvexHull);
+	pObjectA->SetMargin(0.5f); // margin should be set before Load(..) 
 	pObjectA->Load("smallGeoSphere.obj");
 	//pObjectA->Load("cone.obj");
 	//pObjectA->Load("box.obj");
 	//pObjectA->Load("cylinder.obj");
+	
 	pObjectA->GetTransform().GetTranslation().Set(2.0f, 4.6f, 0.0f);
 	pObjectA->SetSize(6.0f, 3.0f, 5.0f);
 	pObjectA->SetColor(1.0f, 0.0f, 0.0f);
@@ -61,13 +63,19 @@ void CWorldSimulation::Create()
 	m_pNarrowPhase->AddPair(CNarrowCollisionInfo(pObjectA, pObjectB));
 
 	// cloth
-	m_Cloth.Load("circle789.obj");
-	m_Cloth.SetVertexMass(0.01f);
+	//m_Cloth.Load("circle789.obj");
+	m_Cloth.Load("circle2723.obj");
+	//m_Cloth.Load("circle4074.obj");
+	/*m_Cloth.AddPin(20);
+	m_Cloth.AddPin(500);*/
+	m_Cloth.SetVertexMass(1.0f);
 	m_Cloth.TranslateW(0.0f, 10.0f, 0.0f);
 	m_Cloth.SetColor(0.0f, 0.0f, 0.8f);
 	m_Cloth.SetGravity(m_Gravity);
-	m_Cloth.SetKb(10.0f);
-	m_Cloth.SetNumIterForConstraintSolver(1);
+	m_Cloth.SetKb(150.0f);
+	m_Cloth.SetKst(100.0f); // Only meaningful when IntegrateEuler(..) is used.
+	m_Cloth.SetFrictionCoef(1.0f);
+	m_Cloth.SetNumIterForConstraintSolver(5);
 
 	clothVertices.reserve(m_Cloth.GetVertexArray().size());
 
@@ -147,8 +155,8 @@ unsigned int CWorldSimulation::SubsUpdate(btScalar dt)
 		//----------------------------------------------------------------------------
 		// Rotate object using local coordinate axes in the local coordinate system
 		//----------------------------------------------------------------------------
-		transA.GetRotation() = transA.GetRotation() * CQuaternion(CVector3D(1.0f, 0.0f, 0.0f).Normalize(), angleRad);
-		transB.GetRotation() = transB.GetRotation() * CQuaternion(CVector3D(1.0f, 0.0f, 0.0f).Normalize(), angleRad);
+		//transA.GetRotation() = transA.GetRotation() * CQuaternion(CVector3D(1.0f, 0.0f, 0.0f).Normalize(), angleRad);
+		//transB.GetRotation() = transB.GetRotation() * CQuaternion(CVector3D(1.0f, 0.0f, 0.0f).Normalize(), angleRad);
 
 		//-----------------------------------------------------------------------
 		// Translate using local coordinate axes in the local coordinate system
@@ -185,22 +193,65 @@ unsigned int CWorldSimulation::SubsUpdate(btScalar dt)
 		}
 	}
 
+	ResolveCollisions(dt);
+
+	return 0;
+}
+
+void CWorldSimulation::ResolveCollisions(btScalar dt)
+{
 	// Cloth vs convex object
-	m_Cloth.IntegrateByLocalPositionContraints(m_dt);
+	m_Cloth.IntegrateByLocalPositionContraints(dt);
+	//m_Cloth.IntegrateEuler(dt);
+	
 	for ( int i = 0; i < (int)clothVertices.size(); i++ )
 	{
 		CNarrowCollisionInfo info;
+		CVertexCloth3D& vert = m_Cloth.GetVertexArray()[i];
 		
 		if ( m_pNarrowPhase->GetConvexCollisionAlgorithm()->CheckCollision(*pObjectA, *clothVertices[i], &info, false) )
 		{
 			CVector3D pointAW = pObjectA->GetTransform() * info.witnessPntA;
 			CVector3D pointBW = m_Cloth.GetVertexArray()[i].m_Pos;
+			CVector3D v = pointAW - pointBW;
+			CVector3D n = v.NormalizeOther();
+			double d = info.penetrationDepth; // d already contains margin
+			btScalar margin = pObjectA->GetMargin();
 
-			CVector3D v = pointBW - pointAW;
-			btScalar margin = 0.2;
+			// TODO:Need to know translational and angular velocities of object A.
+			CVector3D velOnPointAW(0, 0, 0);
+			
+			// critical relative velocity to separate the vertex and object
+			double critical_relVel = d / dt;
 
-			m_Cloth.GetVertexArray()[i].m_Pos -= v.Normalize() * (info.penetrationDepth + margin);
-			//m_Cloth.GetVertexArray()[i].m_Vel.Set(0, 0, 0);
+			CVector3D relVel = vert.m_Vel-velOnPointAW;
+
+			// relative normal velocity of vertex. If positive, vertex is separating from the object.
+			double relVelNLen = relVel.Dot(n);
+			CVector3D relVelN = relVelNLen * n;
+
+			// relative tangential velocity to calculate friction
+			CVector3D relVelT = relVel - relVelN;
+
+			CVector3D impulseN = (critical_relVel - relVelNLen) * vert.m_Mass * n;
+
+			// friction.
+			double mu = m_Cloth.GetFrictionCoef();
+			CVector3D impulseFriction(0, 0, 0);
+
+			if ( mu > 0 )
+			{
+				btScalar relVelTLen = relVelT.Length();
+
+				if ( relVelTLen > 0 )
+				{
+					CVector3D newVelT = max((1.0 - mu * 0.5 * relVelNLen/relVelTLen), 0.0) * relVelT;
+					impulseFriction = (newVelT - relVelT) * vert.m_Mass; 
+				}
+			}
+
+			CVector3D impulse = impulseN + impulseFriction;
+			vert.m_Vel += impulse * vert.m_InvMass;
 		}
 	}
 
@@ -210,11 +261,9 @@ unsigned int CWorldSimulation::SubsUpdate(btScalar dt)
 	{
 		clothVertices[i]->GetTransform().GetTranslation() = m_Cloth.GetVertexArray()[i].m_Pos;
 	}
-
-	return 0;
 }
 
-void CWorldSimulation::Render()
+void CWorldSimulation::Render(bool bWireframe/* = false*/)
 {	
 	glEnable(GL_POLYGON_OFFSET_FILL);
 	glPolygonOffset(1,1);
@@ -223,16 +272,16 @@ void CWorldSimulation::Render()
 	{
 		for ( int i = m_pNarrowPhase->GetPairs().size()-1; i >= 0; i-- )
 		{
-			m_pNarrowPhase->GetPairs()[i].pObjA->Render();
-			m_pNarrowPhase->GetPairs()[i].pObjB->Render();
+			m_pNarrowPhase->GetPairs()[i].pObjA->Render(bWireframe);
+			m_pNarrowPhase->GetPairs()[i].pObjB->Render(bWireframe);
 		}
 	}
 
 	// cloth
 	m_Cloth.Render();
 
-	for ( int i = 0; i < (int)clothVertices.size(); i++ )
-		clothVertices[i]->Render();
+	/*for ( int i = 0; i < (int)clothVertices.size(); i++ )
+		clothVertices[i]->Render();*/
 
 	// Markers
 	glDisable(GL_DEPTH_TEST);

@@ -257,7 +257,7 @@ protected:
 	std::vector<CVector3D> m_NormalVecArray;
 	std::vector<CTriangleCloth3D> m_TriangleArray;
 	std::vector<CClothPin> m_PinArray;
-
+	
 	CCollisionObject m_CollisionObject;
 	
 	// for debug
@@ -314,6 +314,7 @@ public:
 	void Clear();
 	void CalcForces();
 	void IntegrateByLocalPositionContraints(btScalar dt);
+	void IntegrateEuler(double dt);
 	void AdvancePosition(btScalar dt);
 	
 	void SetColor(float r, float g, float b) { m_Color = COLOR(r, g, b); }

@@ -27,6 +27,7 @@ bool bMousePressed = false;
 
 bool g_bPause = true;
 bool g_bOneStep = false;
+bool g_bWireframe = false;
 
 std::string g_sWindowTitle;
 std::string g_sWindowTitleInfo;
@@ -239,7 +240,7 @@ void OnRender()
 	
 	glEnable(GL_LIGHTING);
 	glEnable(GL_LIGHT0);
-	g_WorldSim.Render();	
+	g_WorldSim.Render(g_bWireframe);	
 
 	//------------
 	// Draw texts
@@ -275,14 +276,17 @@ void OnRender()
 	std::string sInfo = "Current Algorithm(press 'a' to change): ";
 	sInfo.append(g_sWindowTitleInfo);
 
-	DrawTextGlut("Press 's' to start or stop. space for one step", -g_Width/2 + 10, g_Height/2 - 20);
-	DrawTextGlut(sInfo.c_str(), -g_Width/2 + 10, g_Height/2 - 40);
+	int linePos = 0;
+	DrawTextGlut("'s': start or stop", -g_Width/2 + 10, g_Height/2 - (linePos += 20));
+	DrawTextGlut("space: advance one step", -g_Width/2 + 10, g_Height/2 - (linePos += 20));
+	DrawTextGlut("'c': reset", -g_Width/2 + 10, g_Height/2 - (linePos += 20));
+	DrawTextGlut(sInfo.c_str(), -g_Width/2 + 10, g_Height/2 - (linePos += 20));
 
 	char frame[10];
 	itoa(g_CurFrame, frame, 10);
 	std::string sFrame = "Frame: ";
 	sFrame.append(frame);
-	DrawTextGlut(sFrame.c_str(), -g_Width/2 + 10, g_Height/2 - 60);
+	DrawTextGlut(sFrame.c_str(), -g_Width/2 + 10, g_Height/2 - (linePos += 20));
 
 	glMatrixMode(GL_PROJECTION);	
 	glPopMatrix();	
@@ -378,6 +382,11 @@ void OnKeyboard(unsigned char key, int x, int y)
 	case 32: // space
 		g_bPause = false;
 		g_bOneStep = true;	
+		break;
+
+	case 'w': 
+	case 'W': 
+		g_bWireframe = !g_bWireframe;	
 		break;
 
 	case 'a':

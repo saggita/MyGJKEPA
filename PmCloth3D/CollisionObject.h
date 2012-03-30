@@ -65,6 +65,7 @@ public:
 	CTransform& GetTransform();
 
 	btScalar GetMargin() const { return m_Margin; }
+	void SetMargin(btScalar margin) { m_Margin = margin; }
 	CVector3D GetSize() const { return 2.0 * m_HalfExtent; }
 
 	CVector3D GetLocalSupportPoint(const CVector3D& dir, btScalar margin = 0) const;
@@ -79,7 +80,7 @@ public:
 
 	//btCollisionObject* GetBulletObject() { return m_pBulletColObj; }
 
-	void Render() const;
+	void Render(bool bWireframe = false) const;
 
 	// visualize convex heightfield
 	void VisualizeHF();

@@ -30,10 +30,11 @@ public:
 	void Create();
 	void ClearAll();
 	unsigned int Update(btScalar dt);
-	void Render();
+	void Render(bool bWireframe = false);
 
 protected:
 	unsigned int SubsUpdate(btScalar dt);
+	void ResolveCollisions(btScalar dt);
 	
 private:
 	CWorldSimulation& operator=(const CWorldSimulation& other) { return *this; }; // private assign operator. This means you cannot use assign operator.

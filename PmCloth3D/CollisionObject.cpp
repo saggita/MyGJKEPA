@@ -307,7 +307,7 @@ CVector3D CCollisionObject::GetLocalSupportPoint(const CVector3D& dir, btScalar 
 	return supportPoint;
 }
 
-void CCollisionObject::Render() const
+void CCollisionObject::Render(bool bWireframe/* = false*/) const
 {
 	glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, m_Color);
 	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, m_Color);
@@ -468,32 +468,35 @@ void CCollisionObject::Render() const
 		glMultMatrixd(rotMatrix);
 
 		glPushAttrib(GL_LIGHTING_BIT);
-		
-		glColor3f(0,0,1);
+				
 		glLineWidth(1.0f);
 
-		// triangles
-		for ( int i = 0; i < (int)m_Faces.size(); i++ )
+		if ( !bWireframe )
 		{
-			const TriangleFace& face = m_Faces[i];
-			
-			CVector3D normal(face.planeEqn[0], face.planeEqn[1], face.planeEqn[2]);
-			glNormal3d(normal.m_X, normal.m_Y, normal.m_Z);
-
-			glBegin(GL_TRIANGLES);
-			
-			for ( int j = 0; j < 3; j++ )
+			// triangles
+			for ( int i = 0; i < (int)m_Faces.size(); i++ )
 			{
-				const CVector3D& vertex = m_Vertices[face.indices[j]];
-				
-				glVertex3d(vertex.m_X, vertex.m_Y, vertex.m_Z);
-			}
+				const TriangleFace& face = m_Faces[i];
+			
+				CVector3D normal(face.planeEqn[0], face.planeEqn[1], face.planeEqn[2]);
+				glNormal3d(normal.m_X, normal.m_Y, normal.m_Z);
 
-			glEnd();
+				glBegin(GL_TRIANGLES);
+			
+				for ( int j = 0; j < 3; j++ )
+				{
+					const CVector3D& vertex = m_Vertices[face.indices[j]];
+				
+					glVertex3d(vertex.m_X, vertex.m_Y, vertex.m_Z);
+				}
+
+				glEnd();
+			}
 		}
 
 		// edges
 		glDisable(GL_LIGHTING);
+		glColor3f(0,0,0);
 		glBegin(GL_LINE_STRIP);
 
 		for ( int i = 0; i < (int)m_Faces.size(); i++ )
@@ -659,7 +662,7 @@ bool CCollisionObject::Load(const char* filename)
 		const CVector3D& p2 = m_Vertices[face.indices[2]];
 
 		CVector3D n = (p1-p0).Cross(p2-p0).Normalize();
-		double d = -n.Dot(p0);
+		double d = -n.Dot(p0) - m_Margin;
 
 		face.planeEqn[0] = n.m_X;
 		face.planeEqn[1] = n.m_Y;
