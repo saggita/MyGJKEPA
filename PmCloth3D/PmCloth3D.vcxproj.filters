@@ -35,7 +35,6 @@
     <ClCompile Include="StringTokenizer.cpp">
       <Filter>util</Filter>
     </ClCompile>
-    <ClCompile Include="Cloth3D.cpp" />
     <ClCompile Include="TriangleCloth3D.cpp" />
     <ClCompile Include="BIMAlgorithm.cpp">
       <Filter>NarrowPhaseCollision</Filter>
@@ -76,6 +75,8 @@
     <ClCompile Include="CollisionObject.cpp">
       <Filter>NarrowPhaseCollision</Filter>
     </ClCompile>
+    <ClCompile Include="ClothCL.cpp" />
+    <ClCompile Include="Cloth.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="WorldSimulation.h" />
@@ -163,7 +164,6 @@
     <ClInclude Include="StringTokenizer.h">
       <Filter>util</Filter>
     </ClInclude>
-    <ClInclude Include="Cloth3D.h" />
     <ClInclude Include="TriangleCloth3D.h" />
     <ClInclude Include="BIMAlgorithm.h">
       <Filter>NarrowPhaseCollision</Filter>
@@ -204,6 +204,8 @@
     <ClInclude Include="CollisionObject.h">
       <Filter>NarrowPhaseCollision</Filter>
     </ClInclude>
+    <ClInclude Include="ClothCL.h" />
+    <ClInclude Include="Cloth.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="ConvexHeightField">

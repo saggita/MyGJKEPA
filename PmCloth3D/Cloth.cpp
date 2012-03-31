@@ -14,35 +14,31 @@
 #include <sstream>
 #include <algorithm>
 
-#include "Cloth3D.h"
+#include "Cloth.h"
 #include "StringTokenizer.h"
 
 
 using namespace std;
 
 
-CCloth3D::CCloth3D(void) : m_bDeformable(true), m_Gravity(0.0f, 0.0f, -5.0f), m_dt(0.0f), m_bShowBV(false)
+CCloth::CCloth(void) : m_bDeformable(true), m_Gravity(0.0f, 0.0f, -5.0f), m_dt(0.0f), m_bShowBV(false)
 {
-	m_h = 0.01f;
 	m_Kst = 10000.0f;
 	m_Ksh = 10000.0f;
 	m_Kb = 5000.0f;
 	m_Kd = 0.0f;
-	m_Epsilon = 0.01f;
 	m_Mu = 0.3f;
 	
 	m_bEqualVertexMass = true;
 	m_NumIterForConstraintSolver = 7;
 }
 
-CCloth3D::CCloth3D(const CCloth3D& other)
+CCloth::CCloth(const CCloth& other)
 {
-	m_h = other.m_h;
 	m_Kst = other.m_Kst;
 	m_Ksh = other.m_Ksh;
 	m_Kb = other.m_Kb;
 	m_Kd = other.m_Kd;
-	m_Epsilon = other.m_Epsilon;
 	m_Gravity = other.m_Gravity;
 
 	m_VertexArray = other.m_VertexArray;
@@ -55,12 +51,12 @@ CCloth3D::CCloth3D(const CCloth3D& other)
 	m_bShowBV = other.m_bShowBV;
 }
 
-CCloth3D::~CCloth3D(void)
+CCloth::~CCloth(void)
 {
 	Clear();
 }
 
-void CCloth3D::Clear()
+void CCloth::Clear()
 {
 	m_VertexArray.clear();
 	m_StrechSpringArray.clear();
@@ -69,12 +65,12 @@ void CCloth3D::Clear()
 	m_Color = COLOR();
 }
 
-void CCloth3D::Initialize()
+void CCloth::Initialize()
 {
 	m_bDeformable = true;
 }
 
-bool CCloth3D::Load(const char* filename)
+bool CCloth::Load(const char* filename)
 {
 	// Loading wavefront obj file.
 	ifstream inFile(filename);
@@ -126,7 +122,6 @@ bool CCloth3D::Load(const char* filename)
 
 			CVertexCloth3D vert;
 			vert.m_Pos.Set(pnt.m_X, pnt.m_Y, pnt.m_Z);
-			vert.m_PosOld = vert.m_Pos;
 
 			m_VertexArray.push_back(vert);
 		}
@@ -201,7 +196,7 @@ bool CCloth3D::Load(const char* filename)
 	return true;
 }
 
-void CCloth3D::FillSpringArray()
+void CCloth::FillSpringArray()
 {
 	//---------------
 	// Stretch springs
@@ -322,97 +317,19 @@ void CCloth3D::FillSpringArray()
 
 		edge.SetRestLength((ver0 - ver1).Length());
 	}
-
-	// Clear m_StrechSpringIndexes and m_BendSpringIndexes in each vertex
-	for ( std::vector<CVertexCloth3D>::iterator iter = m_VertexArray.begin(); iter != m_VertexArray.end(); iter++ )
-	{
-		CVertexCloth3D& vert = *iter;
-		vert.m_StrechSpringIndexes.clear();
-		vert.m_BendSpringIndexes.clear();
-	}
-
-	// Set m_StrechSpringIndexes in each vertex
-	for ( std::vector<CSpringCloth3D>::iterator iterEdge = m_StrechSpringArray.begin(); iterEdge != m_StrechSpringArray.end(); iterEdge++ )
-	{
-		CSpringCloth3D& edge = (*iterEdge);
-		CVertexCloth3D& ver0 = m_VertexArray[edge.GetVertexIndex(0)];
-		CVertexCloth3D& ver1 = m_VertexArray[edge.GetVertexIndex(1)];
-
-		ver0.m_StrechSpringIndexes.push_back(edge.GetIndex());
-		ver1.m_StrechSpringIndexes.push_back(edge.GetIndex());
-	}
-
-	// Set m_BendSpringIndexes in each vertex
-	for ( std::vector<CSpringCloth3D>::iterator iterEdge = m_BendSpringArray.begin(); iterEdge != m_BendSpringArray.end(); iterEdge++ )
-	{
-		CSpringCloth3D& edge = (*iterEdge);
-		CVertexCloth3D& ver0 = m_VertexArray[edge.GetVertexIndex(0)];
-		CVertexCloth3D& ver1 = m_VertexArray[edge.GetVertexIndex(1)];
-
-		ver0.m_BendSpringIndexes.push_back(edge.GetIndex());
-		ver1.m_BendSpringIndexes.push_back(edge.GetIndex());
-	}
-
-	// Calculate area, du1, du2, dv1 and dv2 of triangles
-	for ( iterTri = m_TriangleArray.begin(); iterTri != m_TriangleArray.end(); ++iterTri )
-	{
-		CTriangleCloth3D& tri = (*iterTri);
-		
-		const CVector3D& v0 = m_VertexArray[tri.GetVertexIndex(0)].m_Pos;
-		const CVector3D& v1 = m_VertexArray[tri.GetVertexIndex(1)].m_Pos;
-		const CVector3D& v2 = m_VertexArray[tri.GetVertexIndex(2)].m_Pos;
-
-		// calculate coordinates of vertices in u, v world. It would not work if the triangle is degenerated. 
-		CVector3D uv0(0, 0, 0);
-		CVector3D uv1(0, 0, 0);
-		CVector3D uv2(0, 0, 0);
-
-		CVector3D v10 = v1 - v0;
-		CVector3D u = (v2 - v0).Normalize();
-		CVector3D v = (u).Cross(v10).Cross(u).Normalize();
-
-		uv1.m_X = v10.Dot(u);
-		uv1.m_Y = v10.Dot(v);
-		
-		uv2.m_X = (v2 - v0).Dot(u);
-		uv2.m_Y = 0;
-
-		tri.du1 = uv1.m_X - uv0.m_X;
-		tri.du2 = uv2.m_X - uv0.m_X;
-		tri.dv1 = uv1.m_Y - uv0.m_Y;
-		tri.dv2 = uv2.m_Y - uv0.m_Y;
-
-		assert((tri.du1*tri.dv2 - tri.du2*tri.dv1) != 0); 
-
-		tri.inv_det = 1.0 / (tri.du1*tri.dv2 - tri.du2*tri.dv1);
-
-		tri.dWu_dX[0] = tri.inv_det*(tri.dv1 - tri.dv2);
-		tri.dWu_dX[1] = tri.inv_det*(tri.dv2);
-		tri.dWu_dX[2] = tri.inv_det*(-tri.dv1);
-
-		tri.dWv_dX[0] = tri.inv_det*(tri.du2 - tri.du1);
-		tri.dWv_dX[1] = tri.inv_det*(-tri.du2);
-		tri.dWv_dX[2] = tri.inv_det*(tri.du1);
-
-		tri.A = abs(0.5 * (tri.du1 * tri.dv2 - tri.dv1 * tri.du2));
-		//tri.Asqrt = sqrt(tri.A); // This seems to make solver unstable. Don't know why at this moment..
-		tri.Asqrt = tri.A;
-	}
-
-	//CalcParticleMassFromDensity();	
 }
 
-void CCloth3D::SetGravity(const CVector3D& gravity)
+void CCloth::SetGravity(const CVector3D& gravity)
 {
 	m_Gravity = gravity;
 }
 
-const CVector3D& CCloth3D::GetGravity() const
+const CVector3D& CCloth::GetGravity() const
 {
 	return m_Gravity;
 }
 
-void CCloth3D::SetVertexMass(btScalar vertexMass)
+void CCloth::SetVertexMass(btScalar vertexMass)
 {
 	m_bEqualVertexMass = true;
 
@@ -423,27 +340,26 @@ void CCloth3D::SetVertexMass(btScalar vertexMass)
 	for ( std::vector<CVertexCloth3D>::iterator iter = m_VertexArray.begin(); iter != m_VertexArray.end(); iter++ )
 	{
 		CVertexCloth3D& vert = *iter;
-		vert.m_Mass = vertexMass;
 		vert.m_InvMass = invMass;
 	}
 }
 
-void CCloth3D::SetTotalMass(btScalar totalMass)
+void CCloth::SetTotalMass(btScalar totalMass)
 {
+	assert(totalMass > 0);
+
 	m_bEqualVertexMass = true;
 
-	btScalar eachMass = totalMass / m_VertexArray.size();
-	btScalar invMass =  1.0f / eachMass;
+	btScalar invMass =  m_VertexArray.size() / totalMass;
 
 	for ( std::vector<CVertexCloth3D>::iterator iter = m_VertexArray.begin(); iter != m_VertexArray.end(); iter++ )
 	{
 		CVertexCloth3D& vert = *iter;
-		vert.m_Mass = eachMass;
 		vert.m_InvMass = invMass;
 	}
 }
 
-void CCloth3D::AddPin(int vertexIndex)
+void CCloth::AddPin(int vertexIndex)
 {
 	if ( vertexIndex < 0 || vertexIndex >= (int)GetVertexArray().size() )
 		return;
@@ -456,7 +372,7 @@ void CCloth3D::AddPin(int vertexIndex)
 	pVertex->m_PinIndex = m_PinArray.size()-1;
 }
 
-void CCloth3D::Render()
+void CCloth::Render()
 {
 	// Calculate normal vectors for each vertex
 	for ( std::vector<CVector3D>::iterator iter = m_NormalVecArray.begin(); iter != m_NormalVecArray.end(); iter++ )
@@ -609,7 +525,7 @@ void CCloth3D::Render()
 	glEnable(GL_LIGHTING);
 }
 
-void CCloth3D::EnforceEdgeConstraints(btScalar dt)
+void CCloth::EnforceEdgeConstraints(btScalar dt)
 {
 	m_dt = dt;
 
@@ -669,7 +585,7 @@ void CCloth3D::EnforceEdgeConstraints(btScalar dt)
 	}
 }
 
-void CCloth3D::AdvancePosition(btScalar dt)
+void CCloth::AdvancePosition(btScalar dt)
 {
 	m_dt = dt;
 
@@ -682,7 +598,7 @@ void CCloth3D::AdvancePosition(btScalar dt)
 	}
 }
 
-void CCloth3D::IntegrateByLocalPositionContraints(btScalar dt)
+void CCloth::IntegrateByLocalPositionContraints(btScalar dt)
 {
 	m_dt = dt;
 
@@ -693,7 +609,7 @@ void CCloth3D::IntegrateByLocalPositionContraints(btScalar dt)
 	for ( int i = 0; i < (int)m_VertexArray.size(); i++ )
 	{
 		CVertexCloth3D& vert = m_VertexArray[i];		
-		vert.m_Force = vert.m_Mass * m_Gravity;
+		vert.m_Accel = m_Gravity;
 	}
 
 	// apply bending spring forces
@@ -706,25 +622,23 @@ void CCloth3D::IntegrateByLocalPositionContraints(btScalar dt)
 		CVertexCloth3D& vert0 = m_VertexArray[spring.GetVertexIndex(0)];
 		CVertexCloth3D& vert1 = m_VertexArray[spring.GetVertexIndex(1)];
 
-		double len = (vert0.m_Pos - vert1.m_Pos).Length();
+		btScalar len = (vert0.m_Pos - vert1.m_Pos).Length();
 
 		CVector3D vec = (vert1.m_Pos - vert0.m_Pos).Normalize();
 
-		double springForce = m_Kb * (len - spring.GetRestLength());
+		btScalar springForce = m_Kb * (len - spring.GetRestLength());
 
-		vert0.m_Force += vec * springForce;
-		vert1.m_Force += -vec * springForce;
+		vert0.m_Accel += vec * springForce * vert0.m_InvMass;
+		vert1.m_Accel += -vec * springForce * vert1.m_InvMass;
 	}
 
 	for ( int i = 0; i < (int)m_VertexArray.size(); i++ )
 	{
 		CVertexCloth3D& vert = m_VertexArray[i];
 
-		vert.m_PosOld = vert.m_Pos;
-
 		if ( !vert.m_pPin )			
 		{ 
-			vert.m_Vel += (vert.m_Force * vert.m_InvMass) * dt;
+			vert.m_Vel += vert.m_Accel * dt;
 			//vert.m_Pos += vert.m_Vel * dt;
 		}
 	}
@@ -741,7 +655,7 @@ void CCloth3D::IntegrateByLocalPositionContraints(btScalar dt)
 	m_NumIter = numIteration;
 }
 
-void CCloth3D::IntegrateEuler(double dt)
+void CCloth::IntegrateEuler(btScalar dt)
 {
 	m_dt = dt;
 	
@@ -753,7 +667,7 @@ void CCloth3D::IntegrateEuler(double dt)
 	{
 		CVertexCloth3D& vert = *iter;
 		
-		vert.m_Force = vert.m_Mass * m_Gravity;
+		vert.m_Accel = m_Gravity;
 	}
 	
 	// apply stretching springs force and damping
@@ -766,22 +680,22 @@ void CCloth3D::IntegrateEuler(double dt)
 		CVertexCloth3D& vert0 = m_VertexArray[spring.GetVertexIndex(0)];
 		CVertexCloth3D& vert1 = m_VertexArray[spring.GetVertexIndex(1)];
 
-		double len = (vert0.m_Pos - vert1.m_Pos).Length();
+		btScalar len = (vert0.m_Pos - vert1.m_Pos).Length();
 
 		CVector3D vec = (vert1.m_Pos - vert0.m_Pos).Normalize();
 
-		double springForce = m_Kst * (len - spring.GetRestLength());
+		btScalar springForce = m_Kst * (len - spring.GetRestLength());
 
-		vert0.m_Force += vec * springForce;
-		vert1.m_Force += -vec * springForce;
+		vert0.m_Accel += vec * springForce * vert0.m_InvMass;
+		vert1.m_Accel += -vec * springForce * vert1.m_InvMass;
 
-		double dampingForce = m_Kd * (vert0.m_Vel - vert1.m_Vel).Dot(vec);
+		btScalar dampingForce = m_Kd * (vert0.m_Vel - vert1.m_Vel).Dot(vec);
 
 		if ( abs(dampingForce) > abs(springForce) )
 			dampingForce = springForce;
 
-		vert0.m_Force += vec * dampingForce;
-		vert1.m_Force += -vec * dampingForce;	
+		vert0.m_Accel += vec * dampingForce * vert0.m_InvMass;
+		vert1.m_Accel += -vec * dampingForce * vert1.m_InvMass;	
 	}
 
 	// apply bending spring forces
@@ -794,22 +708,22 @@ void CCloth3D::IntegrateEuler(double dt)
 		CVertexCloth3D& vert0 = m_VertexArray[spring.GetVertexIndex(0)];
 		CVertexCloth3D& vert1 = m_VertexArray[spring.GetVertexIndex(1)];
 
-		double len = (vert0.m_Pos - vert1.m_Pos).Length();
+		btScalar len = (vert0.m_Pos - vert1.m_Pos).Length();
 
 		CVector3D vec = (vert1.m_Pos - vert0.m_Pos).Normalize();
 
-		double springForce = m_Kb * (len - spring.GetRestLength());
+		btScalar springForce = m_Kb * (len - spring.GetRestLength());
 
-		vert0.m_Force += vec * springForce;
-		vert1.m_Force += -vec * springForce;
+		vert0.m_Accel += vec * springForce * vert0.m_InvMass;
+		vert1.m_Accel += -vec * springForce * vert1.m_InvMass;
 
-		double dampingForce = m_Kd * (vert0.m_Vel - vert1.m_Vel).Dot(vec);
+		btScalar dampingForce = m_Kd * (vert0.m_Vel - vert1.m_Vel).Dot(vec);
 
 		if ( abs(dampingForce) > abs(springForce) )
 			dampingForce = springForce;
 
-		vert0.m_Force += vec * dampingForce;
-		vert1.m_Force += -vec * dampingForce;	
+		vert0.m_Accel += vec * dampingForce * vert0.m_InvMass;
+		vert1.m_Accel += -vec * dampingForce * vert1.m_InvMass;	
 	}
 
 	// integrate velocity
@@ -821,28 +735,25 @@ void CCloth3D::IntegrateEuler(double dt)
 		CVertexCloth3D& vert = m_VertexArray[i];
 
 		if ( !vert.m_pPin )
-			vert.m_Vel += (vert.m_Force * vert.m_InvMass) * dt;
+			vert.m_Vel += vert.m_Accel * dt;
 	}
 }
 
-void CCloth3D::TranslateW(btScalar x, btScalar y, btScalar z)
+void CCloth::TranslateW(btScalar x, btScalar y, btScalar z)
 {
 	for ( std::vector<CVertexCloth3D>::iterator iter = m_VertexArray.begin(); iter != m_VertexArray.end(); iter++ )
 	{
 		CVertexCloth3D& vert = *iter;
 				
 		vert.m_Pos += CVector3D(x, y, z);
-		vert.m_PosOld += CVector3D(x, y, z);
 	}
 }
 
-CCloth3D& CCloth3D::operator=(const CCloth3D& other) 
+CCloth& CCloth::operator=(const CCloth& other) 
 { 
-	m_h = other.m_h;
 	m_Kst = other.m_Kst;
 	m_Kb = other.m_Kb;
 	m_Kd = other.m_Kd;
-	m_Epsilon = other.m_Epsilon;
 
 	// ToDo: Need to do something with m_pBVHTree
 

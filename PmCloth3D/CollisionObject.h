@@ -4,6 +4,7 @@
 #include "Transform.h"
 #include "../btBulletCollisionCommon.h"
 #include "ConvexHeightField\ConvexHeightFieldShape.h"
+#include "ConvexHeightField\ChNarrowphase.h"
 #include "ICollidable.h"
 
 struct TriangleFace
@@ -41,8 +42,19 @@ protected:
 
 	bool m_bLoaded;
 
+	//--------
+	// OpenCL
+	//--------
+	Device* m_ddcl; 
+	Device* m_ddhost;	
+	ShapeDataType m_ShapeBuffer;
+	ChNarrowphase<TYPE_CL>::Data* m_Data;
+	HostBuffer<RigidBodyBase::Body>* m_pBufRBodiesCPU;
+	Buffer<RigidBodyBase::Body>* m_pBufRBodiesGPU;
+
 public:
-	CCollisionObject(void);
+	CCollisionObject();
+	CCollisionObject(Device* ddcl, Device* ddhost);
 	virtual ~CCollisionObject(void);
 
 public:

@@ -5,11 +5,11 @@
 #include "Point3D.h"
 #include "Vector3D.h"
 
-class CCloth3D;
+class CCloth;
 
 class CTriangleCloth3D
 {
-	friend class CCloth3D;
+	friend class CCloth;
 
 public:
 	CTriangleCloth3D();
@@ -64,8 +64,8 @@ public:
 	int GetIndex() const { return m_Index; }
 	void SetIndex(int index) { m_Index = index; }
 	int GetNormalVectIndex() const { return m_IndexNormalVec; }
-	CVector3D GetPointByBaryCoord(const CCloth3D* pCloth, double a, double b, double c) const;
-	CVector3D GetVelocityByBaryCoord(const CCloth3D* pCloth, double a, double b, double c) const;
+	CVector3D GetPointByBaryCoord(const CCloth* pCloth, double a, double b, double c) const;
+	CVector3D GetVelocityByBaryCoord(const CCloth* pCloth, double a, double b, double c) const;
 	
 	CTriangleCloth3D& operator=(const CTriangleCloth3D& other);
 };

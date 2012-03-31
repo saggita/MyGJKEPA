@@ -1,5 +1,5 @@
 #include "TriangleCloth3D.h"
-#include "Cloth3D.h"
+#include "Cloth.h"
 
 CTriangleCloth3D::CTriangleCloth3D()
 {
@@ -29,7 +29,7 @@ CTriangleCloth3D::~CTriangleCloth3D()
 {
 }
 
-CVector3D CTriangleCloth3D::GetPointByBaryCoord(const CCloth3D* pCloth, double a, double b, double c) const
+CVector3D CTriangleCloth3D::GetPointByBaryCoord(const CCloth* pCloth, double a, double b, double c) const
 {
 	const CVertexCloth3D& v0 = pCloth->GetVertexArray()[m_IndexVrx[0]];
 	const CVertexCloth3D& v1 = pCloth->GetVertexArray()[m_IndexVrx[1]];
@@ -38,7 +38,7 @@ CVector3D CTriangleCloth3D::GetPointByBaryCoord(const CCloth3D* pCloth, double a
 	return CVector3D(v0.m_Pos*a + v1.m_Pos*b + v2.m_Pos*c);
 }
 
-CVector3D CTriangleCloth3D::GetVelocityByBaryCoord(const CCloth3D* pCloth, double a, double b, double c) const
+CVector3D CTriangleCloth3D::GetVelocityByBaryCoord(const CCloth* pCloth, double a, double b, double c) const
 {
 	const CVertexCloth3D& v0 = pCloth->GetVertexArray()[m_IndexVrx[0]];
 	const CVertexCloth3D& v1 = pCloth->GetVertexArray()[m_IndexVrx[1]];

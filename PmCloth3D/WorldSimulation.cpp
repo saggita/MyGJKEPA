@@ -18,9 +18,23 @@
 #include "ConvexCollisionAlgorithm.h"
 #include "CollisionObject.h"
 
+cl_context        g_cxGPUMainContext = NULL;
+cl_command_queue  g_cqGPUCommandQue = NULL;
+
 CWorldSimulation::CWorldSimulation(void) : m_Gravity(0.0f, -9.87f, 0.0f)
 { 
 	m_Substeps = 2;
+
+	//------------------
+	// Initialize OpenCL
+	//------------------
+	DeviceUtils::Config cfg;
+	m_ddcl = DeviceUtils::allocate(TYPE_CL, cfg);
+	m_ddhost = DeviceUtils::allocate(TYPE_HOST, cfg);
+
+	char name[128];
+	m_ddcl->getDeviceName( name );
+	printf("CL: %s\n", name);
 }
 
 CWorldSimulation::~CWorldSimulation(void)
@@ -31,14 +45,83 @@ CWorldSimulation::~CWorldSimulation(void)
 CCollisionObject g_MarkerA;
 CCollisionObject g_MarkerB;
 
+bool CWorldSimulation::InitCL()
+{
+	cl_platform_id platform_id;
+	cl_uint num_platforms;
+
+	//---------
+	// platform
+	//---------
+	cl_int err = clGetPlatformIDs(1, &platform_id, &num_platforms);
+
+	if ( err != CL_SUCCESS )
+	{
+		printf("Failed to get OpenCL platform\n");
+		return false;
+	}
+
+	//----------
+	// device ID
+	//----------
+	cl_device_id device_id;
+	cl_uint num_of_devices;
+
+	err = clGetDeviceIDs(platform_id, CL_DEVICE_TYPE_GPU, 1, &device_id, &num_of_devices);
+
+	if ( err != CL_SUCCESS )
+	{
+		printf("Failed to get OpenCL device ID\n");
+		return false;
+	}
+	
+	//clGetDeviceInfo(device_id, 
+
+	//--------
+	// context
+	//--------
+	cl_context_properties properties[3];
+
+	properties[0]= CL_CONTEXT_PLATFORM;
+	properties[1]= (cl_context_properties) platform_id;
+	properties[2]= 0;
+
+	g_cxGPUMainContext = clCreateContext(properties, 1, &device_id, NULL, NULL, &err);
+
+	if ( err != CL_SUCCESS )
+	{
+		printf("Failed to get OpenCL context ID\n");
+		return false;
+	}
+
+	//--------------
+	// Command Queue
+	//--------------
+	g_cqGPUCommandQue = clCreateCommandQueue(g_cxGPUMainContext, device_id, 0, &err);
+
+	if ( err != CL_SUCCESS )
+	{
+		printf("Failed to get OpenCL command queue ID\n");
+		return false;
+	}
+
+	return true;
+}
+
 void CWorldSimulation::Create()
 {	
 	ClearAll();
 
+	bool bCLOk = InitCL();
+
+	assert(bCLOk);
+
 	m_pNarrowPhase = new CNarrowPhaseCollisionDetection();
 	
+	//-----------
 	// Object 0
-	pObjectA = new CCollisionObject();
+	//-----------
+	pObjectA = new CCollisionObject(m_ddcl, m_ddhost);
 	pObjectA->SetCollisionObjectType(CCollisionObject::ConvexHull);
 	pObjectA->SetMargin(0.5f); // margin should be set before Load(..) 
 	pObjectA->Load("smallGeoSphere.obj");
@@ -51,7 +134,9 @@ void CWorldSimulation::Create()
 	pObjectA->SetColor(1.0f, 0.0f, 0.0f);
 	pObjectA->GetTransform().GetRotation().SetRotation(CQuaternion(CVector3D(1.0f, 1.0f, 0.0f).Normalize(), 3.141592f/3.0f));
 
+	//-----------
 	// Object 1
+	//-----------
 	CCollisionObject* pObjectB = new CCollisionObject();
 	pObjectB->SetCollisionObjectType(CCollisionObject::Point);
 	pObjectB->SetSize(3.0f, 4.0f, 5.0f);
@@ -64,22 +149,24 @@ void CWorldSimulation::Create()
 
 	// cloth
 	//m_Cloth.Load("circle789.obj");
+	//m_Cloth.Load("circle2723.obj");
 	m_Cloth.Load("circle2723.obj");
 	//m_Cloth.Load("circle4074.obj");
 	/*m_Cloth.AddPin(20);
 	m_Cloth.AddPin(500);*/
+	m_Cloth.Initialize();
 	m_Cloth.SetVertexMass(1.0f);
 	m_Cloth.TranslateW(0.0f, 10.0f, 0.0f);
 	m_Cloth.SetColor(0.0f, 0.0f, 0.8f);
 	m_Cloth.SetGravity(m_Gravity);
-	m_Cloth.SetKb(150.0f);
+	m_Cloth.SetKb(550.0f);
 	m_Cloth.SetKst(100.0f); // Only meaningful when IntegrateEuler(..) is used.
-	m_Cloth.SetFrictionCoef(1.0f);
+	m_Cloth.SetFrictionCoef(0.1f);
 	m_Cloth.SetNumIterForConstraintSolver(5);
 
 	clothVertices.reserve(m_Cloth.GetVertexArray().size());
 
-	for( int i=0; i < m_Cloth.GetVertexArray().size(); i++ ) 
+	for( int i=0; i < (int)m_Cloth.GetVertexArray().size(); i++ ) 
 	{
 		const CVector3D& p = m_Cloth.GetVertexArray()[i].m_Pos;
 	
@@ -121,6 +208,12 @@ void CWorldSimulation::ClearAll()
 		delete clothVertices[i];
 
 	clothVertices.clear();
+
+	if ( g_cxGPUMainContext )
+		clReleaseContext(g_cxGPUMainContext);
+
+	if ( g_cqGPUCommandQue )
+		clReleaseCommandQueue(g_cqGPUCommandQue);
 }
 
 unsigned int CWorldSimulation::Update(btScalar dt)
@@ -215,43 +308,43 @@ void CWorldSimulation::ResolveCollisions(btScalar dt)
 			CVector3D pointBW = m_Cloth.GetVertexArray()[i].m_Pos;
 			CVector3D v = pointAW - pointBW;
 			CVector3D n = v.NormalizeOther();
-			double d = info.penetrationDepth; // d already contains margin
+			btScalar d = info.penetrationDepth; // d already contains margin
 			btScalar margin = pObjectA->GetMargin();
 
 			// TODO:Need to know translational and angular velocities of object A.
 			CVector3D velOnPointAW(0, 0, 0);
 			
 			// critical relative velocity to separate the vertex and object
-			double critical_relVel = d / dt;
+			btScalar critical_relVel = d / dt;
 
 			CVector3D relVel = vert.m_Vel-velOnPointAW;
 
 			// relative normal velocity of vertex. If positive, vertex is separating from the object.
-			double relVelNLen = relVel.Dot(n);
+			btScalar relVelNLen = relVel.Dot(n);
 			CVector3D relVelN = relVelNLen * n;
 
 			// relative tangential velocity to calculate friction
 			CVector3D relVelT = relVel - relVelN;
 
-			CVector3D impulseN = (critical_relVel - relVelNLen) * vert.m_Mass * n;
+			CVector3D delVN = (critical_relVel - relVelNLen) * n;
 
 			// friction.
-			double mu = m_Cloth.GetFrictionCoef();
-			CVector3D impulseFriction(0, 0, 0);
+			btScalar mu = m_Cloth.GetFrictionCoef();
+			CVector3D delVT(0, 0, 0);
 
 			if ( mu > 0 )
 			{
-				btScalar relVelTLen = relVelT.Length();
-
-				if ( relVelTLen > 0 )
+				// apply friction when two objects are getting closer. 
+				if ( relVelNLen < 0  )
 				{
-					CVector3D newVelT = max((1.0 - mu * 0.5 * relVelNLen/relVelTLen), 0.0) * relVelT;
-					impulseFriction = (newVelT - relVelT) * vert.m_Mass; 
+					// 0.6 is magic number to prevent tangling problem when mu is close to 1.0.
+					CVector3D newVelT = (1.0f-0.6f*mu) * relVelT;
+					delVT = (newVelT - relVelT); 
 				}
 			}
 
-			CVector3D impulse = impulseN + impulseFriction;
-			vert.m_Vel += impulse * vert.m_InvMass;
+			CVector3D impulse = delVN + delVT;
+			vert.m_Vel += impulse;
 		}
 	}
 

@@ -1,5 +1,7 @@
 //#define PATH "..\\..\\AdlPhysics\\Narrowphase\\ChNarrowphaseKernels"
-#define PATH "NarrowPhaseCL\\ChNarrowphaseKernels"
+//#define PATH "NarrowPhaseCL\\ChNarrowphaseKernels"
+#define PATH ".\\PmCloth3D\\ConvexHeightField\\ChNarrowphaseKernels"
+
 #define KERNEL0 "SupportCullingKernel"
 #define KERNEL1 "NarrowphaseKernel"
 

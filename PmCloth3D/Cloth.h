@@ -14,9 +14,9 @@
 //----------------------------------------------
 // CSpringCloth3D
 //----------------------------------------------
-class CSpringCloth3D
+struct CSpringCloth3D
 {
-	friend class CCloth3D;
+	friend class CCloth;
 
 public:
 	CSpringCloth3D() 
@@ -50,9 +50,6 @@ public:
 	}
 	
 	virtual ~CSpringCloth3D() { }
-
-	CVector3D m_GradC0;
-	CVector3D m_GradC1;
 
 protected:
 	int m_Index;
@@ -114,15 +111,15 @@ public:
 	}
 };
 
-class CClothPin;
+struct CClothPin;
 
 //----------------------------------------------
 // CVertexCloth3D
 //----------------------------------------------
-class CVertexCloth3D
+struct CVertexCloth3D
 {
 public:
-	CVertexCloth3D() : m_Mass(1.0), m_InvMass(1.0), m_pPin(NULL), m_PinIndex(-1)
+	CVertexCloth3D() : m_InvMass(1.0), m_pPin(NULL), m_PinIndex(-1)
 	{
 	}
 
@@ -130,25 +127,12 @@ public:
 
 	int m_Index;
 	CVector3D m_Pos;
-	CVector3D m_PosOld;
 	CVector3D m_Vel;
-	CVector3D m_dVel; // delta velocity
-	btScalar m_Mass;
 	btScalar m_InvMass; // = 1.0 / m_Mass. In case mass is infinite, m_InvMass is zero and m_Mass doesn't have any meaning.
 					  // Currently infinite mass is not supported. CClothPin should be used to pin cloth vertex.
-	CVector3D m_Force;
-	CClothPin* m_pPin;
+	CVector3D m_Accel;
 	int m_PinIndex;
-
-	// array of indexes of stretch springs connected to this vertex 
-	std::vector<int> m_StrechSpringIndexes; 
-
-	// array of indexes of bend springs connected to this vertex 
-	std::vector<int> m_BendSpringIndexes; 
-
-	// array of indexes of triangles sharing this vertex
-	std::vector<int> m_TriangleIndexes; 
-
+	CClothPin* m_pPin;	
 public:
 	int GetIndex() const { return m_Index; }
 	void SetIndex(int index) { m_Index = index; }
@@ -158,7 +142,7 @@ public:
 //----------------------------------------------
 // CClothPin
 //----------------------------------------------
-class CClothPin
+struct CClothPin
 {
 public:
 	CClothPin() : m_Pos(0, 0, 0), m_Vel(0, 0, 0), m_VertexIndex(-1), m_pVertex(NULL) {}
@@ -230,21 +214,19 @@ struct COLOR
 #include "ICollidable.h"
 #include "CollisionObject.h"
 
-class CCloth3D : public ICollidable
+class CCloth : public ICollidable
 {
 public:
-	CCloth3D(void);
-	CCloth3D(const CCloth3D& other);
-	virtual ~CCloth3D(void);
+	CCloth(void);
+	CCloth(const CCloth& other);
+	virtual ~CCloth(void);
 
 protected:
 	btScalar m_dt;
-	btScalar m_h; // thickness
 	btScalar m_Kst; // stretch force
 	btScalar m_Ksh; // shear force
 	btScalar m_Kb; // bending force
 	btScalar m_Kd;
-	btScalar m_Epsilon; 
 	btScalar m_Mu; // friction
 	CVector3D m_Gravity;
 	//CBVHTree* m_pBVHTree;
@@ -258,7 +240,7 @@ protected:
 	std::vector<CTriangleCloth3D> m_TriangleArray;
 	std::vector<CClothPin> m_PinArray;
 	
-	CCollisionObject m_CollisionObject;
+	//CCollisionObject m_CollisionObject;
 	
 	// for debug
 	bool m_bShowBV; // toggle showing bounding volume
@@ -273,14 +255,11 @@ public:
 	btScalar GetKst() const { return m_Kst; };
 	btScalar GetKsh() const { return m_Ksh; };
 	btScalar GetKb() const { return m_Kb; };
-	btScalar GetThickness() const { return m_h; }
 	btScalar GetFrictionCoef() const { return m_Mu; }
 	void SetKst(btScalar Kst) { m_Kst = Kst; };
 	void SetKsh(btScalar Ksh) { m_Ksh = Ksh; };
 	void SetKb(btScalar Kb) { m_Kb = Kb; };
-	void SetThickness(btScalar h) { m_h = h; }
 	void SetFrictionCoef(btScalar mu) { assert(mu >= 0 && mu <= 1.0); m_Mu = mu; }
-	btScalar GetEpsilon() const { return m_Epsilon; }
 	btScalar Getdt() const { return m_dt; } 
 	void Setdt(btScalar dt) { m_dt = dt; }
 	void SetGravity(const CVector3D& gravity);
@@ -312,15 +291,18 @@ public:
 	void SetDeformable(bool bDeformable) { m_bDeformable = bDeformable; }
 
 	void Clear();
-	void CalcForces();
-	void IntegrateByLocalPositionContraints(btScalar dt);
-	void IntegrateEuler(double dt);
-	void AdvancePosition(btScalar dt);
+	virtual void IntegrateByLocalPositionContraints(btScalar dt);
+	virtual void IntegrateEuler(btScalar dt);
+	virtual void AdvancePosition(btScalar dt);
 	
 	void SetColor(float r, float g, float b) { m_Color = COLOR(r, g, b); }
 	virtual void Render();
-	virtual CCollisionObject* GetCollisionObject() { return &m_CollisionObject; }
-	virtual const CCollisionObject* GetCollisionObject() const { return &m_CollisionObject; }
+	/*virtual CCollisionObject* GetCollisionObject() { return &m_CollisionObject; }
+	virtual const CCollisionObject* GetCollisionObject() const { return &m_CollisionObject; }*/
+
+	virtual CCollisionObject* GetCollisionObject() { return NULL; }
+	virtual const CCollisionObject* GetCollisionObject() const { return NULL; }
+
 	virtual void TranslateW(btScalar x, btScalar y, btScalar z);
 
 protected:
@@ -328,7 +310,7 @@ protected:
 	void EnforceEdgeConstraints(btScalar dt);
 
 public:
-	CCloth3D& operator=(const CCloth3D& other);
+	CCloth& operator=(const CCloth& other);
 };
 
 

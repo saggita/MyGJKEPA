@@ -31,7 +31,8 @@
     <ClInclude Include="Adl\Adl\AdlStopwatch.h" />
     <ClInclude Include="BIMAlgorithm.h" />
     <ClInclude Include="CHFAlgorithm.h" />
-    <ClInclude Include="Cloth3D.h" />
+    <ClInclude Include="Cloth.h" />
+    <ClInclude Include="ClothCL.h" />
     <ClInclude Include="CollisionDetections.h" />
     <ClInclude Include="CollisionObject.h" />
     <ClInclude Include="ConvexCollisionAlgorithm.h" />
@@ -67,7 +68,8 @@
   <ItemGroup>
     <ClCompile Include="BIMAlgorithm.cpp" />
     <ClCompile Include="CHFAlgorithm.cpp" />
-    <ClCompile Include="Cloth3D.cpp" />
+    <ClCompile Include="Cloth.cpp" />
+    <ClCompile Include="ClothCL.cpp" />
     <ClCompile Include="CollisionDetections.cpp" />
     <ClCompile Include="CollisionObject.cpp" />
     <ClCompile Include="ConvexCollisionAlgorithm.cpp" />

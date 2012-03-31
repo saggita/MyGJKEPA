@@ -10,6 +10,7 @@
 #include "CollisionObject.h"
 #include "StringTokenizer.h"
 
+
 #define BarrelVtxCount2 57
 #define BarrelIndexCount 60
 
@@ -137,7 +138,18 @@ static int BarrelIdx[] = {
 44,26,47,
 };
 
-CCollisionObject::CCollisionObject(void) : m_HalfExtent(1.0), m_Margin(0.01), m_pConvexHeightField(NULL), m_bLoaded(false)
+CCollisionObject::CCollisionObject() : m_HalfExtent(1.0), m_Margin(0.01), 
+																   m_pConvexHeightField(NULL), m_bLoaded(false),
+																   m_ddcl(NULL), m_ddhost(NULL)
+{
+	//m_pBulletColObj = new btCollisionObject();	
+
+	SetColor(1.0, 1.0, 1.0);
+}
+
+CCollisionObject::CCollisionObject(Device* ddcl, Device* ddhost) : m_HalfExtent(1.0), m_Margin(0.01), 
+																   m_pConvexHeightField(NULL), m_bLoaded(false),
+																   m_ddcl(ddcl), m_ddhost(ddhost)
 {
 	//m_pBulletColObj = new btCollisionObject();	
 
@@ -684,10 +696,13 @@ bool CCollisionObject::Load(const char* filename)
 	}
 	
 	m_pConvexHeightField = new ConvexHeightField(eqn, m_Faces.size());
+	delete [] eqn;
 
 	//VisualizeHF();
 
-	delete [] eqn;
+	int numOfShapes = 1;
+	m_ShapeBuffer = ChNarrowphase<TYPE_CL>::allocateShapeBuffer(m_ddcl, numOfShapes);	
+	m_Data = ChNarrowphase<TYPE_CL>::allocate(m_ddcl);
 
 	m_bLoaded = true;
 	return true;
