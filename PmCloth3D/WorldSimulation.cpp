@@ -154,7 +154,6 @@ void CWorldSimulation::Create()
 	//m_Cloth.Load("circle4074.obj");
 	/*m_Cloth.AddPin(20);
 	m_Cloth.AddPin(500);*/
-	m_Cloth.Initialize();
 	m_Cloth.SetVertexMass(1.0f);
 	m_Cloth.TranslateW(0.0f, 10.0f, 0.0f);
 	m_Cloth.SetColor(0.0f, 0.0f, 0.8f);

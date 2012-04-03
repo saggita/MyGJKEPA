@@ -77,6 +77,7 @@
     </ClCompile>
     <ClCompile Include="ClothCL.cpp" />
     <ClCompile Include="Cloth.cpp" />
+    <ClCompile Include="CLFunctions.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="WorldSimulation.h" />
@@ -206,6 +207,7 @@
     </ClInclude>
     <ClInclude Include="ClothCL.h" />
     <ClInclude Include="Cloth.h" />
+    <ClInclude Include="CLFunctions.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="ConvexHeightField">
@@ -247,6 +249,9 @@
     <Filter Include="NarrowPhaseCollision">
       <UniqueIdentifier>{96aacac6-9861-4b24-bb34-3b373b464501}</UniqueIdentifier>
     </Filter>
+    <Filter Include="OpenCLC10">
+      <UniqueIdentifier>{0876ae55-344b-4189-bba5-9ba8445cacbd}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="ConvexHeightField\ChNarrowphase.inl">
@@ -284,6 +289,51 @@
     </None>
     <None Include="Adl\AdlPrimitives\Math\Float4.inl">
       <Filter>Adl\AdlPrimitives\Math</Filter>
+    </None>
+    <None Include="OpenCLC10\ApplyForces.cl">
+      <Filter>OpenCLC10</Filter>
+    </None>
+    <None Include="OpenCLC10\ComputeBounds.cl">
+      <Filter>OpenCLC10</Filter>
+    </None>
+    <None Include="OpenCLC10\Integrate.cl">
+      <Filter>OpenCLC10</Filter>
+    </None>
+    <None Include="OpenCLC10\OutputToVertexArray.cl">
+      <Filter>OpenCLC10</Filter>
+    </None>
+    <None Include="OpenCLC10\PrepareLinks.cl">
+      <Filter>OpenCLC10</Filter>
+    </None>
+    <None Include="OpenCLC10\SolveCollisionsAndUpdateVelocities.cl">
+      <Filter>OpenCLC10</Filter>
+    </None>
+    <None Include="OpenCLC10\SolveCollisionsAndUpdateVelocitiesSIMDBatched.cl">
+      <Filter>OpenCLC10</Filter>
+    </None>
+    <None Include="OpenCLC10\SolvePositions.cl">
+      <Filter>OpenCLC10</Filter>
+    </None>
+    <None Include="OpenCLC10\SolvePositionsSIMDBatched.cl">
+      <Filter>OpenCLC10</Filter>
+    </None>
+    <None Include="OpenCLC10\UpdateConstants.cl">
+      <Filter>OpenCLC10</Filter>
+    </None>
+    <None Include="OpenCLC10\UpdateNodes.cl">
+      <Filter>OpenCLC10</Filter>
+    </None>
+    <None Include="OpenCLC10\UpdateNormals.cl">
+      <Filter>OpenCLC10</Filter>
+    </None>
+    <None Include="OpenCLC10\UpdatePositions.cl">
+      <Filter>OpenCLC10</Filter>
+    </None>
+    <None Include="OpenCLC10\UpdatePositionsFromVelocities.cl">
+      <Filter>OpenCLC10</Filter>
+    </None>
+    <None Include="OpenCLC10\VSolveLinks.cl">
+      <Filter>OpenCLC10</Filter>
     </None>
   </ItemGroup>
 </Project>

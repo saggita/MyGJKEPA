@@ -26,7 +26,7 @@ public:
 	int m_Substeps; // = 1
 
 	CCollisionObject* pObjectA;
-	CCloth m_Cloth;
+	CClothCL m_Cloth;
 	std::vector<CCollisionObject*> clothVertices;
 	CVector3D m_Gravity;
 

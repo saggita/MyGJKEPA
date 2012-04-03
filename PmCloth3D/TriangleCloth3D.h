@@ -23,22 +23,7 @@ protected:
 	int m_IndexNormalVec;
 	
 public:
-	// For force calculation following Baraff's paper
-	double A; // initial area without any deformation. Calculated before simulation starts and won't change over the simulation.
-	double Asqrt; // square root of A
-
-	// following members are based on Baraff/Witkins paper
-	double du1; 
-	double du2;
-	double dv1;
-	double dv2;
-	double inv_det; // inverse of determinant
-
-	CVector3D Wu;
-	CVector3D Wv;
-
-	double dWu_dX[3];
-	double dWv_dX[3];
+	btScalar A; // initial area without any deformation. Calculated before simulation starts and won't change over the simulation.
 
 public:
 	int GetVertexIndex(int i) const 
@@ -64,8 +49,8 @@ public:
 	int GetIndex() const { return m_Index; }
 	void SetIndex(int index) { m_Index = index; }
 	int GetNormalVectIndex() const { return m_IndexNormalVec; }
-	CVector3D GetPointByBaryCoord(const CCloth* pCloth, double a, double b, double c) const;
-	CVector3D GetVelocityByBaryCoord(const CCloth* pCloth, double a, double b, double c) const;
+	CVector3D GetPointByBaryCoord(const CCloth* pCloth, btScalar a, btScalar b, btScalar c) const;
+	CVector3D GetVelocityByBaryCoord(const CCloth* pCloth, btScalar a, btScalar b, btScalar c) const;
 	
 	CTriangleCloth3D& operator=(const CTriangleCloth3D& other);
 };

@@ -31,6 +31,7 @@
     <ClInclude Include="Adl\Adl\AdlStopwatch.h" />
     <ClInclude Include="BIMAlgorithm.h" />
     <ClInclude Include="CHFAlgorithm.h" />
+    <ClInclude Include="CLFunctions.h" />
     <ClInclude Include="Cloth.h" />
     <ClInclude Include="ClothCL.h" />
     <ClInclude Include="CollisionDetections.h" />
@@ -68,6 +69,7 @@
   <ItemGroup>
     <ClCompile Include="BIMAlgorithm.cpp" />
     <ClCompile Include="CHFAlgorithm.cpp" />
+    <ClCompile Include="CLFunctions.cpp" />
     <ClCompile Include="Cloth.cpp" />
     <ClCompile Include="ClothCL.cpp" />
     <ClCompile Include="CollisionDetections.cpp" />
@@ -108,6 +110,21 @@
     <None Include="Adl\Adl\Host\AdlStopwatchHost.inl" />
     <None Include="ConvexHeightField\ChNarrowphase.inl" />
     <None Include="ConvexHeightField\ChNarrowphaseKernels.cl" />
+    <None Include="OpenCLC10\ApplyForces.cl" />
+    <None Include="OpenCLC10\ComputeBounds.cl" />
+    <None Include="OpenCLC10\Integrate.cl" />
+    <None Include="OpenCLC10\OutputToVertexArray.cl" />
+    <None Include="OpenCLC10\PrepareLinks.cl" />
+    <None Include="OpenCLC10\SolveCollisionsAndUpdateVelocities.cl" />
+    <None Include="OpenCLC10\SolveCollisionsAndUpdateVelocitiesSIMDBatched.cl" />
+    <None Include="OpenCLC10\SolvePositions.cl" />
+    <None Include="OpenCLC10\SolvePositionsSIMDBatched.cl" />
+    <None Include="OpenCLC10\UpdateConstants.cl" />
+    <None Include="OpenCLC10\UpdateNodes.cl" />
+    <None Include="OpenCLC10\UpdateNormals.cl" />
+    <None Include="OpenCLC10\UpdatePositions.cl" />
+    <None Include="OpenCLC10\UpdatePositionsFromVelocities.cl" />
+    <None Include="OpenCLC10\VSolveLinks.cl" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{D5E2412C-9AA6-41FA-922F-05450EF6912C}</ProjectGuid>
@@ -161,7 +178,7 @@
       </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions);_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <OpenMPSupport>true</OpenMPSupport>
       <AdditionalIncludeDirectories>.;../;../../;Adl;Adl/AdlDemos/;Adl/AdlDemos/TestBed/;$(AMDAPPSDKROOT)\include;$(DXSDK_DIR)/Include;../extern/glut/include</AdditionalIncludeDirectories>
@@ -206,7 +223,7 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions);_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <AdditionalIncludeDirectories>.;../;../../;Adl;Adl/AdlDemos/;Adl/AdlDemos/TestBed/;$(AMDAPPSDKROOT)\include;$(DXSDK_DIR)/Include;../extern/glut/include</AdditionalIncludeDirectories>
       <OpenMPSupport>true</OpenMPSupport>
