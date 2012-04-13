@@ -26,6 +26,7 @@ public:
 		m_IndexTriangle[0] = -1;
 		m_IndexTriangle[1] = -1;
 		m_Index = -1;
+		m_Coloring = -1;
 	}
 
 	CSpringCloth3D(int indexVrx0, int indexVrx1) 
@@ -35,6 +36,7 @@ public:
 		m_IndexTriangle[0] = -1;
 		m_IndexTriangle[1] = -1;
 		m_Index = -1; 
+		m_Coloring = -1;
 	}
 
 	CSpringCloth3D(const CSpringCloth3D& other) 
@@ -47,6 +49,7 @@ public:
 
 		m_Index = other.m_Index;
 		m_RestLength = other.m_RestLength;
+		m_Coloring = other.m_Coloring;
 	}
 	
 	virtual ~CSpringCloth3D() { }
@@ -58,6 +61,8 @@ protected:
 	btScalar m_RestLength;
 
 public:
+	int m_Coloring;
+
 	int GetVertexIndex(int i) const 
 	{
 		assert( 0 <= i && i <= 1 );
@@ -106,6 +111,7 @@ public:
 
 		m_Index = other.m_Index;
 		m_RestLength = other.m_RestLength;
+		m_Coloring = other.m_Coloring;
 
 		return (*this);
 	}
@@ -127,12 +133,20 @@ public:
 
 	int m_Index;
 	CVector3D m_Pos;
+	CVector3D m_PosNext;
 	CVector3D m_Vel;
 	btScalar m_InvMass; // = 1.0 / m_Mass. In case mass is infinite, m_InvMass is zero and m_Mass doesn't have any meaning.
 					  // Currently infinite mass is not supported. CClothPin should be used to pin cloth vertex.
 	CVector3D m_Accel;
 	int m_PinIndex;
 	CClothPin* m_pPin;	
+
+	// array of indexes of stretch springs connected to this vertex 
+	std::vector<int> m_StrechSpringIndexes; 
+
+	// array of indexes of bend springs connected to this vertex 
+	std::vector<int> m_BendSpringIndexes; 
+
 public:
 	int GetIndex() const { return m_Index; }
 	void SetIndex(int index) { m_Index = index; }
@@ -285,20 +299,16 @@ public:
 	std::vector<CTriangleCloth3D>& GetTriangleArray() { return m_TriangleArray; }
 	const std::vector<CTriangleCloth3D>& GetTriangleArray() const { return m_TriangleArray; }
 
-	void FillSpringArray();
-
 	bool IsDeformable() const { return m_bDeformable; }
 	void SetDeformable(bool bDeformable) { m_bDeformable = bDeformable; }
 
 	void Clear();
-	virtual void IntegrateByLocalPositionContraints(btScalar dt);
-	virtual void IntegrateEuler(btScalar dt);
+	
+	virtual void Integrate(btScalar dt);
 	virtual void AdvancePosition(btScalar dt);
 	
 	void SetColor(float r, float g, float b) { m_Color = COLOR(r, g, b); }
 	virtual void Render();
-	/*virtual CCollisionObject* GetCollisionObject() { return &m_CollisionObject; }
-	virtual const CCollisionObject* GetCollisionObject() const { return &m_CollisionObject; }*/
 
 	virtual CCollisionObject* GetCollisionObject() { return NULL; }
 	virtual const CCollisionObject* GetCollisionObject() const { return NULL; }
@@ -306,6 +316,11 @@ public:
 	virtual void TranslateW(btScalar x, btScalar y, btScalar z);
 
 protected:
+	void FillSpringArray();
+	void ApplyForces(btScalar dt);
+	void ApplyGravity(btScalar dt);
+	void ClearAccelations();
+	void ComputeNextVertexPositions(btScalar dt);
 	btScalar CalcConstraint(int indexEdge, int indexVertex, btScalar dt, CVector3D* pGradientOfConstraint = NULL);
 	void EnforceEdgeConstraints(btScalar dt);
 

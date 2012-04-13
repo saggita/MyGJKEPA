@@ -6,18 +6,8 @@
 #include "Adl\AdlPrimitives\Math\Math.h"
 
 struct float4s
-{
-	union
-	{
-		struct
-		{
-			float x,y,z,w;
-		};
-		struct
-		{
-			float s[4];
-		};
-	};
+{	
+	float x,y,z,w;		
 };
 
 __inline
@@ -28,10 +18,12 @@ float4s ToFloat4s(float x, float y, float z, float w = 0.f)
 	return v;
 }
 
+_MEM_CLASSALIGN16
 struct SpringClothCL
 {	
-public:
-	SpringClothCL() 
+	_MEM_ALIGNED_ALLOCATOR16;
+
+	/*SpringClothCL() 
 	{ 
 		m_IndexVrx0 = -1; 
 		m_IndexVrx1 = -1; 
@@ -49,31 +41,29 @@ public:
 		m_Index = -1;
 	}
 
-	~SpringClothCL() {}
+	~SpringClothCL() {}*/
 
-	int m_Index;
-	int m_IndexVrx0;
-	int m_IndexVrx1;
-	int m_IndexTriangle0;
-	int m_IndexTriangle1;
+	unsigned int m_Index;
+	unsigned int m_IndexVrx0;
+	unsigned int m_IndexVrx1;
+	unsigned int m_IndexTriangle0;
+	unsigned int m_IndexTriangle1;
 	float m_RestLength;
 };
 
+_MEM_CLASSALIGN16
 struct VertexClothCL
 {
-public:
-	VertexClothCL() : m_InvMass(1.0), m_PinIndex(-1)
-	{
-	}
-
-	~VertexClothCL() {};
-
-	int m_Index;
-	float m_InvMass;
+	_MEM_ALIGNED_ALLOCATOR16;
+	
 	float4s m_Pos;
+	float4s m_PosTemp;
 	float4s m_Vel;
 	float4s m_Accel;
-	int m_PinIndex;
+	
+	float m_InvMass;
+	unsigned int m_Index;
+	unsigned int m_PinIndex;
 };
 
 class CClothCL : public CCloth
@@ -83,19 +73,22 @@ public:
 	virtual ~CClothCL(void);
 
 protected:
-	cl_mem m_CLMemVertexArray;
-	cl_mem m_CLMemStrechSpringArray;
-	cl_mem m_CLMemBendSpringArray;
+	cl_mem m_DBVertices;
+	cl_mem m_DBStrechSprings;
+	//cl_mem m_DBBendSprings;
 
-	VertexClothCL* m_VertexCLArray;
+	VertexClothCL* m_HBVertexCL;
+	SpringClothCL* m_HBSpringCL;
+	std::vector<int> m_BatchSpringIndexArray;
 
 	bool m_bBuildCLKernels;
 
 	bool BuildCLKernels();
 	void ReleaseKernels();
+	void GenerateBatches();
 
 	// OpenCL kernels
-	cl_kernel m_prepareLinksKernel;
+	/*cl_kernel m_prepareLinksKernel;
 	cl_kernel m_solvePositionsFromLinksKernel;
 	cl_kernel m_updateConstantsKernel;
 	cl_kernel m_integrateKernel;
@@ -108,8 +101,10 @@ protected:
 	cl_kernel m_resetNormalsAndAreasKernel;
 	cl_kernel m_normalizeNormalsAndAreasKernel;
 	cl_kernel m_updateSoftBodiesKernel;
-	cl_kernel m_outputToVertexArrayKernel;
+	cl_kernel m_outputToVertexArrayKernel;*/
+
 	cl_kernel m_applyForcesKernel;
+	cl_kernel m_integrateByLocalPositionContraintsKernel;
 
 	CLFunctions m_clFunctions;
 
