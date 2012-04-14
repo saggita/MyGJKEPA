@@ -304,8 +304,8 @@ public:
 
 	void Clear();
 	
-	virtual void Integrate(btScalar dt);
-	virtual void AdvancePosition(btScalar dt);
+	virtual bool Integrate(btScalar dt);
+	virtual bool AdvancePosition(btScalar dt);
 	
 	void SetColor(float r, float g, float b) { m_Color = COLOR(r, g, b); }
 	virtual void Render();

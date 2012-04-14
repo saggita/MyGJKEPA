@@ -31,8 +31,9 @@ extern cl_command_queue  g_cqGPUCommandQue;
 
 CClothCL::CClothCL(void) : m_bBuildCLKernels(false), m_HBVertexCL(NULL), m_HBSpringCL(NULL)
 {
+	m_applyGravityKernel = NULL;
 	m_applyForcesKernel = NULL;
-	m_integrateByLocalPositionContraintsKernel = NULL;
+	m_integrateKernel = NULL;
 }
 
 CClothCL::~CClothCL(void)
@@ -73,7 +74,7 @@ void CClothCL::Initialize()
 		vertexData.m_InvMass = m_VertexArray[i].m_InvMass;
 		vertexData.m_PinIndex = m_VertexArray[i].m_PinIndex;	*/
 		
-		vertexData.m_Pos = ToFloat4s(m_VertexArray[i].m_Pos.m_X, m_VertexArray[i].m_Pos.m_Y, m_VertexArray[i].m_Pos.m_Z);
+		vertexData.m_Pos = ToFloat4s(m_VertexArray[i].m_Pos);
 		/*vertexData.m_Vel = ToFloat4s(m_VertexArray[i].m_Vel.m_X, m_VertexArray[i].m_Vel.m_Y, m_VertexArray[i].m_Vel.m_Z);
 		vertexData.m_Accel = ToFloat4s(m_VertexArray[i].m_Accel.m_X, m_VertexArray[i].m_Accel.m_Y, m_VertexArray[i].m_Accel.m_Z);
 */
@@ -113,55 +114,84 @@ void CClothCL::Initialize()
 	GenerateBatches();
 }
 
-void CClothCL::IntegrateByLocalPositionContraints(btScalar dt)
+bool CClothCL::Integrate(btScalar dt)
 {
 	int numVertices = (int)m_VertexArray.size();
 	int numSprings = (int)m_StrechSpringArray.size();
 
 	//------------------
+	// ApplyGravityKernel
+	//------------------
+	{
+		cl_int ciErrNum;	
+		ciErrNum = clSetKernelArg(m_applyGravityKernel, 0, sizeof(int), &numVertices);
+		ciErrNum = clSetKernelArg(m_applyGravityKernel, 1, sizeof(float4), &ToFloat4s(m_Gravity));
+		ciErrNum = clSetKernelArg(m_applyGravityKernel, 2, sizeof(float), &dt);
+		ciErrNum = clSetKernelArg(m_applyGravityKernel, 3, sizeof(cl_mem), &m_DBVertices);
+
+		assert(ciErrNum == CL_SUCCESS);
+		
+		size_t m_defaultWorkGroupSize = 64;
+		size_t numWorkItems = m_defaultWorkGroupSize*((numVertices + (m_defaultWorkGroupSize-1)) / m_defaultWorkGroupSize);
+
+		ciErrNum = clEnqueueNDRangeKernel(g_cqGPUCommandQue, m_applyGravityKernel, 1, NULL, &numWorkItems, &m_defaultWorkGroupSize, 0,0,0);
+
+		if (ciErrNum != CL_SUCCESS);
+			return false;
+	}
+
+	//------------------
 	// ApplyForcesKernel
 	//------------------
-	cl_int ciErrNum ;	
-	ciErrNum = clSetKernelArg(m_applyForcesKernel, 0, sizeof(int), &numVertices);
-	ciErrNum = clSetKernelArg(m_applyForcesKernel, 1, sizeof(float), &dt);
-	ciErrNum = clSetKernelArg(m_applyForcesKernel, 2, sizeof(cl_mem), &m_DBVertices);
+	{
+		cl_int ciErrNum;	
+		ciErrNum = clSetKernelArg(m_applyForcesKernel, 0, sizeof(int), &numVertices);
+		ciErrNum = clSetKernelArg(m_applyForcesKernel, 1, sizeof(float), &dt);
+		ciErrNum = clSetKernelArg(m_applyForcesKernel, 2, sizeof(cl_mem), &m_DBVertices);
 
-	assert(ciErrNum == CL_SUCCESS);
+		assert(ciErrNum == CL_SUCCESS);
 		
-	size_t m_defaultWorkGroupSize = 64;
-	size_t numWorkItems = m_defaultWorkGroupSize*((numVertices + (m_defaultWorkGroupSize-1)) / m_defaultWorkGroupSize);
+		size_t m_defaultWorkGroupSize = 64;
+		size_t numWorkItems = m_defaultWorkGroupSize*((numVertices + (m_defaultWorkGroupSize-1)) / m_defaultWorkGroupSize);
 
-	ciErrNum = clEnqueueNDRangeKernel(g_cqGPUCommandQue, m_applyForcesKernel, 1, NULL, &numWorkItems, &m_defaultWorkGroupSize, 0,0,0);
-	//clFinish(g_cqGPUCommandQue);
+		ciErrNum = clEnqueueNDRangeKernel(g_cqGPUCommandQue, m_applyForcesKernel, 1, NULL, &numWorkItems, &m_defaultWorkGroupSize, 0,0,0);
 
-	assert(ciErrNum == CL_SUCCESS);
+		if (ciErrNum != CL_SUCCESS);
+			return false;
+	}
 
-	//-----------------------------------------
-	// IntegrateByLocalPositionContraintsKernel
-	//-----------------------------------------
-	for ( int batch = 0; batch < (int)m_BatchSpringIndexArray.size()-1; batch++ )
+	//-----------
+	// Integrate
+	//-----------
+	/*for ( int batch = 0; batch < (int)m_BatchSpringIndexArray.size()-1; batch++ )
 	{
 		int startSpringIndex = m_BatchSpringIndexArray[batch];
 		int endSpringIndex = m_BatchSpringIndexArray[batch+1]-1;
 
-		ciErrNum = clSetKernelArg(m_integrateByLocalPositionContraintsKernel, 0, sizeof(int), &numSprings);
-		ciErrNum = clSetKernelArg(m_integrateByLocalPositionContraintsKernel, 1, sizeof(cl_mem), &startSpringIndex);
-		ciErrNum = clSetKernelArg(m_integrateByLocalPositionContraintsKernel, 2, sizeof(cl_mem), &endSpringIndex);
-		ciErrNum = clSetKernelArg(m_integrateByLocalPositionContraintsKernel, 3, sizeof(float), &dt);
-		ciErrNum = clSetKernelArg(m_integrateByLocalPositionContraintsKernel, 4, sizeof(cl_mem), &m_DBVertices);
-		ciErrNum = clSetKernelArg(m_integrateByLocalPositionContraintsKernel, 5, sizeof(cl_mem), &m_DBStrechSprings);
+		ciErrNum = clSetKernelArg(m_integrateKernel, 0, sizeof(int), &numSprings);
+		ciErrNum = clSetKernelArg(m_integrateKernel, 1, sizeof(cl_mem), &startSpringIndex);
+		ciErrNum = clSetKernelArg(m_integrateKernel, 2, sizeof(cl_mem), &endSpringIndex);
+		ciErrNum = clSetKernelArg(m_integrateKernel, 3, sizeof(float), &dt);
+		ciErrNum = clSetKernelArg(m_integrateKernel, 4, sizeof(cl_mem), &m_DBVertices);
+		ciErrNum = clSetKernelArg(m_integrateKernel, 5, sizeof(cl_mem), &m_DBStrechSprings);
 
 		assert(ciErrNum == CL_SUCCESS);
 		
 		numWorkItems = m_defaultWorkGroupSize*((numSprings + (m_defaultWorkGroupSize-1)) / m_defaultWorkGroupSize);
 
-		ciErrNum = clEnqueueNDRangeKernel(g_cqGPUCommandQue, m_integrateByLocalPositionContraintsKernel, 1, NULL, &numWorkItems, &m_defaultWorkGroupSize, 0,0,0);
-	}
+		ciErrNum = clEnqueueNDRangeKernel(g_cqGPUCommandQue, m_integrateKernel, 1, NULL, &numWorkItems, &m_defaultWorkGroupSize, 0,0,0);
+
+		if (ciErrNum != CL_SUCCESS);
+			return false;
+	}*/
 
 	//------------------------
 	// Read data back to CPU
 	//------------------------
-	clEnqueueReadBuffer(g_cqGPUCommandQue, m_DBVertices, CL_TRUE, 0, sizeof(VertexClothCL) * numVertices, m_HBVertexCL, 0, NULL, NULL);
+	cl_int ciErrNum = clEnqueueReadBuffer(g_cqGPUCommandQue, m_DBVertices, CL_TRUE, 0, sizeof(VertexClothCL) * numVertices, m_HBVertexCL, 0, NULL, NULL);
+
+	if (ciErrNum != CL_SUCCESS);
+		return false;
 
 	for ( int i = 0; i < numVertices; i++ )
 	{
@@ -173,16 +203,13 @@ void CClothCL::IntegrateByLocalPositionContraints(btScalar dt)
 
 		m_VertexArray[i].m_Pos.Set(vertexData.m_Pos.x, vertexData.m_Pos.y, vertexData.m_Pos.z);
 	}
+
+	return true;
 }
 
-void CClothCL::IntegrateEuler(btScalar dt)
+bool CClothCL::AdvancePosition(btScalar dt)
 {
-
-}
-
-void CClothCL::AdvancePosition(btScalar dt)
-{
-
+	return CCloth::AdvancePosition(dt);
 }
 
 void CClothCL::ReleaseKernels()
@@ -203,8 +230,9 @@ void CClothCL::ReleaseKernels()
 	RELEASE_CL_KERNEL( m_resetNormalsAndAreasKernel );
 	RELEASE_CL_KERNEL( m_normalizeNormalsAndAreasKernel );
 	RELEASE_CL_KERNEL( m_outputToVertexArrayKernel );*/
+	RELEASE_CL_KERNEL( m_applyGravityKernel );
 	RELEASE_CL_KERNEL( m_applyForcesKernel );
-	RELEASE_CL_KERNEL( m_integrateByLocalPositionContraintsKernel );
+	RELEASE_CL_KERNEL( m_integrateKernel );
 }
 
 bool CClothCL::BuildCLKernels()
@@ -216,8 +244,9 @@ bool CClothCL::BuildCLKernels()
 
 	m_clFunctions.clearKernelCompilationFailures();
 
-	m_applyForcesKernel = m_clFunctions.compileCLKernelFromString( ApplyForcesCLString, "ApplyForcesKernel" );
-	m_integrateByLocalPositionContraintsKernel = m_clFunctions.compileCLKernelFromString( ApplyForcesCLString, "IntegrateByLocalPositionContraintsKernel" );
+	m_applyGravityKernel = m_clFunctions.compileCLKernelFromString(ApplyForcesCLString, "ApplyGravityKernel");
+	m_applyForcesKernel = m_clFunctions.compileCLKernelFromString(ApplyForcesCLString, "ApplyForcesKernel");
+	m_integrateKernel = m_clFunctions.compileCLKernelFromString(ApplyForcesCLString, "Integrate");
 
 	/*
 	m_prepareLinksKernel = m_clFunctions.compileCLKernelFromString( PrepareLinksCLString, "PrepareLinksKernel" );

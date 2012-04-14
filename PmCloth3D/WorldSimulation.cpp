@@ -145,7 +145,7 @@ void CWorldSimulation::Create()
 	m_pNarrowPhase->AddPair(CNarrowCollisionInfo(pObjectA, pObjectB));
 
 	// cloth
-	m_pCloth = new CCloth();
+	m_pCloth = new CClothCL();
 	//m_pCloth->Load("circle789.obj");
 	//m_pCloth->Load("circle2723.obj");
 	m_pCloth->Load("circle2723.obj");

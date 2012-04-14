@@ -644,7 +644,7 @@ void CCloth::EnforceEdgeConstraints(btScalar dt)
 	}	
 }
 
-void CCloth::AdvancePosition(btScalar dt)
+bool CCloth::AdvancePosition(btScalar dt)
 {
 	m_dt = dt;
 
@@ -658,9 +658,11 @@ void CCloth::AdvancePosition(btScalar dt)
 		else
 			vert.m_Pos = vert.m_Pos + vert.m_Vel * dt;
 	}
+
+	return true;
 }
 
-void CCloth::Integrate(btScalar dt)
+bool CCloth::Integrate(btScalar dt)
 {
 	m_dt = dt;
 
@@ -712,6 +714,7 @@ void CCloth::Integrate(btScalar dt)
 	}
 
 	m_NumIter = numIteration;
+	return true;
 }
 
 void CCloth::TranslateW(btScalar x, btScalar y, btScalar z)

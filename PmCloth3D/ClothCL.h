@@ -18,6 +18,14 @@ float4s ToFloat4s(float x, float y, float z, float w = 0.f)
 	return v;
 }
 
+__inline
+float4s ToFloat4s(const CVector3D& vec)
+{
+	float4s v;
+	v.x = vec.m_X; v.y = vec.m_Y; v.z = vec.m_Z; v.w = 0.f;
+	return v;
+}
+
 _MEM_CLASSALIGN16
 struct SpringClothCL
 {	
@@ -103,16 +111,15 @@ protected:
 	cl_kernel m_updateSoftBodiesKernel;
 	cl_kernel m_outputToVertexArrayKernel;*/
 
+	cl_kernel m_applyGravityKernel;
 	cl_kernel m_applyForcesKernel;
-	cl_kernel m_integrateByLocalPositionContraintsKernel;
+	cl_kernel m_integrateKernel;
 
 	CLFunctions m_clFunctions;
 
 public:
 	virtual void Initialize();
-
-	virtual void IntegrateByLocalPositionContraints(btScalar dt);
-	virtual void IntegrateEuler(btScalar dt);
-	virtual void AdvancePosition(btScalar dt);
+	virtual bool Integrate(btScalar dt);
+	virtual bool AdvancePosition(btScalar dt);
 };
 
