@@ -21,7 +21,7 @@
 cl_context        g_cxGPUMainContext = NULL;
 cl_command_queue  g_cqGPUCommandQue = NULL;
 
-CWorldSimulation::CWorldSimulation(void) : m_Gravity(0.0f, -9.87f, 0.0f), m_pCloth(NULL)
+CWorldSimulation::CWorldSimulation(void) : m_Gravity(0.0f, -9.87f, 0.0f), m_pCloth(NULL), m_RenderBatchIndex(0), m_bGPU(false)
 { 
 	m_Substeps = 2;
 
@@ -121,9 +121,9 @@ void CWorldSimulation::Create()
 	//-----------
 	pObjectA = new CCollisionObject(m_ddcl, m_ddhost);
 	pObjectA->SetCollisionObjectType(CCollisionObject::ConvexHull);
-	pObjectA->SetMargin(0.2f); // margin should be set before Load(..) 
-	//pObjectA->Load("smallGeoSphere.obj");
-	pObjectA->Load("box.obj");
+	pObjectA->SetMargin(0.1f); // margin should be set before Load(..) 
+	pObjectA->Load("smallGeoSphere.obj");
+	//pObjectA->Load("box.obj");
 	//pObjectA->Load("cylinder.obj");
 	
 	pObjectA->GetTransform().GetTranslation().Set(2.0f, 4.6f, 0.0f);
@@ -145,7 +145,11 @@ void CWorldSimulation::Create()
 	m_pNarrowPhase->AddPair(CNarrowCollisionInfo(pObjectA, pObjectB));
 
 	// cloth
-	m_pCloth = new CClothCL();
+	if ( m_bGPU )
+		m_pCloth = new CClothCL();
+	else
+		m_pCloth = new CCloth();
+
 	//m_pCloth->Load("circle789.obj");
 	//m_pCloth->Load("circle2723.obj");
 	m_pCloth->Load("circle2723.obj");
@@ -154,7 +158,7 @@ void CWorldSimulation::Create()
 	m_pCloth->TranslateW(0.0f, 10.0f, 0.0f);
 	m_pCloth->SetColor(0.0f, 0.0f, 0.8f);
 	m_pCloth->SetGravity(m_Gravity);
-	m_pCloth->SetKb(1000.0f);
+	m_pCloth->SetKb(10.0f);
 	m_pCloth->SetKst(100.0f); // Only meaningful when IntegrateEuler(..) is used.
 	m_pCloth->SetFrictionCoef(0.0f);
 	m_pCloth->SetNumIterForConstraintSolver(5);
@@ -199,6 +203,8 @@ void CWorldSimulation::ClearAll()
 
 	if ( g_cxGPUMainContext )
 		clReleaseContext(g_cxGPUMainContext);
+
+	m_RenderBatchIndex = 0;
 	
 }
 
@@ -273,69 +279,15 @@ unsigned int CWorldSimulation::SubsUpdate(btScalar dt)
 	}
 
 	m_pCloth->Integrate(dt);
-	m_pCloth->AdvancePosition(dt);
-	ResolveCollisions(dt);
+	m_pCloth->ResolveCollision(*pObjectA, dt);
+	m_pCloth->AdvancePosition(dt);	
 
 	return 0;
 }
 
 void CWorldSimulation::ResolveCollisions(btScalar dt)
 {	
-	for ( int i = 0; i < (int)m_pCloth->GetVertexArray().size(); i++ )
-	{
-		CNarrowCollisionInfo info;
-		CVertexCloth3D& vert = m_pCloth->GetVertexArray()[i];
-		
-		CCollisionObject pointColObj;
-		pointColObj.SetCollisionObjectType(CCollisionObject::Point);
-		pointColObj.GetTransform().GetTranslation() = vert.m_Pos;
-
-		if ( m_pNarrowPhase->GetConvexCollisionAlgorithm()->CheckCollision(*pObjectA, pointColObj, &info, false) )
-		{
-			CVector3D pointAW = pObjectA->GetTransform() * info.witnessPntA;
-			CVector3D pointBW = pointColObj.GetTransform().GetTranslation(); // it is a point object. 
-			CVector3D v = pointAW - pointBW;
-			CVector3D n = v.NormalizeOther();
-			btScalar d = info.penetrationDepth; // d already contains margin
-			btScalar margin = pObjectA->GetMargin();
-
-			// TODO:Need to know translational and angular velocities of object A.
-			CVector3D velOnPointAW(0, 0, 0);
-			
-			// critical relative velocity to separate the vertex and object
-			btScalar critical_relVel = d / dt;
-
-			CVector3D relVel = vert.m_Vel-velOnPointAW;
-
-			// relative normal velocity of vertex. If positive, vertex is separating from the object.
-			btScalar relVelNLen = relVel.Dot(n);
-			CVector3D relVelN = relVelNLen * n;
-
-			// relative tangential velocity to calculate friction
-			CVector3D relVelT = relVel - relVelN;
-			CVector3D dVN = (critical_relVel - relVelNLen) * n;
-
-			// friction.
-			btScalar mu = m_pCloth->GetFrictionCoef();
-			CVector3D dVT(0, 0, 0);
-
-			btScalar relVelTLen = relVelT.Length();
-
-			if ( mu > 0 && relVelTLen > 0 )
-			{
-				CVector3D newVelT = max(1.0-mu*relVelNLen/relVelTLen, 0) * relVelT;
-				dVT = -(newVelT - relVelT); 
-			}
-
-			CVector3D dV = dVN + dVT;
-
-			if ( !vert.m_pPin )
-			{
-				vert.m_Vel += dV;
-				vert.m_Pos = pointAW;
-			}
-		}
-	}
+	
 }
 
 void CWorldSimulation::Render(bool bWireframe/* = false*/)
@@ -354,6 +306,7 @@ void CWorldSimulation::Render(bool bWireframe/* = false*/)
 
 	// cloth
 	m_pCloth->Render();
+	m_RenderBatchIndex = m_pCloth->RenderBatch(m_RenderBatchIndex);
 
 	// Markers
 	glDisable(GL_DEPTH_TEST);

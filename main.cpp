@@ -44,6 +44,7 @@ static void DrawTextGlut(const char* str, float x, float y);
 
 void InitSimulation()
 {
+	g_WorldSim.m_bGPU = false;
 	g_WorldSim.Create();
 	g_CurFrame = 0;
 }
@@ -277,16 +278,38 @@ void OnRender()
 	sInfo.append(g_sWindowTitleInfo);
 
 	int linePos = 0;
-	DrawTextGlut("'s': start or stop", -g_Width/2 + 10, g_Height/2 - (linePos += 20));
-	DrawTextGlut("space: advance one step", -g_Width/2 + 10, g_Height/2 - (linePos += 20));
-	DrawTextGlut("'c': reset", -g_Width/2 + 10, g_Height/2 - (linePos += 20));
+	
 	DrawTextGlut(sInfo.c_str(), -g_Width/2 + 10, g_Height/2 - (linePos += 20));
 
+	// frame
 	char frame[10];
 	itoa(g_CurFrame, frame, 10);
-	std::string sFrame = "Frame: ";
-	sFrame.append(frame);
-	DrawTextGlut(sFrame.c_str(), -g_Width/2 + 10, g_Height/2 - (linePos += 20));
+	sInfo = "Frame: ";
+	sInfo.append(frame);
+	DrawTextGlut(sInfo.c_str(), -g_Width/2 + 10, g_Height/2 - (linePos += 20));
+
+	// batch
+	char batch[5];
+	itoa(g_WorldSim.m_RenderBatchIndex, batch, 10);
+	sInfo = "Batch: ";
+	sInfo.append(batch);
+	DrawTextGlut(sInfo.c_str(), -g_Width/2 + 10, g_Height/2 - (linePos += 20));
+
+	// toggle CPU/GPU
+	if ( g_WorldSim.m_bGPU )
+		sInfo = "GPU solver";
+	else
+		sInfo = "CPU solver";
+
+	DrawTextGlut(sInfo.c_str(), -g_Width/2 + 10, g_Height/2 - (linePos += 20));
+
+	// help for keys
+	DrawTextGlut("===========================================", -g_Width/2 + 10, g_Height/2 - (linePos += 20));
+	DrawTextGlut("space: advance one step", -g_Width/2 + 10, g_Height/2 - (linePos += 20));
+	DrawTextGlut("'s': start or stop", -g_Width/2 + 10, g_Height/2 - (linePos += 20));
+	DrawTextGlut("'c': reset", -g_Width/2 + 10, g_Height/2 - (linePos += 20));
+	DrawTextGlut("'b' : next batch", -g_Width/2 + 10, g_Height/2 - (linePos += 20));
+	DrawTextGlut("'g' : toggle CPU/GPU solver", -g_Width/2 + 10, g_Height/2 - (linePos += 20));
 
 	glMatrixMode(GL_PROJECTION);	
 	glPopMatrix();	
@@ -373,6 +396,27 @@ void OnKeyboard(unsigned char key, int x, int y)
 		{
 			bool bPausePrev = g_bPause;
 			g_bPause = true;
+			g_WorldSim.ClearAll();
+			g_WorldSim.Create();
+			g_bPause = bPausePrev;
+		}
+		break;
+	case 'b':
+	case 'B':
+		{
+			bool bPausePrev = g_bPause;
+			g_bPause = true;
+			g_WorldSim.m_RenderBatchIndex++;
+			g_bPause = bPausePrev;
+		}
+		break;
+
+	case 'g':
+	case 'G':
+		{
+			bool bPausePrev = g_bPause;
+			g_bPause = true;
+			g_WorldSim.m_bGPU = !g_WorldSim.m_bGPU;
 			g_WorldSim.ClearAll();
 			g_WorldSim.Create();
 			g_bPause = bPausePrev;

@@ -155,6 +155,11 @@ bool CVector3D::operator==(const CVector3D& other) const
 	return (m_X == other.m_X && m_Y == other.m_Y && m_Z == other.m_Z );
 }
 
+bool CVector3D::operator!=(const CVector3D& other) const
+{
+	return (m_X != other.m_X || m_Y != other.m_Y || m_Z != other.m_Z );
+}
+
 CVector3D& CVector3D::operator-=(const CVector3D& other) 
 { 
 	m_X -= other.m_X; 

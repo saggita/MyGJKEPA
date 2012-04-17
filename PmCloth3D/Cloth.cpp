@@ -16,12 +16,14 @@
 
 #include "Cloth.h"
 #include "StringTokenizer.h"
-
+#include "NarrowPhaseCollisionDetection.h"
+#include "ConvexCollisionAlgorithm.h"
+#include "CollisionObject.h"
 
 using namespace std;
 
 
-CCloth::CCloth(void) : m_bDeformable(true), m_Gravity(0.0f, 0.0f, -5.0f), m_dt(0.0f), m_bShowBV(false)
+CCloth::CCloth(void) : m_bDeformable(true), m_Gravity(0.0f, -9.8f, 0.0f), m_dt(0.0f), m_bShowBV(false)
 {
 	m_Kst = 10000.0f;
 	m_Ksh = 10000.0f;
@@ -68,6 +70,8 @@ void CCloth::Clear()
 void CCloth::Initialize()
 {
 	m_bDeformable = true;
+
+	GenerateBatches();
 }
 
 bool CCloth::Load(const char* filename)
@@ -401,6 +405,167 @@ void CCloth::AddPin(int vertexIndex)
 	pVertex->m_PinIndex = m_PinArray.size()-1;
 }
 
+static bool ColoringCompare(const CSpringCloth3D& a, const CSpringCloth3D& b)
+{
+	return a.m_Coloring < b.m_Coloring;
+}
+
+void CCloth::GenerateBatches()
+{
+	m_BatchSpringIndexArray.clear();
+
+	for ( int i = 0; i < (int)m_StrechSpringArray.size(); i++ )
+	{
+		CSpringCloth3D& spring = m_StrechSpringArray[i];
+
+		const CVertexCloth3D& vert0 = m_VertexArray[spring.GetVertexIndex(0)];
+		const CVertexCloth3D& vert1 = m_VertexArray[spring.GetVertexIndex(1)];
+
+		int coloring = 0;		
+
+		while ( true ) 
+		{
+			bool bFound0 = false;
+			bool bFound1 = false;
+
+			for ( int a = 0; a < (int)vert0.m_StrechSpringIndexes.size(); a++ )
+			{
+				const CSpringCloth3D& otherSpring = m_StrechSpringArray[vert0.m_StrechSpringIndexes[a]];
+
+				// skip if the neighbor spring is actually itself
+				if ( otherSpring.GetIndex() == spring.GetIndex() )
+					continue;
+
+				if ( otherSpring.m_Coloring == coloring )
+				{
+					bFound0 = true;
+					break;
+				}				
+			}
+			
+			for ( int a = 0; a < (int)vert1.m_StrechSpringIndexes.size(); a++ )
+			{
+				const CSpringCloth3D& otherSpring = m_StrechSpringArray[vert1.m_StrechSpringIndexes[a]];
+
+				// skip if the neighbor spring is actually itself
+				if ( otherSpring.GetIndex() == spring.GetIndex() )
+					continue;
+
+				if ( otherSpring.m_Coloring == coloring )
+				{
+					bFound1 = true;
+					break;
+				}				
+			}
+
+			if ( bFound0 || bFound1 )
+				coloring++;
+			else
+				break;
+		} 
+
+		spring.m_Coloring = coloring;
+	}
+
+#ifdef _DEBUG
+
+	for ( int i = 0; i < (int)m_StrechSpringArray.size(); i++ )
+	{
+		CSpringCloth3D& spring = m_StrechSpringArray[i];
+
+		const CVertexCloth3D& vert0 = m_VertexArray[spring.GetVertexIndex(0)];
+		const CVertexCloth3D& vert1 = m_VertexArray[spring.GetVertexIndex(1)];
+
+		int coloring = spring.m_Coloring;
+		bool bFound0 = false;
+		bool bFound1 = false;
+
+		for ( int a = 0; a < (int)vert0.m_StrechSpringIndexes.size(); a++ )
+		{
+			const CSpringCloth3D& otherSpring = m_StrechSpringArray[vert0.m_StrechSpringIndexes[a]];
+
+			// skip if the neighbor spring is actually itself
+			if ( otherSpring.GetIndex() == spring.GetIndex() )
+				continue;
+
+			if ( otherSpring.m_Coloring == coloring )
+			{
+				bFound0 = true;
+				break;
+			}				
+		}
+		
+		for ( int a = 0; a < (int)vert1.m_StrechSpringIndexes.size(); a++ )
+		{
+			const CSpringCloth3D& otherSpring = m_StrechSpringArray[vert1.m_StrechSpringIndexes[a]];
+
+			// skip if the neighbor spring is actually itself
+			if ( otherSpring.GetIndex() == spring.GetIndex() )
+				continue;
+
+			if ( otherSpring.m_Coloring == coloring )
+			{
+				bFound1 = true;
+				break;
+			}				
+		}
+
+		assert(!bFound0 && !bFound1);
+	}
+#endif
+
+	// Count how many batches were generated
+	int countBatches = 0;
+
+	for ( int i = 0; i < (int)m_StrechSpringArray.size(); i++ )
+	{
+		CSpringCloth3D& spring = m_StrechSpringArray[i];
+
+		if ( spring.m_Coloring > countBatches )
+			countBatches = spring.m_Coloring;
+	}
+
+	countBatches++;
+
+	std::sort(m_StrechSpringArray.begin(), m_StrechSpringArray.end(), ColoringCompare);
+
+	m_BatchSpringIndexArray.push_back(0);
+
+	if ( m_StrechSpringArray.size() > 1 )
+	{
+		int i = 0;
+
+		for ( i = 0; i < (int)m_StrechSpringArray.size()-1; i++ )
+		{
+			CSpringCloth3D& spring = m_StrechSpringArray[i];
+			CSpringCloth3D& springNext = m_StrechSpringArray[i+1];
+
+#ifdef _DEBUG
+			assert(spring.m_Coloring <= springNext.m_Coloring);
+#endif
+
+			if ( spring.m_Coloring < springNext.m_Coloring )
+				m_BatchSpringIndexArray.push_back(i+1);
+		}
+
+		m_BatchSpringIndexArray.push_back(i);
+	}
+
+#ifdef _DEBUG
+	for ( int i = 0; i < (int)m_BatchSpringIndexArray.size()-1; i++ )
+	{
+		int startIndex = m_BatchSpringIndexArray[i];
+		int endIndex = m_BatchSpringIndexArray[i+1] - 1;
+
+		for ( int j = startIndex; j <= endIndex; j++ )
+		{
+			assert(m_StrechSpringArray[j].m_Coloring == m_StrechSpringArray[startIndex].m_Coloring);
+		}
+	}
+#endif
+
+}
+
 void CCloth::Render()
 {
 	// Calculate normal vectors for each vertex
@@ -554,6 +719,37 @@ void CCloth::Render()
 	glEnable(GL_LIGHTING);
 }
 
+int CCloth::RenderBatch(int i) const
+{
+	glDisable(GL_LIGHTING);
+	glLineWidth(3.0f);
+	glColor3f(1.0f, 1.0f, 1.0f);
+
+	if ( i >= (int)m_BatchSpringIndexArray.size() - 1 )
+		i = i - ((int)m_BatchSpringIndexArray.size() - 1);
+
+	if ( 0 <= i && i < (int)m_BatchSpringIndexArray.size() - 1  )
+	{
+		int startIndex = m_BatchSpringIndexArray[i];
+		int endIndex = m_BatchSpringIndexArray[i+1] - 1;
+
+		for ( int j = startIndex; j <= endIndex; j++ )
+		{
+			const CVector3D& v0 = m_VertexArray[m_StrechSpringArray[j].GetVertexIndex(0)].m_Pos;
+			const CVector3D& v1 = m_VertexArray[m_StrechSpringArray[j].GetVertexIndex(1)].m_Pos;
+
+			glBegin(GL_LINES);
+			glVertex3f(v0.m_X, v0.m_Y, v0.m_Z);
+			glVertex3f(v1.m_X, v1.m_Y, v1.m_Z);
+			glEnd();
+		}
+	}
+
+	glEnable(GL_LIGHTING);
+
+	return i;
+}
+
 void CCloth::ApplyForces(btScalar dt)
 {
 	#pragma omp parallel for
@@ -572,11 +768,11 @@ void CCloth::ApplyGravity(btScalar dt)
 		CVertexCloth3D& vert = m_VertexArray[i];	
 
 		if ( !vert.m_pPin )
-			vert.m_Vel += m_Gravity * dt;
+			vert.m_Accel += m_Gravity;
 	}
 }
 
-void CCloth::ClearAccelations()
+void CCloth::ClearForces()
 {
 	#pragma omp parallel for
 	for ( int i = 0; i < (int)m_VertexArray.size(); i++ )
@@ -644,6 +840,57 @@ void CCloth::EnforceEdgeConstraints(btScalar dt)
 	}	
 }
 
+void CCloth::EnforceEdgeConstraintsBatched(btScalar dt)
+{
+	m_dt = dt;
+	
+	#pragma omp parallel for
+	for ( int batch = 0; batch < (int)m_BatchSpringIndexArray.size()-1; batch++ )
+	{
+		int startIndex = m_BatchSpringIndexArray[batch];
+		int endIndex = m_BatchSpringIndexArray[batch+1] - 1;
+
+		for ( int j = startIndex; j <= endIndex; j++ )
+		{
+			int indexEdge = j;
+
+			bool bNeedLimiting = false;
+
+			const CSpringCloth3D& spring = m_StrechSpringArray[indexEdge];
+
+			CVertexCloth3D& vert0 = m_VertexArray[spring.GetVertexIndex(0)];
+			CVertexCloth3D& vert1 = m_VertexArray[spring.GetVertexIndex(1)];
+
+			CVector3D vecNewSpring = vert0.m_PosNext - vert1.m_PosNext;
+
+			btScalar newLen = vecNewSpring.Length();
+			btScalar restLen = spring.GetRestLength();
+
+			CVector3D cji = (newLen-restLen)*vecNewSpring.Normalize();
+
+			CVector3D dVert0(0, 0, 0);
+			CVector3D dVert1(0, 0, 0);			
+
+			if ( vert0.m_pPin && !vert1.m_pPin ) // if vert0 is pinned and vert1 is not
+			{
+				dVert1 = cji;
+			}
+			else if ( !vert0.m_pPin && vert1.m_pPin ) // if vert1 is pinned and vert0 is not
+			{
+				dVert0 = -cji;
+			}
+			else if ( !vert0.m_pPin && !vert1.m_pPin ) // if both are not pinned
+			{
+				dVert0 = -0.5*cji;
+				dVert1 = 0.5*cji;
+			}
+
+			vert0.m_PosNext += dVert0;
+			vert1.m_PosNext += dVert1;			  
+		}
+	}	
+}
+
 bool CCloth::AdvancePosition(btScalar dt)
 {
 	m_dt = dt;
@@ -666,10 +913,8 @@ bool CCloth::Integrate(btScalar dt)
 {
 	m_dt = dt;
 
+	ClearForces();
 	ApplyGravity(dt);
-	ApplyForces(dt);
-	ComputeNextVertexPositions(dt);
-	ClearAccelations();
 
 	// apply bending spring forces
 	std::vector<CSpringCloth3D>::const_iterator iterBendSpring;
@@ -681,7 +926,7 @@ bool CCloth::Integrate(btScalar dt)
 		CVertexCloth3D& vert0 = m_VertexArray[spring.GetVertexIndex(0)];
 		CVertexCloth3D& vert1 = m_VertexArray[spring.GetVertexIndex(1)];
 
-		CVector3D vec = (vert1.m_PosNext - vert0.m_PosNext);
+		CVector3D vec = (vert1.m_Pos - vert0.m_Pos);
 		btScalar len = vec.Length();
 		CVector3D springForce = m_Kb * (len - spring.GetRestLength()) * vec.Normalize();
 
@@ -693,18 +938,91 @@ bool CCloth::Integrate(btScalar dt)
 	}
 
 	ApplyForces(dt);
+	ClearForces();
 	ComputeNextVertexPositions(dt);
-	ClearAccelations();
 
 	int numIteration = 0;
 	bool bNeedMoreIteration = true;
 	
 	while ( bNeedMoreIteration && numIteration < m_NumIterForConstraintSolver )
 	{
-		EnforceEdgeConstraints(dt);		
+		//EnforceEdgeConstraints(dt);		
+		EnforceEdgeConstraintsBatched(dt);
 		++numIteration;
 	}
 
+	UpdateVelocities(dt);
+
+	m_NumIter = numIteration;
+	return true;
+}
+
+bool CCloth::ResolveCollision(CCollisionObject& convexObject, btScalar dt)
+{
+	CNarrowPhaseCollisionDetection np;
+
+	for ( int i = 0; i < (int)GetVertexArray().size(); i++ )
+	{
+		CNarrowCollisionInfo info;
+		CVertexCloth3D& vert = GetVertexArray()[i];
+		
+		CCollisionObject pointColObj;
+		pointColObj.SetCollisionObjectType(CCollisionObject::Point);
+
+		// We use the next position of vertices which might become the current positions if there is no collision at the end of step. 
+		pointColObj.GetTransform().GetTranslation() = vert.m_PosNext;
+
+		if ( np.GetConvexCollisionAlgorithm()->CheckCollision(convexObject, pointColObj, &info, false) )
+		{
+			CVector3D pointAW = convexObject.GetTransform() * info.witnessPntA;
+			CVector3D pointBW = pointColObj.GetTransform().GetTranslation(); // it is a point object. 
+			CVector3D v = pointAW - pointBW;
+			CVector3D n = v.NormalizeOther();
+			btScalar d = info.penetrationDepth; // d already contains margin
+			//btScalar margin = convexObject.GetMargin();
+
+			// TODO:Need to know translational and angular velocities of object A.
+			CVector3D velOnPointAW(0, 0, 0);
+			
+			// critical relative velocity to separate the vertex and object
+			btScalar critical_relVel = d / dt;
+
+			CVector3D relVel = vert.m_Vel-velOnPointAW;
+
+			// relative normal velocity of vertex. If positive, vertex is separating from the object.
+			btScalar relVelNLen = relVel.Dot(n);
+			CVector3D relVelN = relVelNLen * n;
+
+			// relative tangential velocity to calculate friction
+			CVector3D relVelT = relVel - relVelN;
+
+			// friction.
+			btScalar mu = GetFrictionCoef();
+			CVector3D dVT(0, 0, 0);
+
+			btScalar relVelTLen = relVelT.Length();
+
+			if ( mu > 0 && relVelTLen > 0 )
+			{
+				CVector3D newVelT = max(1.0-mu*relVelNLen/relVelTLen, 0) * relVelT;
+				dVT = -(newVelT - relVelT); 
+			}
+
+			CVector3D dVN = (critical_relVel) * n;
+			CVector3D dV = dVN + dVT;
+
+			if ( !vert.m_pPin )
+			{
+				vert.m_Vel += dV;
+			}
+		}
+	}
+
+	return true;
+}
+
+void CCloth::UpdateVelocities(btScalar dt)
+{
 	for ( unsigned int i = 0; i < m_VertexArray.size(); i++ )
 	{
 		CVertexCloth3D& vert = m_VertexArray[i];
@@ -712,9 +1030,6 @@ bool CCloth::Integrate(btScalar dt)
 		if ( !vert.m_pPin )
 			vert.m_Vel = (vert.m_PosNext - vert.m_Pos)/dt;
 	}
-
-	m_NumIter = numIteration;
-	return true;
 }
 
 void CCloth::TranslateW(btScalar x, btScalar y, btScalar z)

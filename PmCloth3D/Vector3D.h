@@ -73,6 +73,7 @@ public:
 	bool operator>(btScalar val) const;
 	bool operator==(btScalar val) const;
 	bool operator==(const CVector3D& other) const;
+	bool operator!=(const CVector3D& other) const;
 	CVector3D& operator-=(const CVector3D& other);
 	CVector3D& operator+=(const CVector3D& other);
 	CVector3D& operator*=(btScalar val);

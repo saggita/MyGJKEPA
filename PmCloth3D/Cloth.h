@@ -253,6 +253,8 @@ protected:
 	std::vector<CVector3D> m_NormalVecArray;
 	std::vector<CTriangleCloth3D> m_TriangleArray;
 	std::vector<CClothPin> m_PinArray;
+
+	std::vector<int> m_BatchSpringIndexArray;
 	
 	//CCollisionObject m_CollisionObject;
 	
@@ -304,11 +306,17 @@ public:
 
 	void Clear();
 	
+	void GenerateBatches();
+
 	virtual bool Integrate(btScalar dt);
 	virtual bool AdvancePosition(btScalar dt);
 	
 	void SetColor(float r, float g, float b) { m_Color = COLOR(r, g, b); }
+	
 	virtual void Render();
+	int RenderBatch(int i) const;
+
+	virtual bool ResolveCollision(CCollisionObject& convexObject, btScalar dt);
 
 	virtual CCollisionObject* GetCollisionObject() { return NULL; }
 	virtual const CCollisionObject* GetCollisionObject() const { return NULL; }
@@ -317,13 +325,14 @@ public:
 
 protected:
 	void FillSpringArray();
-	void ApplyForces(btScalar dt);
 	void ApplyGravity(btScalar dt);
-	void ClearAccelations();
+	void ApplyForces(btScalar dt);
+	void ClearForces();	
 	void ComputeNextVertexPositions(btScalar dt);
 	btScalar CalcConstraint(int indexEdge, int indexVertex, btScalar dt, CVector3D* pGradientOfConstraint = NULL);
 	void EnforceEdgeConstraints(btScalar dt);
-
+	void EnforceEdgeConstraintsBatched(btScalar dt);
+	void UpdateVelocities(btScalar dt);
 public:
 	CCloth& operator=(const CCloth& other);
 };

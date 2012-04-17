@@ -28,6 +28,8 @@ public:
 	CCollisionObject* pObjectA;
 	CCloth* m_pCloth;
 	CVector3D m_Gravity;
+	int m_RenderBatchIndex;
+	bool m_bGPU; 
 
 protected:
 	Device* m_ddcl; 
