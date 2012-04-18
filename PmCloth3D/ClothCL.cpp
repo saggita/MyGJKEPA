@@ -44,10 +44,10 @@ CClothCL::~CClothCL(void)
 	ReleaseKernels();	
 	
 	if ( m_HBVertexCL )
-		delete m_HBVertexCL;
+		delete [] m_HBVertexCL;
 
 	if ( m_HBSpringCL )
-		delete m_HBSpringCL;
+		delete [] m_HBSpringCL;
 }
 
 void CClothCL::Initialize()
