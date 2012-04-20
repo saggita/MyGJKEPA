@@ -78,6 +78,7 @@
     <ClCompile Include="ClothCL.cpp" />
     <ClCompile Include="Cloth.cpp" />
     <ClCompile Include="CLFunctions.cpp" />
+    <ClCompile Include="Hair.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="WorldSimulation.h" />
@@ -208,6 +209,7 @@
     <ClInclude Include="ClothCL.h" />
     <ClInclude Include="Cloth.h" />
     <ClInclude Include="CLFunctions.h" />
+    <ClInclude Include="Hair.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="ConvexHeightField">

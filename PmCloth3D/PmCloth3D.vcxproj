@@ -51,6 +51,7 @@
     <ClInclude Include="EPATriangle.h" />
     <ClInclude Include="GJKAlgorithm.h" />
     <ClInclude Include="GJKSimplex.h" />
+    <ClInclude Include="Hair.h" />
     <ClInclude Include="ICollidable.h" />
     <ClInclude Include="mathUtil.h" />
     <ClInclude Include="Matrix33.h" />
@@ -82,6 +83,7 @@
     <ClCompile Include="EPATriangle.cpp" />
     <ClCompile Include="GJKAlgorithm.cpp" />
     <ClCompile Include="GJKSimplex.cpp" />
+    <ClCompile Include="Hair.cpp" />
     <ClCompile Include="ICollidable.cpp" />
     <ClCompile Include="mathUtil.cpp" />
     <ClCompile Include="Matrix33.cpp" />

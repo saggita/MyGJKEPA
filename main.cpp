@@ -20,7 +20,7 @@ using namespace std;
 
 const int width = 1024, height = 800;
 GLint viewport[4];
-HGLCamera   hCamera(threeButtons, false, 25.0f, 0.0f, -5.0f, 30.0f, 30.0f);
+HGLCamera   hCamera(threeButtons, false, 160.0f, 0.0f, -5.0f, 30.0f, 30.0f);
 GLuint btmPlate;
 int mouseButton = -1;
 bool bMousePressed = false;

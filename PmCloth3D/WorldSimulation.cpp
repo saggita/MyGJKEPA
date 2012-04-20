@@ -17,9 +17,12 @@
 #include "NarrowPhaseCollisionDetection.h"
 #include "ConvexCollisionAlgorithm.h"
 #include "CollisionObject.h"
+#include "Hair.h"
 
 cl_context        g_cxGPUMainContext = NULL;
 cl_command_queue  g_cqGPUCommandQue = NULL;
+
+CHair g_Hair;
 
 CWorldSimulation::CWorldSimulation(void) : m_Gravity(0.0f, -9.87f, 0.0f), m_pCloth(NULL), m_RenderBatchIndex(0), m_bGPU(false)
 { 
@@ -135,7 +138,7 @@ void CWorldSimulation::Create()
 	// Object 1
 	//-----------
 	CCollisionObject* pObjectB = new CCollisionObject();
-	pObjectB->SetCollisionObjectType(CCollisionObject::Point);
+	pObjectB->SetCollisionObjectType(CCollisionObject::Box);
 	pObjectB->SetSize(3.0f, 4.0f, 5.0f);
 	pObjectB->SetColor(0.7f, 0.7f, 0.0f);
 	pObjectB->GetTransform().GetRotation().SetRotation(CQuaternion(CVector3D(1.0f, 0.0f, 0.0f).Normalize(), 0.0f));
@@ -173,6 +176,10 @@ void CWorldSimulation::Create()
 	g_MarkerB.SetColor(1.0f, 1.0f, 0.0f);
 	g_MarkerA.SetCollisionObjectType(CCollisionObject::Sphere);
 	g_MarkerB.SetCollisionObjectType(CCollisionObject::Sphere);		
+
+	// Hair
+	g_Hair.Load("C:\\AMD\\Dev\\Hair Simulation\\media\\xuan\\yukselStraighthair-dongsoo2.xuan");
+	g_Hair.SetNumIterForConstraintSolver(2);
 }
 
 void CWorldSimulation::ClearAll()
@@ -224,6 +231,15 @@ unsigned int CWorldSimulation::Update(btScalar dt)
 unsigned int CWorldSimulation::SubsUpdate(btScalar dt)
 {
 	m_dt = dt;
+
+	g_Hair.Integrate(dt);
+	g_Hair.ResolveCollision(*pObjectA, dt);
+	g_Hair.AdvancePosition(dt);	
+
+	return 0;
+
+
+
 		
 	if ( m_pNarrowPhase && m_pNarrowPhase->GetPairs().size() > 0 )
 	{
@@ -292,6 +308,11 @@ void CWorldSimulation::ResolveCollisions(btScalar dt)
 
 void CWorldSimulation::Render(bool bWireframe/* = false*/)
 {	
+
+	g_Hair.Render();
+
+	return;
+
 	glEnable(GL_POLYGON_OFFSET_FILL);
 	glPolygonOffset(1,1);
 
