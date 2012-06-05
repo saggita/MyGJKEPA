@@ -29,7 +29,7 @@ CTriangleCloth3D::~CTriangleCloth3D()
 {
 }
 
-CVector3D CTriangleCloth3D::GetPointByBaryCoord(const CCloth* pCloth, btScalar a, btScalar b, btScalar c) const
+CVector3D CTriangleCloth3D::GetPointByBaryCoord(const CCloth* pCloth, float a, float b, float c) const
 {
 	const CVertexCloth3D& v0 = pCloth->GetVertexArray()[m_IndexVrx[0]];
 	const CVertexCloth3D& v1 = pCloth->GetVertexArray()[m_IndexVrx[1]];
@@ -38,7 +38,7 @@ CVector3D CTriangleCloth3D::GetPointByBaryCoord(const CCloth* pCloth, btScalar a
 	return CVector3D(v0.m_Pos*a + v1.m_Pos*b + v2.m_Pos*c);
 }
 
-CVector3D CTriangleCloth3D::GetVelocityByBaryCoord(const CCloth* pCloth, btScalar a, btScalar b, btScalar c) const
+CVector3D CTriangleCloth3D::GetVelocityByBaryCoord(const CCloth* pCloth, float a, float b, float c) const
 {
 	const CVertexCloth3D& v0 = pCloth->GetVertexArray()[m_IndexVrx[0]];
 	const CVertexCloth3D& v1 = pCloth->GetVertexArray()[m_IndexVrx[1]];

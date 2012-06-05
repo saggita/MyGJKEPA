@@ -78,7 +78,9 @@
     <ClCompile Include="ClothCL.cpp" />
     <ClCompile Include="Cloth.cpp" />
     <ClCompile Include="CLFunctions.cpp" />
-    <ClCompile Include="Hair.cpp" />
+    <ClCompile Include="EMCCAlgorithm.cpp">
+      <Filter>NarrowPhaseCollision</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="WorldSimulation.h" />
@@ -209,7 +211,9 @@
     <ClInclude Include="ClothCL.h" />
     <ClInclude Include="Cloth.h" />
     <ClInclude Include="CLFunctions.h" />
-    <ClInclude Include="Hair.h" />
+    <ClInclude Include="EMCCAlgorithm.h">
+      <Filter>NarrowPhaseCollision</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="ConvexHeightField">

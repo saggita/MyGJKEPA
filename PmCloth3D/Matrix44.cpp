@@ -30,7 +30,7 @@ CMatrix44::CMatrix44(const CMatrix44& other)
 	}
 }
 
-CMatrix44::CMatrix44(btScalar R1[4], btScalar R2[4], btScalar R3[4], btScalar R4[4])
+CMatrix44::CMatrix44(float R1[4], float R2[4], float R3[4], float R4[4])
 {
 	int i;
 
@@ -55,10 +55,10 @@ CMatrix44::CMatrix44(btScalar R1[4], btScalar R2[4], btScalar R3[4], btScalar R4
 	}
 }
 
-CMatrix44::CMatrix44(btScalar e00, btScalar e01, btScalar e02, btScalar e03,
-			  btScalar e10, btScalar e11, btScalar e12, btScalar e13,
-			  btScalar e20, btScalar e21, btScalar e22, btScalar e23,
-			  btScalar e30, btScalar e31, btScalar e32, btScalar e33)
+CMatrix44::CMatrix44(float e00, float e01, float e02, float e03,
+			  float e10, float e11, float e12, float e13,
+			  float e20, float e21, float e22, float e23,
+			  float e30, float e31, float e32, float e33)
 {
 	Row[0][0] = e00; Row[0][1] = e01; Row[0][2] = e02; Row[0][3] = e03;
 	Row[1][0] = e10; Row[1][1] = e11; Row[1][2] = e12; Row[1][3] = e13;
@@ -78,11 +78,11 @@ void CMatrix44::SetIdentity()
 	Row[3][0] = 0.0f; Row[3][1] = 0.0f; Row[3][2] = 0.0f; Row[3][3] = 1.0f;
 }
 
-void CMatrix44::SetRotation(const CVector3D& axis, btScalar ang)
+void CMatrix44::SetRotation(const CVector3D& axis, float ang)
 {
-	btScalar nx = axis.m_X; 
-	btScalar ny = axis.m_Y;
-	btScalar nz = axis.m_Z;
+	float nx = axis.m_X; 
+	float ny = axis.m_Y;
+	float nz = axis.m_Z;
 
 	Row[0][0] = nx*nx*vsin(ang) + cos(ang);
 	Row[0][1] = nx*ny*vsin(ang) - nz*sin(ang);
@@ -102,14 +102,14 @@ void CMatrix44::SetRotation(const CVector3D& axis, btScalar ang)
 	Row[3][3] = 1.0f;
 }
 
-void CMatrix44::SetTranslate(btScalar x, btScalar y, btScalar z)
+void CMatrix44::SetTranslate(float x, float y, float z)
 {
 	Row[0][3] = x;
 	Row[1][3] = y;
 	Row[2][3] = z;
 }
 
-btScalar CMatrix44::GetElement(int nRow, int nCol) const 
+float CMatrix44::GetElement(int nRow, int nCol) const 
 { 
 	if ( nRow < 0 || nRow > 3 )
 		throw 0; // needs to be rewriten

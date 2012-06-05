@@ -20,7 +20,7 @@ using namespace std;
 
 const int width = 1024, height = 800;
 GLint viewport[4];
-HGLCamera   hCamera(threeButtons, false, 160.0f, 0.0f, -5.0f, 30.0f, 30.0f);
+HGLCamera   hCamera(threeButtons, false, 25.0f, 0.0f, -5.0f, 30.0f, 30.0f);
 GLuint btmPlate;
 int mouseButton = -1;
 bool bMousePressed = false;
@@ -137,6 +137,10 @@ void SetWindowTitle()
 		else if ( colAlgoType == CNarrowPhaseCollisionDetection::GJK_EPA )
 		{
 			g_sWindowTitleInfo = "GJK/EPA method";
+		}
+		else if ( colAlgoType == CNarrowPhaseCollisionDetection::EMCC )
+		{
+			g_sWindowTitleInfo = "EMCC method";
 		}
 	}
 }
@@ -445,10 +449,10 @@ void OnKeyboard(unsigned char key, int x, int y)
 
 				if ( colAlgoType == CNarrowPhaseCollisionDetection::GJK_EPA )
 				{
-					colAlgoType = CNarrowPhaseCollisionDetection::BIM;					
+					/*colAlgoType = CNarrowPhaseCollisionDetection::BIM;					
 				}
 				else if ( colAlgoType == CNarrowPhaseCollisionDetection::BIM )
-				{
+				{*/
 					colAlgoType = CNarrowPhaseCollisionDetection::CHF;
 				}
 				else if ( colAlgoType == CNarrowPhaseCollisionDetection::CHF )

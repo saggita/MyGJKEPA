@@ -3,6 +3,7 @@
 #include "GJKAlgorithm.h"
 #include "BIMAlgorithm.h"
 #include "CHFAlgorithm.h"
+#include "EMCCAlgorithm.h"
 
 CNarrowPhaseCollisionDetection::CNarrowPhaseCollisionDetection(void) : m_AlgorithmType(BIM), m_pAlgorithm(NULL)
 {
@@ -27,6 +28,8 @@ void CNarrowPhaseCollisionDetection::SetConvexCollisionAlgorithmType(CollisionAl
 		m_pAlgorithm = new CBIMAlgorithm;
 	else if ( m_AlgorithmType == CHF )
 		m_pAlgorithm = new CCHFAlgorithm;
+	else if ( m_AlgorithmType == EMCC )
+		m_pAlgorithm = new CEMCCAlgorithm;
 }
 
 int CNarrowPhaseCollisionDetection::CheckCollisions()

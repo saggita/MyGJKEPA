@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PmCloth3D", "PmCloth3D\PmCloth3D.vcxproj", "{D5E2412C-9AA6-41FA-922F-05450EF6912C}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ConvexCollision", "PmCloth3D\PmCloth3D.vcxproj", "{D5E2412C-9AA6-41FA-922F-05450EF6912C}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BulletCollision", "BulletCollision\BulletCollision.vcxproj", "{0134A467-8581-4C3D-BEB4-E4B59810BB32}"
 	ProjectSection(ProjectDependencies) = postProject
@@ -15,11 +15,6 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MyGJKEPA", "MyGJKEPA.vcxpro
 		{D5E2412C-9AA6-41FA-922F-05450EF6912C} = {D5E2412C-9AA6-41FA-922F-05450EF6912C}
 		{42B9BF31-41A4-480E-80CF-1F4F4A3CFB46} = {42B9BF31-41A4-480E-80CF-1F4F4A3CFB46}
 		{0134A467-8581-4C3D-BEB4-E4B59810BB32} = {0134A467-8581-4C3D-BEB4-E4B59810BB32}
-	EndProjectSection
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "OpenCloth_PositionBased", "OpenCloth_PositionBased\OpenCloth_PositionBased.vcxproj", "{836F4E4C-205B-4A16-A30F-43913021F9A9}"
-	ProjectSection(ProjectDependencies) = postProject
-		{D5E2412C-9AA6-41FA-922F-05450EF6912C} = {D5E2412C-9AA6-41FA-922F-05450EF6912C}
 	EndProjectSection
 EndProject
 Global
@@ -56,12 +51,6 @@ Global
 		{8D06611F-13AA-4D6F-8946-12B2486A22B4}.Release|Win32.ActiveCfg = Release|Win32
 		{8D06611F-13AA-4D6F-8946-12B2486A22B4}.Release|Win32.Build.0 = Release|Win32
 		{8D06611F-13AA-4D6F-8946-12B2486A22B4}.Release|x64.ActiveCfg = Release|Win32
-		{836F4E4C-205B-4A16-A30F-43913021F9A9}.Debug|Win32.ActiveCfg = Debug|Win32
-		{836F4E4C-205B-4A16-A30F-43913021F9A9}.Debug|Win32.Build.0 = Debug|Win32
-		{836F4E4C-205B-4A16-A30F-43913021F9A9}.Debug|x64.ActiveCfg = Debug|Win32
-		{836F4E4C-205B-4A16-A30F-43913021F9A9}.Release|Win32.ActiveCfg = Release|Win32
-		{836F4E4C-205B-4A16-A30F-43913021F9A9}.Release|Win32.Build.0 = Release|Win32
-		{836F4E4C-205B-4A16-A30F-43913021F9A9}.Release|x64.ActiveCfg = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

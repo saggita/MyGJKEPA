@@ -113,7 +113,7 @@ void CClothCL::UpdateBuffers()
 	assert(result == CL_SUCCESS);
 }
 
-bool CClothCL::Integrate(btScalar dt)
+bool CClothCL::Integrate(float dt)
 {
 	int numVertices = (int)m_VertexArray.size();
 	int numSprings = (int)m_StrechSpringArray.size();
@@ -272,7 +272,7 @@ bool CClothCL::Integrate(btScalar dt)
 	return true;
 }
 
-bool CClothCL::AdvancePosition(btScalar dt)
+bool CClothCL::AdvancePosition(float dt)
 {
 	UpdateBuffers();
 
@@ -316,7 +316,7 @@ bool CClothCL::AdvancePosition(btScalar dt)
 	return true;
 }
 
-bool CClothCL::ResolveCollision(CCollisionObject& convexObject, btScalar dt)
+bool CClothCL::ResolveCollision(CCollisionObject& convexObject, float dt)
 {
 	return CCloth::ResolveCollision(convexObject, dt);
 }

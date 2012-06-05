@@ -58,7 +58,7 @@ protected:
 	int m_Index;
 	int m_IndexVrx[2];
 	int m_IndexTriangle[2];
-	btScalar m_RestLength;
+	float m_RestLength;
 
 public:
 	int m_Coloring;
@@ -70,8 +70,8 @@ public:
 		return m_IndexVrx[i];
 	}
 
-	btScalar GetRestLength() const { return m_RestLength; }
-	void SetRestLength(btScalar restLength) { m_RestLength = restLength; }
+	float GetRestLength() const { return m_RestLength; }
+	void SetRestLength(float restLength) { m_RestLength = restLength; }
 
 	int GetIndex() const { return m_Index; }
 	void SetIndex(int index) { m_Index = index; }
@@ -135,7 +135,7 @@ public:
 	CVector3D m_Pos;
 	CVector3D m_PosNext;
 	CVector3D m_Vel;
-	btScalar m_InvMass; // = 1.0 / m_Mass. In case mass is infinite, m_InvMass is zero and m_Mass doesn't have any meaning.
+	float m_InvMass; // = 1.0 / m_Mass. In case mass is infinite, m_InvMass is zero and m_Mass doesn't have any meaning.
 					  // Currently infinite mass is not supported. CClothPin should be used to pin cloth vertex.
 	CVector3D m_Accel;
 	int m_PinIndex;
@@ -236,12 +236,12 @@ public:
 	virtual ~CCloth(void);
 
 protected:
-	btScalar m_dt;
-	btScalar m_Kst; // stretch force
-	btScalar m_Ksh; // shear force
-	btScalar m_Kb; // bending force
-	btScalar m_Kd;
-	btScalar m_Mu; // friction
+	float m_dt;
+	float m_Kst; // stretch force
+	float m_Ksh; // shear force
+	float m_Kb; // bending force
+	float m_Kd;
+	float m_Mu; // friction
 	CVector3D m_Gravity;
 	//CBVHTree* m_pBVHTree;
 	bool m_bDeformable;
@@ -268,23 +268,23 @@ public:
 
 	virtual bool Load(const char* filename);
 	virtual void Initialize();
-	btScalar GetKst() const { return m_Kst; };
-	btScalar GetKsh() const { return m_Ksh; };
-	btScalar GetKb() const { return m_Kb; };
-	btScalar GetFrictionCoef() const { return m_Mu; }
-	void SetKst(btScalar Kst) { m_Kst = Kst; };
-	void SetKsh(btScalar Ksh) { m_Ksh = Ksh; };
-	void SetKb(btScalar Kb) { m_Kb = Kb; };
-	void SetFrictionCoef(btScalar mu) { assert(mu >= 0 && mu <= 1.0); m_Mu = mu; }
-	btScalar Getdt() const { return m_dt; } 
-	void Setdt(btScalar dt) { m_dt = dt; }
+	float GetKst() const { return m_Kst; };
+	float GetKsh() const { return m_Ksh; };
+	float GetKb() const { return m_Kb; };
+	float GetFrictionCoef() const { return m_Mu; }
+	void SetKst(float Kst) { m_Kst = Kst; };
+	void SetKsh(float Ksh) { m_Ksh = Ksh; };
+	void SetKb(float Kb) { m_Kb = Kb; };
+	void SetFrictionCoef(float mu) { assert(mu >= 0 && mu <= 1.0); m_Mu = mu; }
+	float Getdt() const { return m_dt; } 
+	void Setdt(float dt) { m_dt = dt; }
 	void SetGravity(const CVector3D& gravity);
 	const CVector3D& GetGravity() const;
 	bool GetShowBV() { return m_bShowBV; }
 	void SetShowBV(bool bShowBV) { m_bShowBV = bShowBV; }
-	void SetMassDensity(btScalar massDensity);
-	void SetVertexMass(btScalar vertexMass);
-	void SetTotalMass(btScalar totalMass);
+	void SetMassDensity(float massDensity);
+	void SetVertexMass(float vertexMass);
+	void SetTotalMass(float totalMass);
 	void SetNumIterForConstraintSolver(int numIter) { m_NumIterForConstraintSolver = numIter; }
 
 	void AddPin(int vertexIndex);
@@ -308,31 +308,31 @@ public:
 	
 	void GenerateBatches();
 
-	virtual bool Integrate(btScalar dt);
-	virtual bool AdvancePosition(btScalar dt);
+	virtual bool Integrate(float dt);
+	virtual bool AdvancePosition(float dt);
 	
 	void SetColor(float r, float g, float b) { m_Color = COLOR(r, g, b); }
 	
 	virtual void Render();
 	int RenderBatch(int i) const;
 
-	virtual bool ResolveCollision(CCollisionObject& convexObject, btScalar dt);
+	virtual bool ResolveCollision(CCollisionObject& convexObject, float dt);
 
 	virtual CCollisionObject* GetCollisionObject() { return NULL; }
 	virtual const CCollisionObject* GetCollisionObject() const { return NULL; }
 
-	virtual void TranslateW(btScalar x, btScalar y, btScalar z);
+	virtual void TranslateW(float x, float y, float z);
 
 protected:
 	void FillSpringArray();
-	void ApplyGravity(btScalar dt);
-	void ApplyForces(btScalar dt);
+	void ApplyGravity(float dt);
+	void ApplyForces(float dt);
 	void ClearForces();	
-	void ComputeNextVertexPositions(btScalar dt);
-	btScalar CalcConstraint(int indexEdge, int indexVertex, btScalar dt, CVector3D* pGradientOfConstraint = NULL);
-	void EnforceEdgeConstraints(btScalar dt);
-	void EnforceEdgeConstraintsBatched(btScalar dt);
-	void UpdateVelocities(btScalar dt);
+	void ComputeNextVertexPositions(float dt);
+	float CalcConstraint(int indexEdge, int indexVertex, float dt, CVector3D* pGradientOfConstraint = NULL);
+	void EnforceEdgeConstraints(float dt);
+	void EnforceEdgeConstraintsBatched(float dt);
+	void UpdateVelocities(float dt);
 public:
 	CCloth& operator=(const CCloth& other);
 };

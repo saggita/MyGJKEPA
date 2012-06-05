@@ -23,7 +23,7 @@ protected:
 	int m_IndexNormalVec;
 	
 public:
-	btScalar A; // initial area without any deformation. Calculated before simulation starts and won't change over the simulation.
+	float A; // initial area without any deformation. Calculated before simulation starts and won't change over the simulation.
 
 public:
 	int GetVertexIndex(int i) const 
@@ -49,8 +49,8 @@ public:
 	int GetIndex() const { return m_Index; }
 	void SetIndex(int index) { m_Index = index; }
 	int GetNormalVectIndex() const { return m_IndexNormalVec; }
-	CVector3D GetPointByBaryCoord(const CCloth* pCloth, btScalar a, btScalar b, btScalar c) const;
-	CVector3D GetVelocityByBaryCoord(const CCloth* pCloth, btScalar a, btScalar b, btScalar c) const;
+	CVector3D GetPointByBaryCoord(const CCloth* pCloth, float a, float b, float c) const;
+	CVector3D GetVelocityByBaryCoord(const CCloth* pCloth, float a, float b, float c) const;
 	
 	CTriangleCloth3D& operator=(const CTriangleCloth3D& other);
 };

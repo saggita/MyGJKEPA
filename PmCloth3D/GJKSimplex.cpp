@@ -162,7 +162,7 @@ void CGJKSimplex::CalcDeterminants()
 
 bool CGJKSimplex::IsAffinelyIndependent() const 
 {
-    btScalar sum = 0.0;
+    float sum = 0.0;
     int i;
     Bits bit;
 
@@ -204,7 +204,7 @@ bool CGJKSimplex::IsValidSubset(Bits subset) const
 }
 
 void CGJKSimplex::ClosestPointAandB(CVector3D& pA, CVector3D& pB) const {
-    btScalar sum = 0.0;
+    float sum = 0.0;
     pA.Set(0.0, 0.0, 0.0);
     pB.Set(0.0, 0.0, 0.0);
     int i;
@@ -221,7 +221,7 @@ void CGJKSimplex::ClosestPointAandB(CVector3D& pA, CVector3D& pB) const {
     }
 
     assert(sum > 0.0);
-    btScalar factor = 1.0f / sum;
+    float factor = 1.0f / sum;
     pA *= factor;
     pB *= factor;
 }
@@ -241,7 +241,7 @@ bool CGJKSimplex::RunJohnsonAlgorithm(CVector3D& v)
 
 			v.Set(0, 0, 0);
 			m_MaxLengthSqr = 0.0;
-			btScalar sum = 0.0;
+			float sum = 0.0;
 
 			for ( int i=0, bit = 0x1; i < 4; i++, bit <<= 1 ) 
 			{
@@ -281,7 +281,7 @@ CVector3D CGJKSimplex::computeClosestPointForSubset(Bits subset)
 {
     CVector3D v(0.0, 0.0, 0.0);      // Closet point v = sum(lambda_i * points[i])
     m_MaxLengthSqr = 0.0;
-    btScalar sum = 0.0;
+    float sum = 0.0;
     int i;
     Bits bit;
 

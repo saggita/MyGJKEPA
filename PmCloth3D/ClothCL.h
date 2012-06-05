@@ -84,8 +84,8 @@ protected:
 
 public:
 	virtual void Initialize();
-	virtual bool Integrate(btScalar dt);
-	virtual bool AdvancePosition(btScalar dt);
-	virtual bool ResolveCollision(CCollisionObject& convexObject, btScalar dt);
+	virtual bool Integrate(float dt);
+	virtual bool AdvancePosition(float dt);
+	virtual bool ResolveCollision(CCollisionObject& convexObject, float dt);
 };
 

@@ -112,17 +112,17 @@ bool CCloth::Load(const char* filename)
 			// x
 			++iter;
 			sToken = (*iter);			
-			pnt.m_X = (btScalar)atof(sToken.c_str());
+			pnt.m_X = (float)atof(sToken.c_str());
 
 			// y
 			++iter;
 			sToken = (*iter);			
-			pnt.m_Y = (btScalar)atof(sToken.c_str());
+			pnt.m_Y = (float)atof(sToken.c_str());
 
 			// z
 			++iter;
 			sToken = (*iter);			
-			pnt.m_Z = (btScalar)atof(sToken.c_str());
+			pnt.m_Z = (float)atof(sToken.c_str());
 
 			CVertexCloth3D vert;
 			vert.m_Pos.Set(pnt.m_X, pnt.m_Y, pnt.m_Z);
@@ -362,13 +362,13 @@ const CVector3D& CCloth::GetGravity() const
 	return m_Gravity;
 }
 
-void CCloth::SetVertexMass(btScalar vertexMass)
+void CCloth::SetVertexMass(float vertexMass)
 {
 	m_bEqualVertexMass = true;
 
 	assert(vertexMass > 0 );
 
-	btScalar invMass =  1.0f / vertexMass;
+	float invMass =  1.0f / vertexMass;
 
 	for ( std::vector<CVertexCloth3D>::iterator iter = m_VertexArray.begin(); iter != m_VertexArray.end(); iter++ )
 	{
@@ -377,13 +377,13 @@ void CCloth::SetVertexMass(btScalar vertexMass)
 	}
 }
 
-void CCloth::SetTotalMass(btScalar totalMass)
+void CCloth::SetTotalMass(float totalMass)
 {
 	assert(totalMass > 0);
 
 	m_bEqualVertexMass = true;
 
-	btScalar invMass =  m_VertexArray.size() / totalMass;
+	float invMass =  m_VertexArray.size() / totalMass;
 
 	for ( std::vector<CVertexCloth3D>::iterator iter = m_VertexArray.begin(); iter != m_VertexArray.end(); iter++ )
 	{
@@ -750,7 +750,7 @@ int CCloth::RenderBatch(int i) const
 	return i;
 }
 
-void CCloth::ApplyForces(btScalar dt)
+void CCloth::ApplyForces(float dt)
 {
 	#pragma omp parallel for
 	for ( int i = 0; i < (int)m_VertexArray.size(); i++ )
@@ -760,7 +760,7 @@ void CCloth::ApplyForces(btScalar dt)
 	}
 }
 
-void CCloth::ApplyGravity(btScalar dt)
+void CCloth::ApplyGravity(float dt)
 {
 	#pragma omp parallel for
 	for ( int i = 0; i < (int)m_VertexArray.size(); i++ )
@@ -782,7 +782,7 @@ void CCloth::ClearForces()
 	}
 }
 
-void CCloth::ComputeNextVertexPositions(btScalar dt)
+void CCloth::ComputeNextVertexPositions(float dt)
 {
 	#pragma omp parallel for
 	for ( int i = 0; i < (int)m_VertexArray.size(); i++ )
@@ -796,7 +796,7 @@ void CCloth::ComputeNextVertexPositions(btScalar dt)
 	}
 }
 
-void CCloth::EnforceEdgeConstraints(btScalar dt)
+void CCloth::EnforceEdgeConstraints(float dt)
 {
 	m_dt = dt;
 	
@@ -813,8 +813,8 @@ void CCloth::EnforceEdgeConstraints(btScalar dt)
 
 		CVector3D vecNewSpring = vert0.m_PosNext - vert1.m_PosNext;
 
-		btScalar newLen = vecNewSpring.Length();
-		btScalar restLen = spring.GetRestLength();
+		float newLen = vecNewSpring.Length();
+		float restLen = spring.GetRestLength();
 
 		CVector3D cji = (newLen-restLen)*vecNewSpring.Normalize();
 
@@ -840,7 +840,7 @@ void CCloth::EnforceEdgeConstraints(btScalar dt)
 	}	
 }
 
-void CCloth::EnforceEdgeConstraintsBatched(btScalar dt)
+void CCloth::EnforceEdgeConstraintsBatched(float dt)
 {
 	m_dt = dt;
 	
@@ -863,8 +863,8 @@ void CCloth::EnforceEdgeConstraintsBatched(btScalar dt)
 
 			CVector3D vecNewSpring = vert0.m_PosNext - vert1.m_PosNext;
 
-			btScalar newLen = vecNewSpring.Length();
-			btScalar restLen = spring.GetRestLength();
+			float newLen = vecNewSpring.Length();
+			float restLen = spring.GetRestLength();
 
 			CVector3D cji = (newLen-restLen)*vecNewSpring.Normalize();
 
@@ -891,7 +891,7 @@ void CCloth::EnforceEdgeConstraintsBatched(btScalar dt)
 	}	
 }
 
-bool CCloth::AdvancePosition(btScalar dt)
+bool CCloth::AdvancePosition(float dt)
 {
 	m_dt = dt;
 
@@ -909,7 +909,7 @@ bool CCloth::AdvancePosition(btScalar dt)
 	return true;
 }
 
-bool CCloth::Integrate(btScalar dt)
+bool CCloth::Integrate(float dt)
 {
 	m_dt = dt;
 
@@ -927,7 +927,7 @@ bool CCloth::Integrate(btScalar dt)
 		CVertexCloth3D& vert1 = m_VertexArray[spring.GetVertexIndex(1)];
 
 		CVector3D vec = (vert1.m_Pos - vert0.m_Pos);
-		btScalar len = vec.Length();
+		float len = vec.Length();
 		CVector3D springForce = m_Kb * (len - spring.GetRestLength()) * vec.Normalize();
 
 		if ( !vert0.m_pPin )
@@ -957,7 +957,7 @@ bool CCloth::Integrate(btScalar dt)
 	return true;
 }
 
-bool CCloth::ResolveCollision(CCollisionObject& convexObject, btScalar dt)
+bool CCloth::ResolveCollision(CCollisionObject& convexObject, float dt)
 {
 	CNarrowPhaseCollisionDetection np;
 
@@ -978,29 +978,29 @@ bool CCloth::ResolveCollision(CCollisionObject& convexObject, btScalar dt)
 			CVector3D pointBW = pointColObj.GetTransform().GetTranslation(); // it is a point object. 
 			CVector3D v = pointAW - pointBW;
 			CVector3D n = v.NormalizeOther();
-			btScalar d = info.penetrationDepth; // d already contains margin
-			//btScalar margin = convexObject.GetMargin();
+			float d = info.penetrationDepth; // d already contains margin
+			//float margin = convexObject.GetMargin();
 
 			// TODO:Need to know translational and angular velocities of object A.
 			CVector3D velOnPointAW(0, 0, 0);
 			
 			// critical relative velocity to separate the vertex and object
-			btScalar critical_relVel = d / dt;
+			float critical_relVel = d / dt;
 
 			CVector3D relVel = vert.m_Vel-velOnPointAW;
 
 			// relative normal velocity of vertex. If positive, vertex is separating from the object.
-			btScalar relVelNLen = relVel.Dot(n);
+			float relVelNLen = relVel.Dot(n);
 			CVector3D relVelN = relVelNLen * n;
 
 			// relative tangential velocity to calculate friction
 			CVector3D relVelT = relVel - relVelN;
 
 			// friction.
-			btScalar mu = GetFrictionCoef();
+			float mu = GetFrictionCoef();
 			CVector3D dVT(0, 0, 0);
 
-			btScalar relVelTLen = relVelT.Length();
+			float relVelTLen = relVelT.Length();
 
 			if ( mu > 0 && relVelTLen > 0 )
 			{
@@ -1021,7 +1021,7 @@ bool CCloth::ResolveCollision(CCollisionObject& convexObject, btScalar dt)
 	return true;
 }
 
-void CCloth::UpdateVelocities(btScalar dt)
+void CCloth::UpdateVelocities(float dt)
 {
 	for ( unsigned int i = 0; i < m_VertexArray.size(); i++ )
 	{
@@ -1032,7 +1032,7 @@ void CCloth::UpdateVelocities(btScalar dt)
 	}
 }
 
-void CCloth::TranslateW(btScalar x, btScalar y, btScalar z)
+void CCloth::TranslateW(float x, float y, float z)
 {
 	for ( std::vector<CVertexCloth3D>::iterator iter = m_VertexArray.begin(); iter != m_VertexArray.end(); iter++ )
 	{

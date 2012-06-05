@@ -22,11 +22,11 @@ private:
 public:
 	CNarrowPhaseCollisionDetection* m_pNarrowPhase;
 
-	btScalar m_dt;
+	float m_dt;
 	int m_Substeps; // = 1
 
 	CCollisionObject* pObjectA;
-	CCloth* m_pCloth;
+	//CCloth* m_pCloth;
 	CVector3D m_Gravity;
 	int m_RenderBatchIndex;
 	bool m_bGPU; 
@@ -40,12 +40,12 @@ public:
 	bool InitCL();
 	void Create();
 	void ClearAll();
-	unsigned int Update(btScalar dt);
+	unsigned int Update(float dt);
 	void Render(bool bWireframe = false);
 
 protected:
-	unsigned int SubsUpdate(btScalar dt);
-	void ResolveCollisions(btScalar dt);
+	unsigned int SubsUpdate(float dt);
+	void ResolveCollisions(float dt);
 	
 private:
 	CWorldSimulation& operator=(const CWorldSimulation& other) { return *this; }; // private assign operator. This means you cannot use assign operator.

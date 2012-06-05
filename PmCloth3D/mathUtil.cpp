@@ -1,7 +1,7 @@
 #include "mathUtil.h"
 #include "Vector3D.h"
 
-inline btScalar clamp(btScalar val, btScalar low, btScalar high)
+inline float clamp(float val, float low, float high)
 {
 	if ( val < low )
 		return low;
@@ -12,21 +12,21 @@ inline btScalar clamp(btScalar val, btScalar low, btScalar high)
 }
 
 // http://www.gamedev.net/topic/552906-closest-point-on-triangle/
-btScalar DistanceFromPointToTriangle(const CVector3D& p, const CVector3D& p0, const CVector3D& p1, const CVector3D& p2, CVector3D* closestPointInTriangle/* = NULL*/)
+float DistanceFromPointToTriangle(const CVector3D& p, const CVector3D& p0, const CVector3D& p1, const CVector3D& p2, CVector3D* closestPointInTriangle/* = NULL*/)
 {
 	CVector3D edge0 = p1 - p0;
     CVector3D edge1 = p2 - p0;
     CVector3D v0 = p0 - p;
 
-    btScalar a = edge0.Dot( edge0 );
-    btScalar b = edge0.Dot( edge1 );
-    btScalar c = edge1.Dot( edge1 );
-    btScalar d = edge0.Dot( v0 );
-    btScalar e = edge1.Dot( v0 );
+    float a = edge0.Dot( edge0 );
+    float b = edge0.Dot( edge1 );
+    float c = edge1.Dot( edge1 );
+    float d = edge0.Dot( v0 );
+    float e = edge1.Dot( v0 );
 
-    btScalar det = a*c - b*b;
-    btScalar s = b*e - c*d;
-    btScalar t = b*d - a*e;
+    float det = a*c - b*b;
+    float s = b*e - c*d;
+    float t = b*d - a*e;
 
     if ( s + t < det )
     {
@@ -58,7 +58,7 @@ btScalar DistanceFromPointToTriangle(const CVector3D& p, const CVector3D& p0, co
         }
         else
         {
-            btScalar invDet = 1.f / det;
+            float invDet = 1.f / det;
             s *= invDet;
             t *= invDet;
         }
@@ -67,12 +67,12 @@ btScalar DistanceFromPointToTriangle(const CVector3D& p, const CVector3D& p0, co
     {
         if ( s < 0.f )
         {
-            btScalar tmp0 = b+d;
-            btScalar tmp1 = c+e;
+            float tmp0 = b+d;
+            float tmp1 = c+e;
             if ( tmp1 > tmp0 )
             {
-                btScalar numer = tmp1 - tmp0;
-                btScalar denom = a-2*b+c;
+                float numer = tmp1 - tmp0;
+                float denom = a-2*b+c;
                 s = clamp( numer/denom, 0.f, 1.f );
                 t = 1-s;
             }
@@ -86,8 +86,8 @@ btScalar DistanceFromPointToTriangle(const CVector3D& p, const CVector3D& p0, co
         {
             if ( a+d > b+e )
             {
-                btScalar numer = c+e-b-d;
-                btScalar denom = a-2*b+c;
+                float numer = c+e-b-d;
+                float denom = a-2*b+c;
                 s = clamp( numer/denom, 0.f, 1.f );
                 t = 1-s;
             }
@@ -99,8 +99,8 @@ btScalar DistanceFromPointToTriangle(const CVector3D& p, const CVector3D& p0, co
         }
         else
         {
-            btScalar numer = c+e-b-d;
-            btScalar denom = a-2*b+c;
+            float numer = c+e-b-d;
+            float denom = a-2*b+c;
             s = clamp( numer/denom, 0.f, 1.f );
             t = 1.f - s;
         }
@@ -116,7 +116,7 @@ btScalar DistanceFromPointToTriangle(const CVector3D& p, const CVector3D& p0, co
 
 // The normal vector of plane formed by p0, p1 and p2 is (p1-p0).Cross(p2-p0).Normalize().
 // If 'point' is on the positive side of plane, it returns positive distance. Otherwise, it returns negative distance. 
-btScalar SignedDistanceFromPointToPlane(const CVector3D& point, const CVector3D& p0, const CVector3D& p1, const CVector3D& p2, CVector3D* closestPointInTriangle/* = NULL*/)
+float SignedDistanceFromPointToPlane(const CVector3D& point, const CVector3D& p0, const CVector3D& p1, const CVector3D& p2, CVector3D* closestPointInTriangle/* = NULL*/)
 {
 	CVector3D n = (p1-p0).Cross(p2-p0).Normalize();
 
@@ -124,7 +124,7 @@ btScalar SignedDistanceFromPointToPlane(const CVector3D& point, const CVector3D&
 		return 0;
 	else
 	{
-		btScalar dist = (point-p0).Dot(n);
+		float dist = (point-p0).Dot(n);
 
 		if ( closestPointInTriangle )
 			*closestPointInTriangle = point - dist * n;
@@ -134,7 +134,7 @@ btScalar SignedDistanceFromPointToPlane(const CVector3D& point, const CVector3D&
 }
 
 // Assumes planeEqn[0], planeEqn[1] and planeEqn[2] forms unit normal vector.
-btScalar SignedDistanceFromPointToPlane(const CVector3D& point, const btScalar* planeEqn, CVector3D* closestPointInTriangle/* = NULL*/)
+float SignedDistanceFromPointToPlane(const CVector3D& point, const float* planeEqn, CVector3D* closestPointInTriangle/* = NULL*/)
 {
 	CVector3D n(planeEqn[0], planeEqn[1], planeEqn[2]);
 
@@ -142,7 +142,7 @@ btScalar SignedDistanceFromPointToPlane(const CVector3D& point, const btScalar* 
 		return 0;
 	else
 	{
-		btScalar dist = n.Dot(point) + planeEqn[3];
+		float dist = n.Dot(point) + planeEqn[3];
 
 		if ( closestPointInTriangle )
 			*closestPointInTriangle = point - dist * n;

@@ -17,14 +17,11 @@
 #include "NarrowPhaseCollisionDetection.h"
 #include "ConvexCollisionAlgorithm.h"
 #include "CollisionObject.h"
-#include "Hair.h"
 
 cl_context        g_cxGPUMainContext = NULL;
 cl_command_queue  g_cqGPUCommandQue = NULL;
 
-CHair g_Hair;
-
-CWorldSimulation::CWorldSimulation(void) : m_Gravity(0.0f, -9.87f, 0.0f), m_pCloth(NULL), m_RenderBatchIndex(0), m_bGPU(false)
+CWorldSimulation::CWorldSimulation(void) : m_Gravity(0.0f, -9.87f, 0.0f),/* m_pCloth(NULL),*/ m_RenderBatchIndex(0), m_bGPU(false)
 { 
 	m_Substeps = 2;
 
@@ -118,19 +115,20 @@ void CWorldSimulation::Create()
 	assert(bCLOk);
 
 	m_pNarrowPhase = new CNarrowPhaseCollisionDetection();
-	
+	m_pNarrowPhase->SetConvexCollisionAlgorithmType(CNarrowPhaseCollisionDetection::EMCC);
+
 	//-----------
 	// Object 0
 	//-----------
 	pObjectA = new CCollisionObject(m_ddcl, m_ddhost);
-	pObjectA->SetCollisionObjectType(CCollisionObject::ConvexHull);
-	pObjectA->SetMargin(0.1f); // margin should be set before Load(..) 
-	pObjectA->Load("smallGeoSphere.obj");
+	pObjectA->SetCollisionObjectType(CCollisionObject::Box);
+	pObjectA->SetMargin(0.0f); // margin should be set before Load(..) 
+	//pObjectA->Load("smallGeoSphere.obj");
 	//pObjectA->Load("box.obj");
 	//pObjectA->Load("cylinder.obj");
 	
-	pObjectA->GetTransform().GetTranslation().Set(2.0f, 4.6f, 0.0f);
-	pObjectA->SetSize(6.0f, 3.0f, 5.0f);
+	pObjectA->GetTransform().GetTranslation().Set(6.0f, 6.0f, 0.0f);
+	pObjectA->SetSize(6.0f, 3.0f, 2.0f);
 	pObjectA->SetColor(1.0f, 0.0f, 0.0f);
 	pObjectA->GetTransform().GetRotation().SetRotation(CQuaternion(CVector3D(1.0f, 1.0f, 0.0f).Normalize(), 3.141592f/3.0f));
 
@@ -141,33 +139,34 @@ void CWorldSimulation::Create()
 	pObjectB->SetCollisionObjectType(CCollisionObject::Box);
 	pObjectB->SetSize(3.0f, 4.0f, 5.0f);
 	pObjectB->SetColor(0.7f, 0.7f, 0.0f);
-	pObjectB->GetTransform().GetRotation().SetRotation(CQuaternion(CVector3D(1.0f, 0.0f, 0.0f).Normalize(), 0.0f));
-	pObjectB->GetTransform().GetTranslation().Set(2.0f, 5.5f, 0.0f);
+	pObjectB->SetMargin(0.0f);
+	//pObjectB->GetTransform().GetRotation().SetRotation(CQuaternion(CVector3D(1.0f, 0.0f, 0.0f).Normalize(), 0.0f));
+	pObjectB->GetTransform().GetTranslation().Set(2.0f, 5.0f, 0.0f);
 	//pObjectB->GetTransform().GetTranslation().Set(2.0f, 10.0f, 0.0f);
 
 	m_pNarrowPhase->AddPair(CNarrowCollisionInfo(pObjectA, pObjectB));
 
 	// cloth
-	if ( m_bGPU )
-		m_pCloth = new CClothCL();
-	else
-		m_pCloth = new CCloth();
+	//if ( m_bGPU )
+	//	m_pCloth = new CClothCL();
+	//else
+	//	m_pCloth = new CCloth();
 
-	//m_pCloth->Load("circle789.obj");
+	////m_pCloth->Load("circle789.obj");
+	////m_pCloth->Load("circle2723.obj");
 	//m_pCloth->Load("circle2723.obj");
-	m_pCloth->Load("circle2723.obj");
-	//m_pCloth->Load("circle4074.obj");	
-	m_pCloth->SetVertexMass(1.0f);
-	m_pCloth->TranslateW(0.0f, 10.0f, 0.0f);
-	m_pCloth->SetColor(0.0f, 0.0f, 0.8f);
-	m_pCloth->SetGravity(m_Gravity);
-	m_pCloth->SetKb(10.0f);
-	m_pCloth->SetKst(100.0f); // Only meaningful when IntegrateEuler(..) is used.
-	m_pCloth->SetFrictionCoef(0.0f);
-	m_pCloth->SetNumIterForConstraintSolver(5);
-	/*m_pCloth->AddPin(20);
-	m_pCloth->AddPin(500);*/
-	m_pCloth->Initialize();	
+	////m_pCloth->Load("circle4074.obj");	
+	//m_pCloth->SetVertexMass(1.0f);
+	//m_pCloth->TranslateW(0.0f, 10.0f, 0.0f);
+	//m_pCloth->SetColor(0.0f, 0.0f, 0.8f);
+	//m_pCloth->SetGravity(m_Gravity);
+	//m_pCloth->SetKb(10.0f);
+	//m_pCloth->SetKst(100.0f); // Only meaningful when IntegrateEuler(..) is used.
+	//m_pCloth->SetFrictionCoef(0.0f);
+	//m_pCloth->SetNumIterForConstraintSolver(5);
+	///*m_pCloth->AddPin(20);
+	//m_pCloth->AddPin(500);*/
+	//m_pCloth->Initialize();	
 
 	// markers
 	g_MarkerA.SetSize(0.05f, 1.5f, 1.5f);
@@ -176,10 +175,6 @@ void CWorldSimulation::Create()
 	g_MarkerB.SetColor(1.0f, 1.0f, 0.0f);
 	g_MarkerA.SetCollisionObjectType(CCollisionObject::Sphere);
 	g_MarkerB.SetCollisionObjectType(CCollisionObject::Sphere);		
-
-	// Hair
-	g_Hair.Load("C:\\AMD\\Dev\\Hair Simulation\\media\\xuan\\yukselStraighthair-dongsoo2.xuan");
-	g_Hair.SetNumIterForConstraintSolver(2);
 }
 
 void CWorldSimulation::ClearAll()
@@ -200,10 +195,10 @@ void CWorldSimulation::ClearAll()
 
 	m_pNarrowPhase = NULL;
 
-	if ( m_pCloth )
+	/*if ( m_pCloth )
 		delete m_pCloth;
 
-	m_pCloth = NULL;
+	m_pCloth = NULL;*/
 
 	if ( g_cqGPUCommandQue )
 		clReleaseCommandQueue(g_cqGPUCommandQue);
@@ -215,11 +210,11 @@ void CWorldSimulation::ClearAll()
 	
 }
 
-unsigned int CWorldSimulation::Update(btScalar dt)
+unsigned int CWorldSimulation::Update(float dt)
 {
 	int numIter = 0;
 
-	btScalar sub_dt = dt / m_Substeps;
+	float sub_dt = dt / m_Substeps;
 	m_dt = sub_dt;
 
 	for ( int i = 0; i < m_Substeps; i++ )
@@ -228,22 +223,13 @@ unsigned int CWorldSimulation::Update(btScalar dt)
 	return numIter;
 }
 
-unsigned int CWorldSimulation::SubsUpdate(btScalar dt)
+unsigned int CWorldSimulation::SubsUpdate(float dt)
 {
 	m_dt = dt;
-
-	g_Hair.Integrate(dt);
-	g_Hair.ResolveCollision(*pObjectA, dt);
-	g_Hair.AdvancePosition(dt);	
-
-	return 0;
-
-
-
-		
+	
 	if ( m_pNarrowPhase && m_pNarrowPhase->GetPairs().size() > 0 )
 	{
-		const btScalar angleRad = 0.001f;
+		const float angleRad = 0.001f;
 
 		CTransform& transA = m_pNarrowPhase->GetPairs()[0].pObjA->GetTransform();
 		CTransform& transB = m_pNarrowPhase->GetPairs()[0].pObjB->GetTransform();
@@ -256,8 +242,8 @@ unsigned int CWorldSimulation::SubsUpdate(btScalar dt)
 		//----------------------------------------------------------------------------
 		// Rotate object using local coordinate axes in the local coordinate system
 		//----------------------------------------------------------------------------
-		//transA.GetRotation() = transA.GetRotation() * CQuaternion(CVector3D(1.0f, 0.0f, 0.0f).Normalize(), angleRad);
-		//transB.GetRotation() = transB.GetRotation() * CQuaternion(CVector3D(1.0f, 0.0f, 0.0f).Normalize(), angleRad);
+		transA.GetRotation() = transA.GetRotation() * CQuaternion(CVector3D(1.0f, 0.0f, 0.0f).Normalize(), angleRad);
+		transB.GetRotation() = transB.GetRotation() * CQuaternion(CVector3D(1.0f, 0.0f, 0.0f).Normalize(), angleRad);
 
 		//-----------------------------------------------------------------------
 		// Translate using local coordinate axes in the local coordinate system
@@ -294,25 +280,20 @@ unsigned int CWorldSimulation::SubsUpdate(btScalar dt)
 		}
 	}
 
-	m_pCloth->Integrate(dt);
+	/*m_pCloth->Integrate(dt);
 	m_pCloth->ResolveCollision(*pObjectA, dt);
-	m_pCloth->AdvancePosition(dt);	
+	m_pCloth->AdvancePosition(dt);	*/
 
 	return 0;
 }
 
-void CWorldSimulation::ResolveCollisions(btScalar dt)
+void CWorldSimulation::ResolveCollisions(float dt)
 {	
 	
 }
 
 void CWorldSimulation::Render(bool bWireframe/* = false*/)
 {	
-
-	g_Hair.Render();
-
-	return;
-
 	glEnable(GL_POLYGON_OFFSET_FILL);
 	glPolygonOffset(1,1);
 
@@ -326,8 +307,8 @@ void CWorldSimulation::Render(bool bWireframe/* = false*/)
 	}
 
 	// cloth
-	m_pCloth->Render();
-	m_RenderBatchIndex = m_pCloth->RenderBatch(m_RenderBatchIndex);
+	/*m_pCloth->Render();
+	m_RenderBatchIndex = m_pCloth->RenderBatch(m_RenderBatchIndex);*/
 
 	// Markers
 	glDisable(GL_DEPTH_TEST);

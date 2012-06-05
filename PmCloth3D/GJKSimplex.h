@@ -13,13 +13,13 @@ public:
 
 private:
     CVector3D m_Points[4];			  
-    btScalar m_LengthSqr[4];			// m_LengthSqr[i] = m_Points[i].LengthSqr()
-    btScalar m_MaxLengthSqr;			// Maximum value among m_LengthSqr[i]
+    float m_LengthSqr[4];			// m_LengthSqr[i] = m_Points[i].LengthSqr()
+    float m_MaxLengthSqr;			// Maximum value among m_LengthSqr[i]
     CVector3D m_SuppPointsA[4];		  
     CVector3D m_SuppPointsB[4];		  
     CVector3D m_DiffLength[4][4];	// m_DiffLength[i][j] = m_Points[i] - m_Points[j]
-    btScalar m_DiffLengthSqr[4][4];
-	btScalar m_Det[16][4];			// Determinant 
+    float m_DiffLengthSqr[4][4];
+	float m_Det[16][4];			// Determinant 
  
 	Bits m_CurBits; 
 	unsigned int m_LastFound; // indicates a bit location found last time. It is between 0 to 3. 
@@ -36,7 +36,7 @@ public:
 	bool IsFull() const;                                                                          
     bool isEmpty() const;                                                                         
     int GetPoints(std::vector<CVector3D>& suppPointsA, std::vector<CVector3D>& suppPointsB, std::vector<CVector3D>& points) const;  
-    btScalar MaxLengthSqr() const;                                                      
+    float MaxLengthSqr() const;                                                      
     void AddPoint(const CVector3D& point, const CVector3D& suppPointA, const CVector3D& suppPointB);  
     bool IsDegenerate(const CVector3D& point) const;                                             
     bool IsAffinelyIndependent() const;                                                              
@@ -57,14 +57,14 @@ inline bool CGJKSimplex::IsFull() const
     return (m_CurBits == 0xf);
 }
 
-// Return true if the simple is empty
+// Return true if the simplex is empty
 inline bool CGJKSimplex::isEmpty() const 
 {
     return (m_CurBits == 0x0);
 }
 
 // Return the maximum squared length of a point
-inline btScalar CGJKSimplex::MaxLengthSqr() const 
+inline float CGJKSimplex::MaxLengthSqr() const 
 {
     return m_MaxLengthSqr;
 }

@@ -16,7 +16,7 @@ protected:
 
 protected:
 	// helper function to generate CollisionInfo
-	bool GenerateCollisionInfo(const CCollisionObject& objA, const CCollisionObject& objB, const CTransform &transB2A, const CGJKSimplex& simplex, CVector3D v, btScalar distSqr, CNarrowCollisionInfo* pCollisionInfo) const;
+	bool GenerateCollisionInfo(const CCollisionObject& objA, const CCollisionObject& objB, const CTransform &transB2A, const CGJKSimplex& simplex, CVector3D v, float distSqr, CNarrowCollisionInfo* pCollisionInfo) const;
 
 public:
 	CGJKAlgorithm();

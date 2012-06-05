@@ -34,7 +34,7 @@ bool CCHFAlgorithm::CheckCollision(CCollisionObject& objA, CCollisionObject& obj
 
 	float4 normal;
 	bool bNormal = objA.GetConvexHFObject()->queryDistanceWithNormal(make_float4(point.m_X, point.m_Y, point.m_Z), normal);
-	btScalar dist = objA.GetConvexHFObject()->queryDistance(make_float4(point.m_X, point.m_Y, point.m_Z));
+	float dist = objA.GetConvexHFObject()->queryDistance(make_float4(point.m_X, point.m_Y, point.m_Z));
 
 	if ( dist >= 0 )
 		return false;

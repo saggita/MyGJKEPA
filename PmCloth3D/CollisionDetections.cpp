@@ -19,19 +19,19 @@ inline CVector3D norm(const CVector3D& p1, const CVector3D& p2, const CVector3D&
 	return (p2-p1).Cross(p3-p1);
 }
 
-inline btScalar Triple(const CVector3D& a, const CVector3D& b, const CVector3D& c)
+inline float Triple(const CVector3D& a, const CVector3D& b, const CVector3D& c)
 { 
 	return a.Dot(b.Cross(c));
 }
 
-inline void SWAP(btScalar a, btScalar b) 
+inline void SWAP(float a, float b) 
 { 
-	btScalar tmp = b; 
+	float tmp = b; 
 	b = a; 
 	a = tmp; 
 }
 
-int SolveQuadraticEqn(btScalar a, btScalar b, btScalar c, btScalar roots[2])
+int SolveQuadraticEqn(float a, float b, float c, float roots[2])
 {
 	if (a == 0) 
 	{
@@ -46,22 +46,22 @@ int SolveQuadraticEqn(btScalar a, btScalar b, btScalar c, btScalar roots[2])
 		};
 	}
 
-	btScalar disc = b * b - 4.0 * a * c;
+	float disc = b * b - 4.0 * a * c;
 
 	if (disc > 0)
 	{
 		if (b == 0)
 		{
-			btScalar r = fabs (0.5 * sqrt (disc) / a);
+			float r = fabs (0.5 * sqrt (disc) / a);
 			roots[0] = -r;
 			roots[1] =  r;
 		}
 		else
 		{
-			btScalar sgnb = (b > 0 ? 1.0 : -1.0);
-			btScalar temp = -0.5 * (b + sgnb * sqrt (disc));
-			btScalar r1 = temp / a ;
-			btScalar r2 = c / temp ;
+			float sgnb = (b > 0 ? 1.0 : -1.0);
+			float temp = -0.5 * (b + sgnb * sqrt (disc));
+			float r1 = temp / a ;
+			float r2 = c / temp ;
 
 			if (r1 < r2) 
 			{
@@ -87,19 +87,19 @@ int SolveQuadraticEqn(btScalar a, btScalar b, btScalar c, btScalar roots[2])
 	return 0;
 }
 
-int SolveCubicEqn(btScalar a, btScalar b, btScalar c, btScalar roots[3])
+int SolveCubicEqn(float a, float b, float c, float roots[3])
 {
-	btScalar q = (a * a - 3.0 * b);
-	btScalar r = (2.0 * a * a * a - 9.0 * a * b + 27.0 * c);
+	float q = (a * a - 3.0 * b);
+	float r = (2.0 * a * a * a - 9.0 * a * b + 27.0 * c);
 
-	btScalar Q = q / 9.0;
-	btScalar R = r / 54.0;
+	float Q = q / 9.0;
+	float R = r / 54.0;
 
-	btScalar Q3 = Q * Q * Q;
-	btScalar R2 = R * R;
+	float Q3 = Q * Q * Q;
+	float R2 = R * R;
 
-	btScalar CR2 = 729.0 * r * r;
-	btScalar CQ3 = 2916.0 * q * q * q;
+	float CR2 = 729.0 * r * r;
+	float CQ3 = 2916.0 * q * q * q;
 
 	if (R == 0 && Q == 0)
 	{
@@ -110,7 +110,7 @@ int SolveCubicEqn(btScalar a, btScalar b, btScalar c, btScalar roots[3])
 	}
 	else if (CR2 == CQ3) 
 	{
-		btScalar sqrtQ = sqrt(Q);
+		float sqrtQ = sqrt(Q);
 
 		if (R > 0)
 		{
@@ -128,10 +128,10 @@ int SolveCubicEqn(btScalar a, btScalar b, btScalar c, btScalar roots[3])
 	}
 	else if (CR2 < CQ3) /* equivalent to R2 < Q3 */
 	{
-		btScalar sqrtQ = sqrt(Q);
-		btScalar sqrtQ3 = sqrtQ * sqrtQ * sqrtQ;
-		btScalar theta = acos(R / sqrtQ3);
-		btScalar norm = -2.0 * sqrtQ;
+		float sqrtQ = sqrt(Q);
+		float sqrtQ3 = sqrtQ * sqrtQ * sqrtQ;
+		float theta = acos(R / sqrtQ3);
+		float norm = -2.0 * sqrtQ;
 
 		roots[0] = norm * cos(theta / 3.0) - a / 3.0;
 		roots[1] = norm * cos((theta + 2.0 * PI_D) / 3.0) - a / 3.0;
@@ -153,9 +153,9 @@ int SolveCubicEqn(btScalar a, btScalar b, btScalar c, btScalar roots[3])
 	}
 	else
 	{
-		btScalar sgnR = (R >= 0 ? 1.0 : -1.0);
-		btScalar A = -sgnR * std::powf(std::abs(R) + sqrt(R2 - Q3), 1.0/3.0);
-		btScalar B = Q / A ;
+		float sgnR = (R >= 0 ? 1.0 : -1.0);
+		float A = -sgnR * std::powf(std::abs(R) + sqrt(R2 - Q3), 1.0/3.0);
+		float B = Q / A ;
 		roots[0] = A + B - a / 3.0;
 		return 1;
 	}
@@ -165,14 +165,14 @@ int SolveCubicEqn(btScalar a, btScalar b, btScalar c, btScalar roots[3])
 
 //=========================================================================
 // From ROS.org
-inline btScalar cbrt(btScalar v)
+inline float cbrt(float v)
 {
   return powf(v, 1.0 / 3.0);
 }
 
-const btScalar IEPSILON = 1e-5;
-const btScalar NEAR_ZERO_THRESHOLD = 1e-7;
-const btScalar CCD_RESOLUTION = 1e-7;
+const float IEPSILON = 1e-5;
+const float NEAR_ZERO_THRESHOLD = 1e-7;
+const float CCD_RESOLUTION = 1e-7;
 
 template<typename FPT> 
   bool roughlyEqual(FPT left, FPT right, FPT tolerance)
@@ -180,12 +180,12 @@ template<typename FPT>
   return ((left < right + tolerance) && (left > right - tolerance));
 }
 
-bool isZero(btScalar v)
+bool isZero(float v)
 {
-  return roughlyEqual(v, (btScalar)0, NEAR_ZERO_THRESHOLD);
+  return roughlyEqual(v, (float)0, NEAR_ZERO_THRESHOLD);
 }
 
-int PolySolverSolveLinear(const btScalar c[2], btScalar s[1])
+int PolySolverSolveLinear(const float c[2], float s[1])
 {
   if(isZero(c[1]))
     return 0;
@@ -193,9 +193,9 @@ int PolySolverSolveLinear(const btScalar c[2], btScalar s[1])
   return 1;
 }
 
-int PolySolverSolveQuadric(const btScalar c[3], btScalar s[2])
+int PolySolverSolveQuadric(const float c[3], float s[2])
 {
-  btScalar p, q, D;
+  float p, q, D;
 
   // make sure we have a d2 equation
 
@@ -209,7 +209,7 @@ int PolySolverSolveQuadric(const btScalar c[3], btScalar s[2])
 
   if(isZero(D))
   {
-    // one btScalar root
+    // one float root
     s[0] = s[1] = -p;
 	s[1] = s[0];
     return 1;
@@ -221,7 +221,7 @@ int PolySolverSolveQuadric(const btScalar c[3], btScalar s[2])
   else
   {
     // two real roots
-    btScalar sqrt_D = sqrt(D);
+    float sqrt_D = sqrt(D);
     s[0] = -sqrt_D - p;
     s[1] = sqrt_D - p;
 
@@ -229,12 +229,12 @@ int PolySolverSolveQuadric(const btScalar c[3], btScalar s[2])
   }
 }
 
-int PolySolverSolveCubic(const btScalar c[4], btScalar s[3])
+int PolySolverSolveCubic(const float c[4], float s[3])
 {
 
   int i, num;
-  btScalar sub, A, B, C, sq_A, p, q, cb_p, D;
-  const btScalar ONE_OVER_THREE = 1 / 3.0;
+  float sub, A, B, C, sq_A, p, q, cb_p, D;
+  const float ONE_OVER_THREE = 1 / 3.0;
 
   // make sure we have a d2 equation
   if(isZero(c[3]))
@@ -266,8 +266,8 @@ int PolySolverSolveCubic(const btScalar c[4], btScalar s[3])
     }
     else
     {
-      // one single and one btScalar solution
-      btScalar u = cbrt(-q);
+      // one single and one float solution
+      float u = cbrt(-q);
       s[0] = 2.0 * u;
       s[1] = -u;
 	  s[2] = s[1];
@@ -279,8 +279,8 @@ int PolySolverSolveCubic(const btScalar c[4], btScalar s[3])
     if(D < 0.0)
     {
       // three real solutions
-      btScalar phi = ONE_OVER_THREE * acos(-q / sqrt(-cb_p));
-      btScalar t = 2.0 * sqrt(-p);
+      float phi = ONE_OVER_THREE * acos(-q / sqrt(-cb_p));
+      float t = 2.0 * sqrt(-p);
       s[0] = t * cos(phi);
       s[1] = -t * cos(phi + PI_D / 3.0);
       s[2] = -t * cos(phi - PI_D / 3.0);
@@ -289,8 +289,8 @@ int PolySolverSolveCubic(const btScalar c[4], btScalar s[3])
     else
     {
       // one real solution
-      btScalar sqrt_D = sqrt(D);
-      btScalar u = cbrt(sqrt_D + fabs(q));
+      float sqrt_D = sqrt(D);
+      float u = cbrt(sqrt_D + fabs(q));
       if(q > 0.0)
         s[0] = - u + p / u ;
       else
@@ -324,11 +324,11 @@ int PolySolverSolveCubic(const btScalar c[4], btScalar s[3])
   return num;
 }
 
-bool ROSSolveCubicWithIntervalNewton(btScalar& l, btScalar& r, btScalar coeffs[])
+bool ROSSolveCubicWithIntervalNewton(float& l, float& r, float coeffs[])
 {
-  btScalar v2[2]= {l*l,r*r};
-  btScalar v[2]= {l,r};
-  btScalar r_backup;
+  float v2[2]= {l*l,r*r};
+  float v[2]= {l,r};
+  float r_backup;
 
   unsigned char min3, min2, min1, max3, max2, max1;
 
@@ -338,25 +338,25 @@ bool ROSSolveCubicWithIntervalNewton(btScalar& l, btScalar& r, btScalar coeffs[]
 
   // bound the cubic
 
-  btScalar minor = coeffs[3]*v2[min3]*v[min3]+coeffs[2]*v2[min2]+coeffs[1]*v[min1]+coeffs[0];
-  btScalar major = coeffs[3]*v2[max3]*v[max3]+coeffs[2]*v2[max2]+coeffs[1]*v[max1]+coeffs[0];
+  float minor = coeffs[3]*v2[min3]*v[min3]+coeffs[2]*v2[min2]+coeffs[1]*v[min1]+coeffs[0];
+  float major = coeffs[3]*v2[max3]*v[max3]+coeffs[2]*v2[max2]+coeffs[1]*v[max1]+coeffs[0];
 
   if(major<0) return false;
   if(minor>0) return false;
 
   // starting here, the bounds have opposite values
-  btScalar m = 0.5 * (r + l);
+  float m = 0.5 * (r + l);
 
   // bound the derivative
-  btScalar dminor = 3.0*coeffs[3]*v2[min3]+2.0*coeffs[2]*v[min2]+coeffs[1];
-  btScalar dmajor = 3.0*coeffs[3]*v2[max3]+2.0*coeffs[2]*v[max2]+coeffs[1];
+  float dminor = 3.0*coeffs[3]*v2[min3]+2.0*coeffs[2]*v[min2]+coeffs[1];
+  float dmajor = 3.0*coeffs[3]*v2[max3]+2.0*coeffs[2]*v[max2]+coeffs[1];
 
   if((dminor > 0)||(dmajor < 0)) // we can use Newton
   {
-    btScalar m2 = m*m;
-    btScalar fm = coeffs[3]*m2*m+coeffs[2]*m2+coeffs[1]*m+coeffs[0];
-    btScalar nl = m;
-    btScalar nu = m;
+    float m2 = m*m;
+    float fm = coeffs[3]*m2*m+coeffs[2]*m2+coeffs[1]*m+coeffs[0];
+    float nl = m;
+    float nu = m;
     if(fm>0)
     {
       nl-=(fm/dminor);
@@ -415,12 +415,12 @@ bool CCD_Filter(const CVector3D& a0, const CVector3D& b0, const CVector3D& c0, c
 	CVector3D& pa0 = d0-a0;
 	CVector3D& pa1 = d1-a1;
 
-	btScalar A = n0.Dot(pa0);
-	btScalar B = n1.Dot(pa1);
-	btScalar C = nX.Dot(pa0);
-	btScalar D = nX.Dot(pa1);
-	btScalar E = n1.Dot(pa0);
-	btScalar F = n0.Dot(pa1);
+	float A = n0.Dot(pa0);
+	float B = n1.Dot(pa1);
+	float C = nX.Dot(pa0);
+	float D = nX.Dot(pa1);
+	float E = n1.Dot(pa0);
+	float F = n0.Dot(pa1);
 
 	if ( A > 0 && B > 0 && (2*C+F) > 0 && (2*D+E) > 0 )
 		return false;
@@ -431,7 +431,7 @@ bool CCD_Filter(const CVector3D& a0, const CVector3D& b0, const CVector3D& c0, c
 	return true;
 }
 
-inline btScalar Clamp(btScalar a, btScalar l, btScalar h)
+inline float Clamp(float a, float l, float h)
 {
    if ( a < l ) 
 	   return l;
@@ -442,9 +442,9 @@ inline btScalar Clamp(btScalar a, btScalar l, btScalar h)
 }
 
 // TODO: need to add , bool bClampToNearest
-btScalar DistancePointToEdge(const CVector3D& p, const CVector3D& x0, const CVector3D& x1, btScalar& t, CVector3D& n)
+float DistancePointToEdge(const CVector3D& p, const CVector3D& x0, const CVector3D& x1, float& t, CVector3D& n)
 {
-	btScalar d = 0;
+	float d = 0;
 
 	t = Clamp((x1-p).Dot(x1-x0)/(x1-x0).LengthSqr(), 0.0, 1.0); 
 	CVector3D a = p - (t*x0 + (1.0-t)*x1);
@@ -454,23 +454,23 @@ btScalar DistancePointToEdge(const CVector3D& p, const CVector3D& x0, const CVec
 	return d;
 }
 
-btScalar DistanceEdgeToEdge(const CVector3D& x00, const CVector3D& x01, const CVector3D& x10, const CVector3D& x11, btScalar& p, btScalar& q, CVector3D& n, bool bClampToNearest/* = false*/)
+float DistanceEdgeToEdge(const CVector3D& x00, const CVector3D& x01, const CVector3D& x10, const CVector3D& x11, float& p, float& q, CVector3D& n, bool bClampToNearest/* = false*/)
 {
-	btScalar d = 0;
+	float d = 0;
 	CVector3D e0 = x00 - x01;
-	btScalar l0 = e0.Length() + 1e-30;
+	float l0 = e0.Length() + 1e-30;
 	e0 = e0 / l0;
 
 	CVector3D e1 = x11 - x10;
-	btScalar l1 = e1.Dot(e0);
+	float l1 = e1.Dot(e0);
 	e1 = e1 - l1*e0;
-	btScalar l2 = e1.Length() + 1e-30;
+	float l2 = e1.Length() + 1e-30;
 	e1 = e1 / l2;
 	CVector3D e2 = x11 - x01;
 	q = e1.Dot(e2)/l2;
 	p = (e0.Dot(e2)-l1*q)/l0;
 
-	btScalar tol = 1e-8;
+	float tol = 1e-8;
 
 	if ( p < -tol )
 	{
@@ -481,7 +481,7 @@ btScalar DistanceEdgeToEdge(const CVector3D& x00, const CVector3D& x01, const CV
 				d = DistancePointToEdge(x01, x10, x11, q, n);
 				n = (-1.0) * n;
 
-				btScalar dd = DistancePointToEdge(x11, x00, x01, p, n);
+				float dd = DistancePointToEdge(x11, x00, x01, p, n);
 
 				if ( dd < d )
 					d = dd;
@@ -491,7 +491,7 @@ btScalar DistanceEdgeToEdge(const CVector3D& x00, const CVector3D& x01, const CV
 				d = DistancePointToEdge(x01, x10, x11, q, n);
 				n = (-1.0) * n;
 
-				btScalar dd = DistancePointToEdge(x10, x00, x01, p, n);
+				float dd = DistancePointToEdge(x10, x00, x01, p, n);
 
 				if ( dd < d )
 					d = dd;
@@ -506,7 +506,7 @@ btScalar DistanceEdgeToEdge(const CVector3D& x00, const CVector3D& x01, const CV
 		}
 		else // the point is not on the edge and we ignore this case when bClampToNearest == false;
 		{
-			d = std::numeric_limits<btScalar>::max();
+			d = std::numeric_limits<float>::max();
 			n = CVector3D(1.0, 0, 0); // no meaning at all.
 		}
 	}
@@ -519,7 +519,7 @@ btScalar DistanceEdgeToEdge(const CVector3D& x00, const CVector3D& x01, const CV
 				d = DistancePointToEdge(x00, x10, x11, q, n);
 				n = (-1.0) * n;
 
-				btScalar dd = DistancePointToEdge(x11, x00, x01, p, n);
+				float dd = DistancePointToEdge(x11, x00, x01, p, n);
 
 				if ( dd < d )
 					d = dd;
@@ -529,7 +529,7 @@ btScalar DistanceEdgeToEdge(const CVector3D& x00, const CVector3D& x01, const CV
 				d = DistancePointToEdge(x00, x10, x11, q, n);
 				n = (-1.0) * n;
 
-				btScalar dd = DistancePointToEdge(x10, x00, x01, p, n);
+				float dd = DistancePointToEdge(x10, x00, x01, p, n);
 
 				if ( dd < d )
 					d = dd;
@@ -544,7 +544,7 @@ btScalar DistanceEdgeToEdge(const CVector3D& x00, const CVector3D& x01, const CV
 		}
 		else // the point is not on the edge and we ignore this case when bClampToNearest == false;
 		{
-			d = std::numeric_limits<btScalar>::max();
+			d = std::numeric_limits<float>::max();
 			n = CVector3D(1.0, 0, 0); // no meaning at all.
 		}
 	}
@@ -559,7 +559,7 @@ btScalar DistanceEdgeToEdge(const CVector3D& x00, const CVector3D& x01, const CV
 			}
 			else // the point is not on the edge and we ignore this case when bClampToNearest == false;
 			{
-				d = std::numeric_limits<btScalar>::max();
+				d = std::numeric_limits<float>::max();
 				n = CVector3D(1.0, 0, 0); // no meaning at all. 
 		}
 		}
@@ -572,7 +572,7 @@ btScalar DistanceEdgeToEdge(const CVector3D& x00, const CVector3D& x01, const CV
 			}
 			else // the point is not on the edge and we ignore this case when bClampToNearest == false;
 			{
-				d = std::numeric_limits<btScalar>::max();
+				d = std::numeric_limits<float>::max();
 				n = CVector3D(1.0, 0, 0); // no meaning at all. 
 			}
 		}
@@ -597,16 +597,16 @@ btScalar DistanceEdgeToEdge(const CVector3D& x00, const CVector3D& x01, const CV
 	return d;
 }
 
-btScalar DistancePointToTriangle(const CVector3D& p, const CVector3D& x0, const CVector3D& x1, const CVector3D& x2,btScalar& a, btScalar& b, btScalar& c, CVector3D& n, bool bClampToNearest/* = false*/)
+float DistancePointToTriangle(const CVector3D& p, const CVector3D& x0, const CVector3D& x1, const CVector3D& x2,float& a, float& b, float& c, CVector3D& n, bool bClampToNearest/* = false*/)
 {
-	btScalar d = 0;	
+	float d = 0;	
 	CVector3D x02 = x0 - x2;
-	btScalar l0 = x02.Length() + 1e-30;
+	float l0 = x02.Length() + 1e-30;
 	x02 = x02 / l0;
 	CVector3D x12 = x1 - x2;
-    btScalar l1 = x12.Dot(x02);
+    float l1 = x12.Dot(x02);
 	x12 = x12 - l1*x02;
-	btScalar l2 = x12.Length() + 1e-30;
+	float l2 = x12.Length() + 1e-30;
     x12 = x12 / l2;
     CVector3D px2 = p - x2;
 
@@ -614,7 +614,7 @@ btScalar DistancePointToTriangle(const CVector3D& p, const CVector3D& x0, const 
 	a = (x02.Dot(px2)-l1*b) / l0;
 	c = 1 - a - b;
 
-	btScalar tol = 1e-8;
+	float tol = 1e-8;
 
 	if ( a >= -tol && b >= -tol && c >= -tol )
 	{
@@ -637,7 +637,7 @@ btScalar DistancePointToTriangle(const CVector3D& p, const CVector3D& x0, const 
 	{
 		if ( !bClampToNearest )
 		{
-			d = std::numeric_limits<btScalar>::max();
+			d = std::numeric_limits<float>::max();
 			n = CVector3D(1.0, 0, 0); // no meaning at all. 
 
 			a = -1.0; 
@@ -646,7 +646,7 @@ btScalar DistancePointToTriangle(const CVector3D& p, const CVector3D& x0, const 
 		}
 		else
 		{
-			btScalar t;
+			float t;
 
 			if ( a > 0 )
 			{ 
@@ -656,7 +656,7 @@ btScalar DistancePointToTriangle(const CVector3D& p, const CVector3D& x0, const 
 				b = 1.0 - t; 
 				c = 0; 
 
-				btScalar dd = DistancePointToEdge(p, x0, x2, t, n);
+				float dd = DistancePointToEdge(p, x0, x2, t, n);
 
 				if ( dd < d )
 				{
@@ -674,7 +674,7 @@ btScalar DistancePointToTriangle(const CVector3D& p, const CVector3D& x0, const 
 				 b = 1.0 - t; 
 				 c = 0; 
          
-				 btScalar dd = DistancePointToEdge(p, x1, x2, t, n);
+				 float dd = DistancePointToEdge(p, x1, x2, t, n);
 
 				 if ( dd < d )
 				 {
@@ -692,7 +692,7 @@ btScalar DistancePointToTriangle(const CVector3D& p, const CVector3D& x0, const 
 				b = t; 
 				c = 1.0 - t; 
 
-				btScalar dd = DistancePointToEdge(p, x0, x2, t, n);
+				float dd = DistancePointToEdge(p, x0, x2, t, n);
 
 				if ( dd < d )			
 				{
@@ -710,7 +710,7 @@ btScalar DistancePointToTriangle(const CVector3D& p, const CVector3D& x0, const 
 
 bool ContinuousCollisionEdgeAndEdge(const CVector3D& x00_old, const CVector3D& x01_old, const CVector3D& x10_old, const CVector3D& x11_old,
 	                      const CVector3D& x00_new, const CVector3D& x01_new, const CVector3D& x10_new, const CVector3D& x11_new, 
-						  btScalar& p, btScalar& q, CVector3D& n, btScalar& time)
+						  float& p, float& q, CVector3D& n, float& time)
 {
 	if ( !CCD_Filter(x00_old, x01_old, x10_old, x11_old, x00_new, x01_new, x10_new, x11_new) )
 		return false;
@@ -727,12 +727,12 @@ bool ContinuousCollisionEdgeAndEdge(const CVector3D& x00_old, const CVector3D& x
 	CVector3D v20 = (x10_new - x10_old) - v00;
 	CVector3D v30 = (x11_new - x11_old) - v00;
 
-	btScalar A = Triple(v10, v20, v30);
-	btScalar B = Triple(x10, v20, v30) + Triple(v10, x20, v30) + Triple(v10, v20, x30);
-	btScalar C = Triple(x10, x20, v30) + Triple(x10, v20, x30) + Triple(v10, x20, x30);
-	btScalar D = Triple(x10, x20, x30);
+	float A = Triple(v10, v20, v30);
+	float B = Triple(x10, v20, v30) + Triple(v10, x20, v30) + Triple(v10, v20, x30);
+	float C = Triple(x10, x20, v30) + Triple(x10, v20, x30) + Triple(v10, x20, x30);
+	float D = Triple(x10, x20, x30);
 
-	btScalar root[3];
+	float root[3];
 	int num = 0;
 
 	//if ( A == 0 )
@@ -744,12 +744,12 @@ bool ContinuousCollisionEdgeAndEdge(const CVector3D& x00_old, const CVector3D& x
 	//	num = SolveCubicEqn(B/A, C/A, D/A, root);
 	//}
 
-	btScalar coeffs[4];
+	float coeffs[4];
 	coeffs[3] = A, coeffs[2] = B, coeffs[1] = C, coeffs[0] = D;
 	/*num = PolySolverSolveCubic(coeffs, root);*/
 
-	btScalar l = 0;
-	btScalar r = 1.0;
+	float l = 0;
+	float r = 1.0;
 	if ( ROSSolveCubicWithIntervalNewton(l, r, coeffs) )
 	{
 		num = 1;
@@ -758,7 +758,7 @@ bool ContinuousCollisionEdgeAndEdge(const CVector3D& x00_old, const CVector3D& x
 
 	for ( int i = 0; i < num; i++ )
 	{
-		btScalar t = root[i];
+		float t = root[i];
 
 		if ( t < -1e-8 || t > 1.0 + 1e-8 )
 			continue;
@@ -768,7 +768,7 @@ bool ContinuousCollisionEdgeAndEdge(const CVector3D& x00_old, const CVector3D& x
 		CVector3D x10t = (1.0-t)*x10_old + t*x10_new;
 		CVector3D x11t = (1.0-t)*x11_old + t*x11_new;
 
-		btScalar d = DistanceEdgeToEdge(x00t, x01t, x10t, x11t, p, q, n, false);
+		float d = DistanceEdgeToEdge(x00t, x01t, x10t, x11t, p, q, n, false);
 
 		//if ( 0 <= p && p <= 1.0 && 0 <= q && q <= 1.0 )
 		if ( d <= 1e-8 )
@@ -805,7 +805,7 @@ bool ContinuousCollisionEdgeAndEdge(const CVector3D& x00_old, const CVector3D& x
 */
 bool ContinuousCollisionPointToTriangle(const CVector3D& p_old, const CVector3D& x0_old, const CVector3D& x1_old, const CVector3D& x2_old,
 				                const CVector3D& p_new, const CVector3D& x0_new, const CVector3D& x1_new, const CVector3D& x2_new,
-								btScalar& a, btScalar& b, btScalar& c, CVector3D& n, btScalar& time)
+								float& a, float& b, float& c, CVector3D& n, float& time)
 {
 	if ( !CCD_Filter(x0_old, x1_old, x2_old, p_old, x0_new, x1_new, x2_new, p_new) )
 		return false;
@@ -822,12 +822,12 @@ bool ContinuousCollisionPointToTriangle(const CVector3D& p_old, const CVector3D&
 		CVector3D v20 = (x1_new - x1_old) - (p_new - p_old);
 		CVector3D v30 = (x2_new - x2_old) - (p_new - p_old);
 
-		btScalar A = Triple(v10, v20, v30);
-		btScalar B = Triple(x10, v20, v30) + Triple(v10, x20, v30) + Triple(v10, v20, x30);
-		btScalar C = Triple(x10, x20, v30) + Triple(x10, v20, x30) + Triple(v10, x20, x30);
-		btScalar D = Triple(x10, x20, x30);
+		float A = Triple(v10, v20, v30);
+		float B = Triple(x10, v20, v30) + Triple(v10, x20, v30) + Triple(v10, v20, x30);
+		float C = Triple(x10, x20, v30) + Triple(x10, v20, x30) + Triple(v10, x20, x30);
+		float D = Triple(x10, x20, x30);
 
-		btScalar root[3];
+		float root[3];
 		int num = 0;
 
 		//if ( A == 0 )
@@ -840,15 +840,15 @@ bool ContinuousCollisionPointToTriangle(const CVector3D& p_old, const CVector3D&
 		//	//num = Solve3CubicBullet(A, B, C, D, root);
 		//}
 
-		btScalar coeffs[4];
+		float coeffs[4];
 		coeffs[3] = A, coeffs[2] = B, coeffs[1] = C, coeffs[0] = D;
 		//num = PolySolverSolveCubic(coeffs, root);
 
 		//num = cubicRoots(B/A, C/A, D/A, root);
 
 	
-		btScalar l = 0;
-		btScalar r = 1.0;
+		float l = 0;
+		float r = 1.0;
 		if ( ROSSolveCubicWithIntervalNewton(l, r, coeffs) )
 		{
 			num = 1;
@@ -857,7 +857,7 @@ bool ContinuousCollisionPointToTriangle(const CVector3D& p_old, const CVector3D&
 
 		for ( int i = 0; i < num; i++ )
 		{
-			btScalar t = root[i];
+			float t = root[i];
 
 			if ( t < -1e-8 || t > 1.0 + 1e-8 )
 				continue;
@@ -867,7 +867,7 @@ bool ContinuousCollisionPointToTriangle(const CVector3D& p_old, const CVector3D&
 			CVector3D x1 = (1.0-t)*x1_old + t*x1_new;
 			CVector3D x2 = (1.0-t)*x2_old + t*x2_new;
 
-			btScalar d = DistancePointToTriangle(p, x0, x1, x2, a, b, c, n, false);
+			float d = DistancePointToTriangle(p, x0, x1, x2, a, b, c, n, false);
 
 			if ( a >= 0 && b >= 0 && c >= 0 ) // if the intersecting point is inside of triangle
 			{

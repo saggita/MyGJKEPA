@@ -18,7 +18,7 @@ public:
 	// Compiler provided copy constructor 'CNarrowCollisionInfo(CNarrowCollisionInfo& )' will be good enough.
 
 	CNarrowCollisionInfo(ICollidable* pObjA, ICollidable* pObjB, bool bIntersect, const CVector3D& witnessPntA, 
-		const CVector3D& witnessPntB, btScalar penetrationDepth) : pObjA(pObjA->GetCollisionObject()), pObjB(pObjB->GetCollisionObject()), bIntersect(bIntersect), 
+		const CVector3D& witnessPntB, float penetrationDepth) : pObjA(pObjA->GetCollisionObject()), pObjB(pObjB->GetCollisionObject()), bIntersect(bIntersect), 
 																				  witnessPntA(witnessPntA), witnessPntB(witnessPntB), 
 																				  penetrationDepth(penetrationDepth) {}
 
@@ -30,8 +30,8 @@ public:
 	bool bIntersect;
 	CVector3D witnessPntA; // clostest point in object A in local space of object A
 	CVector3D witnessPntB; // clostest point in object B in local space of object B
-	btScalar proximityDistance; 
-	btScalar penetrationDepth; // must be positive in case bIntersect is true.
+	float proximityDistance; 
+	float penetrationDepth; // must be positive in case bIntersect is true.
 
 	// Compiler provided assign operator(=) will be good enough.
 };
@@ -39,7 +39,7 @@ public:
 class CNarrowPhaseCollisionDetection
 {
 public:
-	enum CollisionAlgorithmType { GJK_EPA, BIM, CHF };
+	enum CollisionAlgorithmType { GJK_EPA, BIM, CHF, EMCC };
 
 	CNarrowPhaseCollisionDetection(void);
 	virtual ~CNarrowPhaseCollisionDetection(void);

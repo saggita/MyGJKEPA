@@ -14,7 +14,7 @@
 #define BarrelVtxCount2 57
 #define BarrelIndexCount 60
 
-static btScalar BarrelVtx2[] = {
+static float BarrelVtx2[] = {
 0.0f,-0.5f,0.0f,				0.0f,-1.0f,0.0f,
 0.282362f,-0.5f,-0.205148f,     0.0f,-1.0f,0.0f,
 0.349018f,-0.5f,0.0f,           0.0f,-1.0f,0.0f,
@@ -138,6 +138,46 @@ static int BarrelIdx[] = {
 44,26,47,
 };
 
+CTriangleFace::CTriangleFace()
+{
+	for ( int i = 0; i < 3; i++ )
+	{
+		m_IndexVrx[i] = -1;
+		m_IndexEdge[i] = -1;			
+	}
+		
+	m_Index = -1;
+}
+
+CTriangleFace::CTriangleFace(const CTriangleFace& other)
+{
+	for ( int i = 0; i < 3; i++ )
+	{
+		m_IndexVrx[i] = other.m_IndexVrx[i];
+		m_IndexEdge[i] = other.m_IndexEdge[i];
+	}
+
+	m_Index = other.m_Index;
+}
+
+CTriangleFace::~CTriangleFace() 
+{
+}
+
+CTriangleFace& CTriangleFace::operator=(const CTriangleFace& other)
+{
+	for ( int i = 0; i < 3; i++ )
+	{
+		m_IndexVrx[i] = other.m_IndexVrx[i];
+		m_IndexEdge[i] = other.m_IndexEdge[i];
+	}
+
+	m_Index = other.m_Index;
+	return (*this);
+}
+
+
+
 CCollisionObject::CCollisionObject() : m_HalfExtent(1.0), m_Margin(0.01), 
 																   m_pConvexHeightField(NULL), m_bLoaded(false),
 																   m_ddcl(NULL), m_ddhost(NULL)
@@ -161,6 +201,12 @@ CCollisionObject::~CCollisionObject(void)
 	//delete m_pBulletColObj;
 
 	delete m_pConvexHeightField;
+}
+
+bool CCollisionObject::Create()
+{
+
+	return true;
 }
 
 const CTransform& CCollisionObject::GetTransform() const 
@@ -225,10 +271,10 @@ void CCollisionObject::SetCollisionObjectType(CollisionObjectType collisionObjec
 				indices[1] = BarrelIdx[i*3+1];
 				indices[2] = BarrelIdx[i*3+2];
 			
-				TriangleFace face;
+				CTriangleFace face;
 
 				for ( int i = 0; i < 3; i++ )
-					face.indices[i] = indices[i];
+					face.SetVertexIndex(i, indices[i]);
 
 				m_Faces.push_back(face);
 			}
@@ -236,7 +282,7 @@ void CCollisionObject::SetCollisionObjectType(CollisionObjectType collisionObjec
 	}
 }
 
-CVector3D CCollisionObject::GetLocalSupportPoint(const CVector3D& dir, btScalar margin/* = 0*/) const
+CVector3D CCollisionObject::GetLocalSupportPoint(const CVector3D& dir, float margin/* = 0*/) const
 {
 	assert(margin >= 0.0);
 
@@ -255,7 +301,7 @@ CVector3D CCollisionObject::GetLocalSupportPoint(const CVector3D& dir, btScalar 
 	}
 	else if ( m_CollisionObjectType == Sphere )
 	{
-		btScalar radius = m_HalfExtent.m_X;
+		float radius = m_HalfExtent.m_X;
 
 		if ( dir.LengthSqr() > 0.0 )
 			supportPoint = (radius + margin) * dir.NormalizeOther();
@@ -270,19 +316,19 @@ CVector3D CCollisionObject::GetLocalSupportPoint(const CVector3D& dir, btScalar 
 	}
 	else if ( m_CollisionObjectType == Cone )
 	{
-		btScalar radius = m_HalfExtent.m_X;
-		btScalar halfHeight = 2.0*m_HalfExtent.m_Y;
-		btScalar sinTheta = radius / (sqrt(radius * radius + 4 * halfHeight * halfHeight));
+		float radius = m_HalfExtent.m_X;
+		float halfHeight = 2.0*m_HalfExtent.m_Y;
+		float sinTheta = radius / (sqrt(radius * radius + 4 * halfHeight * halfHeight));
 		const CVector3D& v = dir;
-		btScalar sinThetaTimesLengthV = sinTheta * v.Length();
+		float sinThetaTimesLengthV = sinTheta * v.Length();
 
 		if ( v.m_Y >= sinThetaTimesLengthV) {
 			supportPoint = CVector3D(0.0, halfHeight, 0.0);
 		}
 		else {
-			btScalar projectedLength = sqrt(v.m_X * v.m_X + v.m_Z * v.m_Z);
+			float projectedLength = sqrt(v.m_X * v.m_X + v.m_Z * v.m_Z);
 			if (projectedLength > 1e-10) {
-				btScalar d = radius / projectedLength;
+				float d = radius / projectedLength;
 				supportPoint = CVector3D(v.m_X * d, -halfHeight, v.m_Z * d);
 			}
 			else {
@@ -301,12 +347,12 @@ CVector3D CCollisionObject::GetLocalSupportPoint(const CVector3D& dir, btScalar 
 	}
 	else if ( m_CollisionObjectType == ConvexHull )
 	{
-		btScalar maxDot = -SIMD_INFINITY;
+		float maxDot = -FLT_MAX;
 	
 		for ( int i = 0; i < (int)m_Vertices.size(); i++ )
 		{
 			const CVector3D& vertex = m_Vertices[i];
-			btScalar dot = vertex.Dot(dir);
+			float dot = vertex.Dot(dir);
 
 			if ( dot > maxDot )
 			{
@@ -335,7 +381,7 @@ void CCollisionObject::Render(bool bWireframe/* = false*/) const
 		GLdouble val[16];
 		memset(val, 0, sizeof(GLdouble)*16);
 		
-		btScalar x, y, z;
+		float x, y, z;
 		x = m_HalfExtent.m_X;
 		y = x;
 		z = y;
@@ -386,7 +432,7 @@ void CCollisionObject::Render(bool bWireframe/* = false*/) const
 		GLdouble val[16];
 		memset(val, 0, sizeof(GLdouble)*16);
 		
-		btScalar x, y, z;
+		float x, y, z;
 		x = 2.0* m_HalfExtent.m_X;
 		y = 2.0* m_HalfExtent.m_Y;
 		z = 2.0* m_HalfExtent.m_Z;
@@ -434,7 +480,7 @@ void CCollisionObject::Render(bool bWireframe/* = false*/) const
 		GLdouble val[16];
 		memset(val, 0, sizeof(GLdouble)*16);
 		
-		btScalar x, y, z;
+		float x, y, z;
 		x = 1.0;
 		y = 1.0;
 		z = 1.0;
@@ -463,7 +509,7 @@ void CCollisionObject::Render(bool bWireframe/* = false*/) const
 		GLdouble val[16];
 		memset(val, 0, sizeof(GLdouble)*16);
 		
-		btScalar x, y, z;
+		float x, y, z;
 		x = 1.0;
 		y = 1.0;
 		z = 1.0;
@@ -488,16 +534,16 @@ void CCollisionObject::Render(bool bWireframe/* = false*/) const
 			// triangles
 			for ( int i = 0; i < (int)m_Faces.size(); i++ )
 			{
-				const TriangleFace& face = m_Faces[i];
+				const CTriangleFace& face = m_Faces[i];
 			
-				CVector3D normal(face.planeEqn[0], face.planeEqn[1], face.planeEqn[2]);
+				CVector3D normal(face.PlaneEquation()[0], face.PlaneEquation()[1], face.PlaneEquation()[2]);
 				glNormal3d(normal.m_X, normal.m_Y, normal.m_Z);
 
 				glBegin(GL_TRIANGLES);
 			
 				for ( int j = 0; j < 3; j++ )
 				{
-					const CVector3D& vertex = m_Vertices[face.indices[j]];
+					const CVector3D& vertex = m_Vertices[face.GetVertexIndex(j)];
 				
 					glVertex3d(vertex.m_X, vertex.m_Y, vertex.m_Z);
 				}
@@ -513,15 +559,15 @@ void CCollisionObject::Render(bool bWireframe/* = false*/) const
 
 		for ( int i = 0; i < (int)m_Faces.size(); i++ )
 		{
-			const TriangleFace& face = m_Faces[i];
+			const CTriangleFace& face = m_Faces[i];
 
 			for ( int j = 0; j < 3; j++ )
 			{
-				const CVector3D& vertex = m_Vertices[face.indices[j]];
+				const CVector3D& vertex = m_Vertices[face.GetVertexIndex(j)];
 				glVertex3d(vertex.m_X, vertex.m_Y, vertex.m_Z);
 			}
 
-			const CVector3D& vertex = m_Vertices[face.indices[0]];
+			const CVector3D& vertex = m_Vertices[face.GetVertexIndex(0)];
 			glVertex3d(vertex.m_X, vertex.m_Y, vertex.m_Z);
 
 			// normal
@@ -564,6 +610,7 @@ bool CCollisionObject::Load(const char* filename)
 	m_Vertices.clear();
 	m_Normals.clear();
 	m_Faces.clear();
+	m_Edges.clear();
 
 	// Loading wavefront obj file.
 	ifstream inFile(filename);
@@ -597,17 +644,17 @@ bool CCollisionObject::Load(const char* filename)
 			// x
 			++iter;
 			sToken = (*iter);			
-			pnt.m_X = (btScalar)atof(sToken.c_str());
+			pnt.m_X = (float)atof(sToken.c_str());
 
 			// y
 			++iter;
 			sToken = (*iter);			
-			pnt.m_Y = (btScalar)atof(sToken.c_str());
+			pnt.m_Y = (float)atof(sToken.c_str());
 
 			// z
 			++iter;
 			sToken = (*iter);			
-			pnt.m_Z = (btScalar)atof(sToken.c_str());
+			pnt.m_Z = (float)atof(sToken.c_str());
 
 			m_Vertices.push_back(pnt);
 		}
@@ -618,23 +665,23 @@ bool CCollisionObject::Load(const char* filename)
 			// x
 			++iter;
 			sToken = (*iter);			
-			n.m_X = (btScalar)atof(sToken.c_str());
+			n.m_X = (float)atof(sToken.c_str());
 
 			// y
 			++iter;
 			sToken = (*iter);			
-			n.m_Y = (btScalar)atof(sToken.c_str());
+			n.m_Y = (float)atof(sToken.c_str());
 
 			// z
 			++iter;
 			sToken = (*iter);			
-			n.m_Z = (btScalar)atof(sToken.c_str());
+			n.m_Z = (float)atof(sToken.c_str());
 
 			m_Normals.push_back(n);
 		}
 		else if ( sToken == "f" ) // face
 		{
-			TriangleFace tri;
+			CTriangleFace tri;
 			vector<string> sTokens2;
 
 			int i = 0;
@@ -647,39 +694,85 @@ bool CCollisionObject::Load(const char* filename)
 
 				if ( numFound > 0 )
 				{
-					tri.indices[i++] = atoi(sTokens2[0].c_str())-1;
+					tri.SetVertexIndex(i++, atoi(sTokens2[0].c_str())-1);
 
 					//if ( numFound == 3 )
 					//	tri.m_IndexNormalVec = atoi(sTokens2[2].c_str());
 				}
 				else if ( numFound == 0 && sToken != "" )
 				{
-					tri.indices[i++] = atoi(sToken.c_str())-1;
+					tri.SetVertexIndex(i++, atoi(sToken.c_str())-1);
 				}
 			}		
 			
+			tri.SetIndex((int)m_Faces.size());
 			m_Faces.push_back(tri);	
 		}		
 	}
 
 	inFile.close();
 
+	//-------
+	// edges
+	//-------
+	for ( int i = 0; i < (int)m_Faces.size(); i++ )
+	{
+		CTriangleFace& tri = m_Faces[i];
+
+		for ( int i = 0; i < 3; i++ )
+		{
+			int j = ((i != 2) ? i+1 : 0);
+
+			CEdge edge(tri.GetVertexIndex(i), tri.GetVertexIndex(j));
+
+			vector<CEdge>::iterator iterEdge = std::find(m_Edges.begin(), m_Edges.end(), edge);
+
+			if ( iterEdge == m_Edges.end() )
+			{
+				edge.SetTriangleIndex(0, tri.GetIndex());
+
+				edge.SetIndex((int)m_Edges.size());
+				m_Edges.push_back(edge);
+			}
+			else
+				(*iterEdge).SetTriangleIndex(1, tri.GetIndex());
+		}		
+	}
+
+	for ( int i = 0; i < (int)m_Faces.size(); i++ )
+	{
+		CTriangleFace& tri = m_Faces[i];
+
+		for ( int i = 0; i < 3; i++ )
+		{
+			int j = ((i != 2) ? i+1 : 0);
+
+			CEdge edge(tri.GetVertexIndex(i), tri.GetVertexIndex(j));	
+			vector<CEdge>::iterator iterEdge = std::find(m_Edges.begin(), m_Edges.end(), edge);
+
+			if ( iterEdge == m_Edges.end() )
+				assert(0); // must not reach here!
+
+			tri.SetEdgeIndex(i, (*iterEdge).GetIndex());
+		}		
+	}
+
 	// Compute plane equation for faces.
 	for ( int i = 0; i < (int)m_Faces.size(); i++ )
 	{
-		TriangleFace& face = m_Faces[i];
+		CTriangleFace& face = m_Faces[i];
 
-		const CVector3D& p0 = m_Vertices[face.indices[0]];
-		const CVector3D& p1 = m_Vertices[face.indices[1]];
-		const CVector3D& p2 = m_Vertices[face.indices[2]];
+		const CVector3D& p0 = m_Vertices[face.GetVertexIndex(0)];
+		const CVector3D& p1 = m_Vertices[face.GetVertexIndex(1)];
+		const CVector3D& p2 = m_Vertices[face.GetVertexIndex(2)];
 
 		CVector3D n = (p1-p0).Cross(p2-p0).Normalize();
 		double d = -n.Dot(p0) - m_Margin;
 
-		face.planeEqn[0] = n.m_X;
-		face.planeEqn[1] = n.m_Y;
-		face.planeEqn[2] = n.m_Z;
-		face.planeEqn[3] = d;
+		face.PlaneEquation()[0] = n.m_X;
+		face.PlaneEquation()[1] = n.m_Y;
+		face.PlaneEquation()[2] = n.m_Z;
+		face.PlaneEquation()[3] = d;
 	}
 
 	if ( m_pConvexHeightField )
@@ -689,10 +782,10 @@ bool CCollisionObject::Load(const char* filename)
 
 	for ( int i=0; i < (int)m_Faces.size();i++ )
 	{
-		eqn[i].x = m_Faces[i].planeEqn[0];
-		eqn[i].y = m_Faces[i].planeEqn[1];
-		eqn[i].z = m_Faces[i].planeEqn[2];
-		eqn[i].w = m_Faces[i].planeEqn[3];
+		eqn[i].x = m_Faces[i].PlaneEquation()[0];
+		eqn[i].y = m_Faces[i].PlaneEquation()[1];
+		eqn[i].z = m_Faces[i].PlaneEquation()[2];
+		eqn[i].w = m_Faces[i].PlaneEquation()[3];
 	}
 	
 	m_pConvexHeightField = new ConvexHeightField(eqn, m_Faces.size());
@@ -717,22 +810,22 @@ void CCollisionObject::VisualizeHF()
 
 	srand(0);
 	
-	btScalar del = 0.01;
+	float del = 0.01;
 	m_VisualizedPoints.reserve(0.5 * (1.0/(del*del)) * m_Faces.size());
 
 	for ( int i = 0; i < (int)m_Faces.size(); i++ )
 	{
-		const TriangleFace& face = m_Faces[i];
+		const CTriangleFace& face = m_Faces[i];
 
-		const CVector3D& p0 = m_Vertices[face.indices[0]];
-		const CVector3D& p1 = m_Vertices[face.indices[1]];
-		const CVector3D& p2 = m_Vertices[face.indices[2]];
+		const CVector3D& p0 = m_Vertices[face.GetVertexIndex(0)];
+		const CVector3D& p1 = m_Vertices[face.GetVertexIndex(1)];
+		const CVector3D& p2 = m_Vertices[face.GetVertexIndex(2)];
 		
-		for ( btScalar a = 0; a <= 1.0; a += del )
+		for ( float a = 0; a <= 1.0; a += del )
 		{
-			for ( btScalar b = 0; b <= 1.0; b += del )
+			for ( float b = 0; b <= 1.0; b += del )
 			{
-				btScalar c = 1.0 - a - b;
+				float c = 1.0 - a - b;
 
 				if ( 0 <= c && c <= 1.0 )
 				{
@@ -750,7 +843,7 @@ void CCollisionObject::VisualizeHF()
 
 		float4 normal;
 		bool bNormal = m_pConvexHeightField->queryDistanceWithNormal(make_float4(point.m_X, point.m_Y, point.m_Z), normal);
-		btScalar dist = m_pConvexHeightField->queryDistance(make_float4(point.m_X, point.m_Y, point.m_Z));
+		float dist = m_pConvexHeightField->queryDistance(make_float4(point.m_X, point.m_Y, point.m_Z));
 
 		CVector3D closestPoint =  (point + CVector3D(normal.x, normal.y, normal.z) * (-dist));
 

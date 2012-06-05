@@ -19,15 +19,15 @@ private:
 	CEPATriangle* m_AdjacentTriangles[3];
 	CEPAEdge* m_Edges[3];
 	bool m_bObsolete;
-	btScalar m_Det;
+	float m_Det;
 	
 	CVector3D m_ClosestPointToOrigin; 
 
-	btScalar m_Lambda1; 
-	btScalar m_Lambda2;
+	float m_Lambda1; 
+	float m_Lambda2;
 
 	// squared distance to origin
-	btScalar m_DistSqr; // = m_ClosestPointToOrigin.LenghSqr()
+	float m_DistSqr; // = m_ClosestPointToOrigin.LenghSqr()
 	
 public:
 
@@ -49,7 +49,7 @@ public:
 	}
 
 	void SetAdjacentEdge(int index, CEPAEdge& EPAEdge);
-	btScalar GetDistSqr() const { return m_DistSqr; }
+	float GetDistSqr() const { return m_DistSqr; }
 	bool IsObsolete() const { return m_bObsolete; }
 	void SetObsolete(bool bObsolete) { m_bObsolete = bObsolete; }	
 	const CVector3D& GetClosestPoint() const { return m_ClosestPointToOrigin; }

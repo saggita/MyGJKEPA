@@ -22,7 +22,7 @@ CMatrix33::CMatrix33(const CMatrix33& other)
 			e[i][j] = other.e[i][j];
 }
 
-CMatrix33::CMatrix33(btScalar e00, btScalar e01, btScalar e02, btScalar e10, btScalar e11, btScalar e12, btScalar e20, btScalar e21, btScalar e22)
+CMatrix33::CMatrix33(float e00, float e01, float e02, float e10, float e11, float e12, float e20, float e21, float e22)
 {
 	e[0][0] = e00;
 	e[0][1] = e01;
@@ -37,7 +37,7 @@ CMatrix33::CMatrix33(btScalar e00, btScalar e01, btScalar e02, btScalar e10, btS
 	e[2][2] = e22;
 }
 
-CMatrix33::CMatrix33(btScalar a)
+CMatrix33::CMatrix33(float a)
 {
 	for ( int i = 0; i < 3; i++ )
 		for ( int j = 0; j < 3; j++ )
@@ -63,7 +63,7 @@ void CMatrix33::SetIdentity()
 	e[2][2] = 1.0;
 }
 
-btScalar CMatrix33::GetElement(int i, int j) const
+float CMatrix33::GetElement(int i, int j) const
 {
 	assert(0 <= i && i < 3);
 	assert(0 <= i && j < 3);
@@ -71,7 +71,7 @@ btScalar CMatrix33::GetElement(int i, int j) const
 	return e[i][j];
 }
 
-void CMatrix33::SetElement(int i, int j, btScalar val)
+void CMatrix33::SetElement(int i, int j, float val)
 {
 	assert(0 <= i && i < 3);
 	assert(0 <= i && j < 3);
@@ -79,7 +79,7 @@ void CMatrix33::SetElement(int i, int j, btScalar val)
 	e[i][j] = val;
 }
 
-void CMatrix33::Set(btScalar e00, btScalar e01, btScalar e02, btScalar e10, btScalar e11, btScalar e12, btScalar e20, btScalar e21, btScalar e22)
+void CMatrix33::Set(float e00, float e01, float e02, float e10, float e11, float e12, float e20, float e21, float e22)
 {
 	e[0][0] = e00;
 	e[0][1] = e01;
@@ -94,11 +94,11 @@ void CMatrix33::Set(btScalar e00, btScalar e01, btScalar e02, btScalar e10, btSc
 	e[2][2] = e22;
 }
 
-void CMatrix33::SetRotation(const CVector3D& axis, btScalar ang)
+void CMatrix33::SetRotation(const CVector3D& axis, float ang)
 {
-	btScalar nx = axis.m_X; 
-	btScalar ny = axis.m_Y;
-	btScalar nz = axis.m_Z;
+	float nx = axis.m_X; 
+	float ny = axis.m_Y;
+	float nz = axis.m_Z;
 
 	e[0][0] = nx*nx*vsin(ang) + cos(ang);
 	e[0][1] = nx*ny*vsin(ang) - nz*sin(ang);
@@ -115,7 +115,7 @@ void CMatrix33::SetRotation(const CVector3D& axis, btScalar ang)
 
 void CMatrix33::Inverse()
 {
-	btScalar det = e[0][0] * ( e[2][2] * e[1][1] - e[2][1] * e[1][2] ) - 
+	float det = e[0][0] * ( e[2][2] * e[1][1] - e[2][1] * e[1][2] ) - 
 				 e[1][0] * ( e[2][2] * e[0][1] - e[2][1] * e[0][2] ) +
 				 e[2][0] * ( e[1][2] * e[0][1] - e[1][1] * e[0][2] );
 
@@ -202,7 +202,7 @@ CMatrix33 CMatrix33::operator-(const CMatrix33& other) const
 }
 
 
-CMatrix33 CMatrix33::operator*(btScalar val) const
+CMatrix33 CMatrix33::operator*(float val) const
 {
 	CMatrix33 ret;
 
@@ -213,13 +213,13 @@ CMatrix33 CMatrix33::operator*(btScalar val) const
 	return ret;
 }
 
-CMatrix33 CMatrix33::operator/(btScalar val) const
+CMatrix33 CMatrix33::operator/(float val) const
 {
 	CMatrix33 ret;
 
 	//assert(val != 0);
 
-	btScalar eps = 1e-10f;
+	float eps = 1e-10f;
 
 	if ( 0 <= val && val <= eps )
 		val += eps;
@@ -233,7 +233,7 @@ CMatrix33 CMatrix33::operator/(btScalar val) const
 	return ret;
 }
 
-CMatrix33& CMatrix33::operator*=(btScalar val)
+CMatrix33& CMatrix33::operator*=(float val)
 {
 	for ( int i = 0; i < 3; i++ )
 		for ( int j = 0; j < 3; j++ )
@@ -269,7 +269,7 @@ CMatrix33& CMatrix33::operator=(const CMatrix33& other)
 	return (*this);
 }
 
-//CMatrix33& CMatrix33::operator=(btScalar a)
+//CMatrix33& CMatrix33::operator=(float a)
 //{
 //	for ( int i = 0; i < 3; i++ )
 //		for ( int j = 0; j < 3; j++ )
@@ -295,7 +295,7 @@ bool CMatrix33::operator!=(const CMatrix33& other)
 	return !(*this).operator==(other);
 }
 
-bool CMatrix33::operator==(btScalar a)
+bool CMatrix33::operator==(float a)
 {
 	for ( int i = 0; i < 3; i++ )
 		for ( int j = 0; j < 3; j++ )
@@ -307,12 +307,12 @@ bool CMatrix33::operator==(btScalar a)
 	return true;
 }
 
-bool CMatrix33::operator!=(btScalar a)
+bool CMatrix33::operator!=(float a)
 {
 	return !(*this).operator==(a);
 }
 
-btScalar& CMatrix33::operator()(int i, int j)
+float& CMatrix33::operator()(int i, int j)
 {
 	assert(0 <= i && i < 3);
 	assert(0 <= i && j < 3);
@@ -320,7 +320,7 @@ btScalar& CMatrix33::operator()(int i, int j)
 	return e[i][j];
 }
 
-const btScalar& CMatrix33::operator()(int i, int j) const
+const float& CMatrix33::operator()(int i, int j) const
 {
 	assert(0 <= i && i < 3);
 	assert(0 <= i && j < 3);
@@ -328,7 +328,7 @@ const btScalar& CMatrix33::operator()(int i, int j) const
 	return e[i][j];
 }
 
-CMatrix33 operator*(btScalar val, const CMatrix33& other)
+CMatrix33 operator*(float val, const CMatrix33& other)
 {
 	return other * val;
 }

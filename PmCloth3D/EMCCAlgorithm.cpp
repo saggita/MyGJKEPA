@@ -1,21 +1,21 @@
 #include <cassert>
-#include "BIMAlgorithm.h"
+#include "EMCCAlgorithm.h"
 #include "GJKAlgorithm.h"
 #include "CollisionObject.h"
 #include "mathUtil.h"
 #include "NarrowPhaseCollisionDetection.h"
 
-CBIMAlgorithm::CBIMAlgorithm(void)
+CEMCCAlgorithm::CEMCCAlgorithm(void)
 {
 }
 
-CBIMAlgorithm::~CBIMAlgorithm(void)
+CEMCCAlgorithm::~CEMCCAlgorithm(void)
 {
 }
 
-bool CBIMAlgorithm::CheckCollision(CCollisionObject& objA, CCollisionObject& objB, CNarrowCollisionInfo* pCollisionInfo, bool bProximity/* = false*/)
+bool CEMCCAlgorithm::CheckCollision(CCollisionObject& objA, CCollisionObject& objB, CNarrowCollisionInfo* pCollisionInfo, bool bProximity/* = false*/)
 {
-	assert(objB.GetCollisionObjectType() == CCollisionObject::Point);
+	//assert(objB.GetCollisionObjectType() == CCollisionObject::Point); 
 	//assert(objA.GetCollisionObjectType() == CCollisionObject::ConvexHull);
 
 	// Initialize collision info

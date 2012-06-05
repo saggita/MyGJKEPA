@@ -12,23 +12,23 @@ class CMatrix44
 public:
 	CMatrix44();
 	CMatrix44(const CMatrix44& other);
-	CMatrix44(btScalar r1[4], btScalar r2[4], btScalar r3[4], btScalar r4[4]);
-	CMatrix44(btScalar e00, btScalar e01, btScalar e02, btScalar e03,
-			  btScalar e10, btScalar e11, btScalar e12, btScalar e13,
-			  btScalar e20, btScalar e21, btScalar e22, btScalar e23,
-			  btScalar e30, btScalar e31, btScalar e32, btScalar e33);
+	CMatrix44(float r1[4], float r2[4], float r3[4], float r4[4]);
+	CMatrix44(float e00, float e01, float e02, float e03,
+			  float e10, float e11, float e12, float e13,
+			  float e20, float e21, float e22, float e23,
+			  float e30, float e31, float e32, float e33);
 	virtual ~CMatrix44();
 
 
-	btScalar Row[4][4];
+	float Row[4][4];
 
 public:
 	void SetIdentity();
-	void SetRotation(const CVector3D& axis, btScalar ang);
-	void SetTranslate(btScalar x, btScalar y, btScalar z);
-	//void SetScale(const CPoint3D& pnt, btScalar w, btScalar fact);
+	void SetRotation(const CVector3D& axis, float ang);
+	void SetTranslate(float x, float y, float z);
+	//void SetScale(const CPoint3D& pnt, float w, float fact);
 
-	btScalar GetElement(int nRow, int nCol) const;
+	float GetElement(int nRow, int nCol) const;
 
 	CVector3D operator*(const CVector3D& vec) const;
 	CPoint3D operator*(const CPoint3D& pt) const;
