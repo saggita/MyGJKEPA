@@ -163,10 +163,12 @@ public:
 
 protected:
 	CollisionObjectType m_CollisionObjectType; 
+
+	// transforms local to world. 
 	CTransform m_Transform;
 
 	CVector3D m_HalfExtent;
-	float m_Margin;
+	
 	float m_Color[4];
 
 	// For ConvexHull
@@ -219,11 +221,13 @@ public:
 	std::vector<CTriangleFace>& GetFaces() { return m_Faces; }
 	const std::vector<CTriangleFace>& GetFaces() const { return m_Faces; }
 
+	std::vector<CEdge>& GetEdges() { return m_Edges; }
+	const std::vector<CEdge>& GetEdges() const { return m_Edges; }
+
 	const CTransform& GetTransform() const;
 	CTransform& GetTransform();
 
-	float GetMargin() const { return m_Margin; }
-	void SetMargin(float margin) { m_Margin = margin; }
+	
 	CVector3D GetSize() const { return 2.0 * m_HalfExtent; }
 
 	CVector3D GetLocalSupportPoint(const CVector3D& dir, float margin = 0) const;

@@ -1,7 +1,7 @@
 #include "ICollidable.h"
 
 
-ICollidable::ICollidable(void)
+ICollidable::ICollidable(void) : m_Margin(0.0001)
 {
 }
 

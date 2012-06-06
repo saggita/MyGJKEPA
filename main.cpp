@@ -447,15 +447,24 @@ void OnKeyboard(unsigned char key, int x, int y)
 
 				CNarrowPhaseCollisionDetection::CollisionAlgorithmType colAlgoType = g_WorldSim.m_pNarrowPhase->GetConvexCollisionAlgorithmType();
 
-				if ( colAlgoType == CNarrowPhaseCollisionDetection::GJK_EPA )
+				/*if ( colAlgoType == CNarrowPhaseCollisionDetection::GJK_EPA )
 				{
-					/*colAlgoType = CNarrowPhaseCollisionDetection::BIM;					
+					colAlgoType = CNarrowPhaseCollisionDetection::BIM;					
 				}
 				else if ( colAlgoType == CNarrowPhaseCollisionDetection::BIM )
-				{*/
+				{
 					colAlgoType = CNarrowPhaseCollisionDetection::CHF;
 				}
 				else if ( colAlgoType == CNarrowPhaseCollisionDetection::CHF )
+				{
+					colAlgoType = CNarrowPhaseCollisionDetection::GJK_EPA;
+				}*/
+
+				if ( colAlgoType == CNarrowPhaseCollisionDetection::GJK_EPA )
+				{
+					colAlgoType = CNarrowPhaseCollisionDetection::EMCC;					
+				}
+				else if ( colAlgoType == CNarrowPhaseCollisionDetection::EMCC )
 				{
 					colAlgoType = CNarrowPhaseCollisionDetection::GJK_EPA;
 				}

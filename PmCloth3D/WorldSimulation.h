@@ -4,9 +4,7 @@
 #include "ClothCL.h"
 #include "ConvexHeightField\ConvexHeightFieldShape.h"
 #include "ConvexHeightField\ChNarrowphase.h"
-
-extern cl_context        g_cxGPUMainContext;
-extern cl_command_queue  g_cqGPUCommandQue;
+#include "global.h"
 
 class CNarrowPhaseCollisionDetection;
 
@@ -24,8 +22,7 @@ public:
 
 	float m_dt;
 	int m_Substeps; // = 1
-
-	CCollisionObject* pObjectA;
+		
 	//CCloth* m_pCloth;
 	CVector3D m_Gravity;
 	int m_RenderBatchIndex;

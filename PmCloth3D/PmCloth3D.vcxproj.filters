@@ -81,6 +81,9 @@
     <ClCompile Include="EMCCAlgorithm.cpp">
       <Filter>NarrowPhaseCollision</Filter>
     </ClCompile>
+    <ClCompile Include="MinkowskiSum.cpp">
+      <Filter>NarrowPhaseCollision</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="WorldSimulation.h" />
@@ -212,6 +215,10 @@
     <ClInclude Include="Cloth.h" />
     <ClInclude Include="CLFunctions.h" />
     <ClInclude Include="EMCCAlgorithm.h">
+      <Filter>NarrowPhaseCollision</Filter>
+    </ClInclude>
+    <ClInclude Include="global.h" />
+    <ClInclude Include="MinkowskiSum.h">
       <Filter>NarrowPhaseCollision</Filter>
     </ClInclude>
   </ItemGroup>

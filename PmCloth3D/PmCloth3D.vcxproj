@@ -52,10 +52,12 @@
     <ClInclude Include="EPATriangle.h" />
     <ClInclude Include="GJKAlgorithm.h" />
     <ClInclude Include="GJKSimplex.h" />
+    <ClInclude Include="global.h" />
     <ClInclude Include="ICollidable.h" />
     <ClInclude Include="mathUtil.h" />
     <ClInclude Include="Matrix33.h" />
     <ClInclude Include="Matrix44.h" />
+    <ClInclude Include="MinkowskiSum.h" />
     <ClInclude Include="NarrowPhaseCollisionDetection.h" />
     <ClInclude Include="Point2D.h" />
     <ClInclude Include="Point3D.h" />
@@ -88,6 +90,7 @@
     <ClCompile Include="mathUtil.cpp" />
     <ClCompile Include="Matrix33.cpp" />
     <ClCompile Include="Matrix44.cpp" />
+    <ClCompile Include="MinkowskiSum.cpp" />
     <ClCompile Include="NarrowPhaseCollisionDetection.cpp" />
     <ClCompile Include="Point2D.cpp" />
     <ClCompile Include="Point3D.cpp" />
