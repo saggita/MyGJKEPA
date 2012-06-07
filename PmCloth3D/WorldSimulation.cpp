@@ -136,7 +136,7 @@ void CWorldSimulation::Create()
 	pObjectA->Load("box.obj");
 	//pObjectA->Load("cylinder.obj");
 	
-	pObjectA->GetTransform().GetTranslation().Set(4.0f, 6.0f, 0.0f);
+	pObjectA->GetTransform().GetTranslation().Set(5.5f, 6.0f, 0.0f);
 	//pObjectA->SetSize(6.0f, 3.0f, 2.0f);
 	pObjectA->SetColor(1.0f, 0.0f, 0.0f);
 	pObjectA->GetTransform().GetRotation().SetRotation(CQuaternion(CVector3D(1.0f, 1.0f, 0.0f).Normalize(), 3.141592f/3.0f));

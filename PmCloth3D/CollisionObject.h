@@ -52,6 +52,8 @@ public:
 
 	float* PlaneEquation() { return m_PlaneEqn; }
 	const float* PlaneEquation() const { return m_PlaneEqn; }
+
+	CVector3D GetNormal() { return CVector3D(m_PlaneEqn[0], m_PlaneEqn[1], m_PlaneEqn[2]); }
 	
 	CTriangleFace& operator=(const CTriangleFace& other);
 };
@@ -200,6 +202,7 @@ protected:
 
 public:
 	CCollisionObject();
+	CCollisionObject(const CCollisionObject& other);
 	CCollisionObject(Device* ddcl, Device* ddhost);
 	virtual ~CCollisionObject(void);
 
@@ -246,5 +249,7 @@ public:
 
 	// visualize convex heightfield
 	void VisualizeHF();
+
+	CCollisionObject& operator=(const CCollisionObject& other);
 };
 

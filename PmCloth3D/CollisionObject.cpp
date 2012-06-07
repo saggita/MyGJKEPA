@@ -195,11 +195,39 @@ CCollisionObject::CCollisionObject(Device* ddcl, Device* ddhost) : m_HalfExtent(
 	SetColor(1.0, 1.0, 1.0);
 }
 
+CCollisionObject::CCollisionObject(const CCollisionObject& other)
+{
+	m_CollisionObjectType = other.m_CollisionObjectType;
+	m_Transform = other.m_Transform;
+	m_HalfExtent = other.m_HalfExtent;
+	
+	for ( int i = 0; i < 4; i++ )
+		m_Color[i] = other.m_Color[i];
+
+	m_Vertices = other.m_Vertices;	
+	m_Normals = other.m_Normals;
+	m_Faces = other.m_Faces;
+	m_Edges = other.m_Edges;
+
+	m_VisualizedPoints = other.m_VisualizedPoints;
+	m_pConvexHeightField = other.m_pConvexHeightField;
+
+	m_bLoaded = other.m_bLoaded;
+
+	m_ddcl = other.m_ddcl; 
+	m_ddhost = other.m_ddhost;	
+	m_ShapeBuffer = other.m_ShapeBuffer;
+	m_Data = other.m_Data;
+	m_pBufRBodiesCPU = other.m_pBufRBodiesCPU;
+	m_pBufRBodiesGPU = other.m_pBufRBodiesGPU;
+}
+
 CCollisionObject::~CCollisionObject(void)
 {
 	//delete m_pBulletColObj;
 
-	delete m_pConvexHeightField;
+	if ( m_pConvexHeightField )
+		delete m_pConvexHeightField;
 }
 
 bool CCollisionObject::Create()
@@ -766,7 +794,7 @@ bool CCollisionObject::Load(const char* filename)
 		const CVector3D& p2 = m_Vertices[face.GetVertexIndex(2)];
 
 		CVector3D n = (p1-p0).Cross(p2-p0).Normalize();
-		double d = -n.Dot(p0) - m_Margin;
+		double d = -n.Dot(p0);
 
 		face.PlaneEquation()[0] = n.m_X;
 		face.PlaneEquation()[1] = n.m_Y;
@@ -852,4 +880,33 @@ void CCollisionObject::VisualizeHF()
 		m_VisualizedPoints[i] = closestPoint;
 	}
 
+}
+
+CCollisionObject& CCollisionObject::operator=(const CCollisionObject& other)
+{
+	m_CollisionObjectType = other.m_CollisionObjectType;
+	m_Transform = other.m_Transform;
+	m_HalfExtent = other.m_HalfExtent;
+	
+	for ( int i = 0; i < 4; i++ )
+		m_Color[i] = other.m_Color[i];
+
+	m_Vertices = other.m_Vertices;	
+	m_Normals = other.m_Normals;
+	m_Faces = other.m_Faces;
+	m_Edges = other.m_Edges;
+
+	m_VisualizedPoints = other.m_VisualizedPoints;
+	m_pConvexHeightField = other.m_pConvexHeightField;
+
+	m_bLoaded = other.m_bLoaded;
+
+	m_ddcl = other.m_ddcl; 
+	m_ddhost = other.m_ddhost;	
+	m_ShapeBuffer = other.m_ShapeBuffer;
+	m_Data = other.m_Data;
+	m_pBufRBodiesCPU = other.m_pBufRBodiesCPU;
+	m_pBufRBodiesGPU = other.m_pBufRBodiesGPU;
+
+	return (*this);
 }

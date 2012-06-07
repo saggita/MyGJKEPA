@@ -28,9 +28,11 @@ bool CMinkowskiSum::Create(const CCollisionObject& objA, const CCollisionObject&
 		
 		
 	}
+
+	return true;
 }
 
-void CMinkowskiSum::Render(bool bWireframe = false) const
+void CMinkowskiSum::Render(bool bWireframe/* = false*/) const
 {
 
 }
