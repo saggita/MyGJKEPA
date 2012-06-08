@@ -16,6 +16,8 @@ public:
 	CTriangleFace(const CTriangleFace& other);
 	virtual ~CTriangleFace();
 
+	bool m_bFlag; 
+
 protected:
 	int m_Index;
 	int m_IndexVrx[3];
@@ -161,7 +163,7 @@ class CCollisionObject : public ICollidable
 //-------------------------------------------
 {
 public:
-	enum CollisionObjectType { None, Point, Box, Sphere, Cone, Capsule, Cylinder, ConvexHull };
+	enum CollisionObjectType { None, Point, LineSegment, Box, Sphere, Cone, Capsule, Cylinder, ConvexHull };
 
 protected:
 	CollisionObjectType m_CollisionObjectType; 

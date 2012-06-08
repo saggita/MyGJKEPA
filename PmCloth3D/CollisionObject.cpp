@@ -138,7 +138,7 @@ static int BarrelIdx[] = {
 44,26,47,
 };
 
-CTriangleFace::CTriangleFace()
+CTriangleFace::CTriangleFace() : m_bFlag(false)
 {
 	for ( int i = 0; i < 3; i++ )
 	{
@@ -157,6 +157,10 @@ CTriangleFace::CTriangleFace(const CTriangleFace& other)
 		m_IndexEdge[i] = other.m_IndexEdge[i];
 	}
 
+	for ( int i = 0; i < 4; i++ )
+		m_PlaneEqn[i] = other.m_PlaneEqn[i];
+
+	m_bFlag = other.m_bFlag;
 	m_Index = other.m_Index;
 }
 
@@ -172,7 +176,12 @@ CTriangleFace& CTriangleFace::operator=(const CTriangleFace& other)
 		m_IndexEdge[i] = other.m_IndexEdge[i];
 	}
 
+	for ( int i = 0; i < 4; i++ )
+		m_PlaneEqn[i] = other.m_PlaneEqn[i];
+
 	m_Index = other.m_Index;
+	m_bFlag = other.m_bFlag;
+
 	return (*this);
 }
 
@@ -195,7 +204,7 @@ CCollisionObject::CCollisionObject(Device* ddcl, Device* ddhost) : m_HalfExtent(
 	SetColor(1.0, 1.0, 1.0);
 }
 
-CCollisionObject::CCollisionObject(const CCollisionObject& other)
+CCollisionObject::CCollisionObject(const CCollisionObject& other) : m_pConvexHeightField(NULL)
 {
 	m_CollisionObjectType = other.m_CollisionObjectType;
 	m_Transform = other.m_Transform;
@@ -210,7 +219,20 @@ CCollisionObject::CCollisionObject(const CCollisionObject& other)
 	m_Edges = other.m_Edges;
 
 	m_VisualizedPoints = other.m_VisualizedPoints;
-	m_pConvexHeightField = other.m_pConvexHeightField;
+	
+	// m_pConvexHeightField
+	float4* eqn = new float4[m_Faces.size()];
+
+	for ( int i=0; i < (int)m_Faces.size();i++ )
+	{
+		eqn[i].x = m_Faces[i].PlaneEquation()[0];
+		eqn[i].y = m_Faces[i].PlaneEquation()[1];
+		eqn[i].z = m_Faces[i].PlaneEquation()[2];
+		eqn[i].w = m_Faces[i].PlaneEquation()[3];
+	}
+	
+	m_pConvexHeightField = new ConvexHeightField(eqn, m_Faces.size());
+	delete [] eqn;
 
 	m_bLoaded = other.m_bLoaded;
 
@@ -227,7 +249,10 @@ CCollisionObject::~CCollisionObject(void)
 	//delete m_pBulletColObj;
 
 	if ( m_pConvexHeightField )
+	{
 		delete m_pConvexHeightField;
+		m_pConvexHeightField = NULL;
+	}
 }
 
 bool CCollisionObject::Create()
@@ -325,6 +350,22 @@ CVector3D CCollisionObject::GetLocalSupportPoint(const CVector3D& dir, float mar
 		}
 		else
 			supportPoint.Set(margin, 0, 0);
+	}
+	if ( m_CollisionObjectType == LineSegment )
+	{
+		float maxDot = -FLT_MAX;
+	
+		for ( int i = 0; i < (int)m_Vertices.size(); i++ )
+		{
+			const CVector3D& vertex = m_Vertices[i];
+			float dot = vertex.Dot(dir);
+
+			if ( dot > maxDot )
+			{
+				supportPoint = vertex;
+				maxDot = dot;
+			}
+		}
 	}
 	else if ( m_CollisionObjectType == Sphere )
 	{
@@ -452,6 +493,50 @@ void CCollisionObject::Render(bool bWireframe/* = false*/) const
 		glPushMatrix();
 		glTranslated(translation.m_X, translation.m_Y, translation.m_Z);
 		glutSolidSphere(0.05, 6, 6);
+		glPopMatrix();
+	}
+	else if ( m_CollisionObjectType == LineSegment )
+	{
+		GLdouble val[16];
+		memset(val, 0, sizeof(GLdouble)*16);
+		
+		float x, y, z;
+		x = 1.0;
+		y = 1.0;
+		z = 1.0;
+
+		GLdouble rotMatrix[16];
+		rotMatrix[0] = x*mat(0, 0); rotMatrix[4] = y*mat(0, 1); rotMatrix[8] =  z*mat(0, 2); rotMatrix[12] = translation.m_X;
+		rotMatrix[1] = x*mat(1, 0); rotMatrix[5] = y*mat(1, 1); rotMatrix[9] =  z*mat(1, 2); rotMatrix[13] = translation.m_Y;
+		rotMatrix[2] = x*mat(2, 0); rotMatrix[6] = y*mat(2, 1); rotMatrix[10] = z*mat(2, 2); rotMatrix[14] = translation.m_Z;
+		rotMatrix[3] = 0;           rotMatrix[7] = 0;           rotMatrix[11] = 0;           rotMatrix[15] = 1;
+
+		glMatrixMode(GL_MODELVIEW);
+
+		glPushMatrix();
+		glMultMatrixd(rotMatrix);
+
+		glPushAttrib(GL_LIGHTING_BIT);
+				
+		glLineWidth(1.0f);
+		
+		// one edge for line segment
+		assert(m_Vertices.size() == 2);
+		
+		glDisable(GL_LIGHTING);
+		glColor3f(0,0,0);
+		glBegin(GL_LINES);
+
+		const CVector3D& vertex0 = m_Vertices[0];
+		const CVector3D& vertex1 = m_Vertices[1];
+
+		glVertex3d(vertex0.m_X, vertex0.m_Y, vertex0.m_Z);
+		glVertex3d(vertex1.m_X, vertex1.m_Y, vertex1.m_Z);
+
+		glEnd();
+		
+		glPopAttrib();
+		
 		glPopMatrix();
 	}
 	else if ( m_CollisionObjectType == Box )
@@ -897,7 +982,23 @@ CCollisionObject& CCollisionObject::operator=(const CCollisionObject& other)
 	m_Edges = other.m_Edges;
 
 	m_VisualizedPoints = other.m_VisualizedPoints;
-	m_pConvexHeightField = other.m_pConvexHeightField;
+	
+	// m_pConvexHeightField
+	if ( m_pConvexHeightField )
+		delete m_pConvexHeightField;
+
+	float4* eqn = new float4[m_Faces.size()];
+
+	for ( int i=0; i < (int)m_Faces.size();i++ )
+	{
+		eqn[i].x = m_Faces[i].PlaneEquation()[0];
+		eqn[i].y = m_Faces[i].PlaneEquation()[1];
+		eqn[i].z = m_Faces[i].PlaneEquation()[2];
+		eqn[i].w = m_Faces[i].PlaneEquation()[3];
+	}
+	
+	m_pConvexHeightField = new ConvexHeightField(eqn, m_Faces.size());
+	delete [] eqn;
 
 	m_bLoaded = other.m_bLoaded;
 
