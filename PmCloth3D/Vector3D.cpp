@@ -2,6 +2,8 @@
 #include "Vector3D.h"
 #include "Point3D.h"
 
+const CVector3D CVector3D::ZERO = CVector3D(0, 0, 0);
+
 CVector3D::CVector3D(const CVector3D& other) 
 { 
 	m_X = other.m_X; 

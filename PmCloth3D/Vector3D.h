@@ -22,6 +22,8 @@ public:
 		m_Z = 0.0;
 	}
 
+	static const CVector3D ZERO;
+
 	CVector3D(float x, float y, float z) { m_X = x; m_Y = y; m_Z = z; };
 	CVector3D(float val) { m_X = val; m_Y = val; m_Z = val; };
 	CVector3D(const CVector3D& other);

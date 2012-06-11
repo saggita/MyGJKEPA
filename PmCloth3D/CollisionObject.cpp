@@ -657,7 +657,7 @@ void CCollisionObject::Render(bool bWireframe/* = false*/) const
 				{
 					const CVector3D& vertex = m_Vertices[face.GetVertexIndex(j)];
 				
-					glVertex3d(vertex.m_X, vertex.m_Y, vertex.m_Z);
+					glVertex3f(vertex.m_X, vertex.m_Y, vertex.m_Z);
 				}
 
 				glEnd();
@@ -666,30 +666,51 @@ void CCollisionObject::Render(bool bWireframe/* = false*/) const
 
 		// edges
 		glDisable(GL_LIGHTING);
-		glColor3f(0,0,0);
-		glBegin(GL_LINE_STRIP);
+		glColor3f(0,0,0);		
+
+		for ( int i = 0; i < (int)m_Edges.size(); i++ )
+		{
+			const CEdge& edge = m_Edges[i];
+
+			const CVector3D& vertex0 = m_Vertices[edge.GetVertexIndex(0)];
+			const CVector3D& vertex1 = m_Vertices[edge.GetVertexIndex(1)];
+
+			// sihlouette edges
+			if ( edge.m_bFlag )
+			{
+				glLineWidth(5.0f);
+				glColor3f(0, 0, 1.0f);	
+			}
+			else
+			{
+				glLineWidth(1.0f);
+				glColor3f(0,0,0);	
+			}
+
+			glBegin(GL_LINE_STRIP);
+				glVertex3f(vertex0.m_X, vertex0.m_Y, vertex0.m_Z);
+				glVertex3f(vertex1.m_X, vertex1.m_Y, vertex1.m_Z);
+			glEnd();
+		}
+				
+		// normal
+		glBegin(GL_LINES);
 
 		for ( int i = 0; i < (int)m_Faces.size(); i++ )
 		{
 			const CTriangleFace& face = m_Faces[i];
+			
+			CVector3D normal(face.PlaneEquation()[0], face.PlaneEquation()[1], face.PlaneEquation()[2]);
+			
+			const CVector3D& v0 = m_Vertices[face.GetVertexIndex(0)];
+			const CVector3D& v1 = m_Vertices[face.GetVertexIndex(1)];
+			const CVector3D& v2 = m_Vertices[face.GetVertexIndex(2)];
 
-			for ( int j = 0; j < 3; j++ )
-			{
-				const CVector3D& vertex = m_Vertices[face.GetVertexIndex(j)];
-				glVertex3d(vertex.m_X, vertex.m_Y, vertex.m_Z);
-			}
-
-			const CVector3D& vertex = m_Vertices[face.GetVertexIndex(0)];
-			glVertex3d(vertex.m_X, vertex.m_Y, vertex.m_Z);
-
-			// normal
-			/*const CVector3D& v0 = m_Vertices[face.indices[0]];
-			const CVector3D& v1 = m_Vertices[face.indices[1]];
-			const CVector3D& v2 = m_Vertices[face.indices[2]];
-
-			const CVector3D& normal = (v1-v0).Cross(v2-v0).Normalize();
-			CVector3D n = vertex + normal;
-			glVertex3d(n.m_X, n.m_Y, n.m_Z);*/
+			CVector3D c = (v0 + v1 + v2) * 0.3333333f;
+			CVector3D n = c + normal;
+			
+			glVertex3f(c.m_X, c.m_Y, c.m_Z);
+			glVertex3f(n.m_X, n.m_Y, n.m_Z);
 		}
 
 		glEnd();

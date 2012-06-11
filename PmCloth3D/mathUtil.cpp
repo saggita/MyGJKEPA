@@ -140,6 +140,16 @@ float SignedDistanceFromPointToPlane(const CVector3D& point, const float* planeE
 
 	if ( n.LengthSqr() < 1e-6 )
 		return 0;
+
+	if ( point == CVector3D::ZERO )
+	{
+		float dist = planeEqn[3];
+
+		if ( closestPointInTriangle )
+			*closestPointInTriangle = - dist * n;
+
+		return dist;
+	}
 	else
 	{
 		float dist = n.Dot(point) + planeEqn[3];

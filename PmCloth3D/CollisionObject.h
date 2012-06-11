@@ -55,7 +55,7 @@ public:
 	float* PlaneEquation() { return m_PlaneEqn; }
 	const float* PlaneEquation() const { return m_PlaneEqn; }
 
-	CVector3D GetNormal() { return CVector3D(m_PlaneEqn[0], m_PlaneEqn[1], m_PlaneEqn[2]); }
+	CVector3D GetNormal() const { return CVector3D(m_PlaneEqn[0], m_PlaneEqn[1], m_PlaneEqn[2]); }
 	
 	CTriangleFace& operator=(const CTriangleFace& other);
 };
@@ -66,7 +66,7 @@ class CEdge
 //----------
 {
 public:
-	CEdge() 
+	CEdge() : m_bFlag(false)
 	{ 
 		m_IndexVrx[0] = -1; 
 		m_IndexVrx[1] = -1; 
@@ -75,7 +75,7 @@ public:
 		m_Index = -1;
 	}
 
-	CEdge(int indexVrx0, int indexVrx1) 
+	CEdge(int indexVrx0, int indexVrx1) : m_bFlag(false)
 	{ 
 		m_IndexVrx[0] = indexVrx0; 
 		m_IndexVrx[1] = indexVrx1;
@@ -92,10 +92,14 @@ public:
 			m_IndexTriangle[i] = other.m_IndexTriangle[i];
 		}
 
+		m_bFlag = other.m_bFlag;
+
 		m_Index = other.m_Index;
 	}
 	
 	virtual ~CEdge() { }
+
+	bool m_bFlag; 
 	
 protected:
 	int m_Index;
@@ -152,6 +156,7 @@ public:
 			m_IndexTriangle[i] = other.m_IndexTriangle[i];
 		}
 
+		m_bFlag = other.m_bFlag;
 		m_Index = other.m_Index;
 
 		return (*this);

@@ -23,7 +23,7 @@ cl_command_queue  g_cqGPUCommandQue = NULL;
 
 CWorldSimulation::CWorldSimulation(void) : m_Gravity(0.0f, -9.87f, 0.0f),/* m_pCloth(NULL),*/ m_RenderBatchIndex(0), m_bGPU(false)
 { 
-	m_Substeps = 2;
+	m_Substeps = 1;
 
 }
 
