@@ -144,30 +144,6 @@ void CWorldSimulation::Create()
 	//-----------
 	// Object 1
 	//-----------
-	CCollisionObject* pObjectB;
-
-	if ( m_bGPU )
-		pObjectB = new CCollisionObject(m_ddcl, m_ddhost);
-	else
-		pObjectB = new CCollisionObject();
-
-	pObjectB->SetCollisionObjectType(CCollisionObject::LineSegment);
-	//pObjectB->SetSize(3.0f, 4.0f, 5.0f);
-	pObjectB->SetColor(0.7f, 0.7f, 0.0f);
-	pObjectB->SetMargin(0.0f);
-	//pObjectB->Load("box.obj");
-
-	pObjectB->GetVertices().push_back(CVector3D(2.0, 0.0, 0.0));
-	pObjectB->GetVertices().push_back(CVector3D(-2.0, 0.0, 0.0));
-	pObjectB->GetEdges().push_back(CEdge(0, 1));
-	pObjectB->GetEdges()[0].SetIndex(0);
-
-
-	//pObjectB->GetTransform().GetRotation().SetRotation(CQuaternion(CVector3D(1.0f, 0.0f, 0.0f).Normalize(), 0.0f));
-	pObjectB->GetTransform().GetTranslation().Set(3.0f, 6.0f, -2.0f);
-	//pObjectB->GetTransform().GetTranslation().Set(2.0f, 10.0f, 0.0f);
-
-
 	//CCollisionObject* pObjectB;
 
 	//if ( m_bGPU )
@@ -175,14 +151,38 @@ void CWorldSimulation::Create()
 	//else
 	//	pObjectB = new CCollisionObject();
 
-	//pObjectB->SetCollisionObjectType(CCollisionObject::ConvexHull);
+	//pObjectB->SetCollisionObjectType(CCollisionObject::LineSegment);
+	////pObjectB->SetSize(3.0f, 4.0f, 5.0f);
 	//pObjectB->SetColor(0.7f, 0.7f, 0.0f);
 	//pObjectB->SetMargin(0.0f);
-	//pObjectB->Load("box.obj");
+	////pObjectB->Load("box.obj");
+
+	//pObjectB->GetVertices().push_back(CVector3D(2.0, 0.0, 0.0));
+	//pObjectB->GetVertices().push_back(CVector3D(-2.0, 0.0, 0.0));
+	//pObjectB->GetEdges().push_back(CEdge(0, 1));
+	//pObjectB->GetEdges()[0].SetIndex(0);
+
 
 	////pObjectB->GetTransform().GetRotation().SetRotation(CQuaternion(CVector3D(1.0f, 0.0f, 0.0f).Normalize(), 0.0f));
-	//pObjectB->GetTransform().GetTranslation().Set(2.0f, 6.0f, -2.0f);
+	//pObjectB->GetTransform().GetTranslation().Set(3.0f, 6.0f, -2.0f);
 	////pObjectB->GetTransform().GetTranslation().Set(2.0f, 10.0f, 0.0f);
+
+
+	CCollisionObject* pObjectB;
+
+	if ( m_bGPU )
+		pObjectB = new CCollisionObject(m_ddcl, m_ddhost);
+	else
+		pObjectB = new CCollisionObject();
+
+	pObjectB->SetCollisionObjectType(CCollisionObject::ConvexHull);
+	pObjectB->SetColor(0.7f, 0.7f, 0.0f);
+	pObjectB->SetMargin(0.0f);
+	pObjectB->Load("box.obj");
+
+	//pObjectB->GetTransform().GetRotation().SetRotation(CQuaternion(CVector3D(1.0f, 0.0f, 0.0f).Normalize(), 0.0f));
+	pObjectB->GetTransform().GetTranslation().Set(2.0f, 6.0f, -2.0f);
+	//pObjectB->GetTransform().GetTranslation().Set(2.0f, 10.0f, 0.0f);
 
 	m_pNarrowPhase->AddPair(CNarrowCollisionInfo(pObjectA, pObjectB));
 
