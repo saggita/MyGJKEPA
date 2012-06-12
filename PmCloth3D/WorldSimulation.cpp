@@ -139,7 +139,7 @@ void CWorldSimulation::Create()
 	pObjectA->GetTransform().GetTranslation().Set(5.0f, 6.0f, -2.0f);
 	//pObjectA->SetSize(6.0f, 3.0f, 2.0f);
 	pObjectA->SetColor(1.0f, 0.0f, 0.0f);
-	pObjectA->GetTransform().GetRotation().SetRotation(CQuaternion(CVector3D(1.0f, 1.0f, 0.0f).Normalize(), 3.141592f/3.0f));
+	//pObjectA->GetTransform().GetRotation().SetRotation(CQuaternion(CVector3D(1.0f, 1.0f, 0.0f).Normalize(), 3.141592f/3.0f));
 
 	//-----------
 	// Object 1
@@ -341,8 +341,11 @@ void CWorldSimulation::Render(bool bWireframe/* = false*/)
 	{
 		for ( int i = m_pNarrowPhase->GetPairs().size()-1; i >= 0; i-- )
 		{
+			//m_pNarrowPhase->GetPairs()[i].pObjA->GetTransform().GetTranslation() += (g_MarkerB.GetTransform().GetTranslation() - g_MarkerA.GetTransform().GetTranslation());
 			m_pNarrowPhase->GetPairs()[i].pObjA->Render(bWireframe);
-			m_pNarrowPhase->GetPairs()[i].pObjB->Render(bWireframe);
+			//m_pNarrowPhase->GetPairs()[i].pObjA->GetTransform().GetTranslation() -= (g_MarkerB.GetTransform().GetTranslation() - g_MarkerA.GetTransform().GetTranslation());
+			
+			m_pNarrowPhase->GetPairs()[i].pObjB->Render(bWireframe);			
 		}
 	}
 

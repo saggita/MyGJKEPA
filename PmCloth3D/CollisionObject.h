@@ -7,6 +7,43 @@
 #include "ConvexHeightField\ChNarrowphase.h"
 #include "ICollidable.h"
 
+class CVertex : public CVector3D
+{
+public:
+	CVertex() {}
+	CVertex(const CVertex& other) : CVector3D(other) 
+	{
+		m_IndexFaces = other.m_IndexFaces;
+	}
+
+private:
+	std::vector<int> m_IndexFaces;
+
+public:
+	void SetFaceIndex(int indexFace)
+	{
+		std::vector<int>::iterator iter = std::find(m_IndexFaces.begin(), m_IndexFaces.end(), indexFace);
+
+		if ( iter == m_IndexFaces.end() )
+		{
+			m_IndexFaces.push_back(indexFace);
+		}
+	}
+
+	const std::vector<int>& GetFaceIndeces() const
+	{		
+		return m_IndexFaces;
+	}
+
+	CVertex& operator=(const CVertex& other)
+	{
+		CVector3D::operator=(other);
+		m_IndexFaces = other.m_IndexFaces;
+
+		return (*this);
+	}
+};
+
 //------------------
 class CTriangleFace
 //------------------
@@ -181,7 +218,7 @@ protected:
 	float m_Color[4];
 
 	// For ConvexHull
-	std::vector<CVector3D> m_Vertices;	
+	std::vector<CVertex> m_Vertices;	
 	std::vector<CVector3D> m_Normals;
 	std::vector<CTriangleFace> m_Faces;
 	std::vector<CEdge> m_Edges;
@@ -216,14 +253,14 @@ public:
 public:
 	bool Create();
 
-	CollisionObjectType GetCollisionObjectType() { return m_CollisionObjectType; }
+	CollisionObjectType GetCollisionObjectType() const { return m_CollisionObjectType; }
 	void SetCollisionObjectType(CollisionObjectType collisionObjectType);
 	
 	void SetSize(float x, float y, float z) { m_HalfExtent.Set(x/2.0f, y/2.0f, z/2.0f); }
 	void SetColor(float r, float g, float b) { m_Color[0] = r; m_Color[1] = g; m_Color[2] = b; m_Color[3] = 1.0; }
 
-	std::vector<CVector3D>& GetVertices() { return m_Vertices; }
-	const std::vector<CVector3D>& GetVertices() const { return m_Vertices; }
+	std::vector<CVertex>& GetVertices() { return m_Vertices; }
+	const std::vector<CVertex>& GetVertices() const { return m_Vertices; }
 
 	std::vector<CVector3D>& GetNormals() { return m_Normals; }
 	const std::vector<CVector3D>& GetNormals() const { return m_Normals; }

@@ -303,7 +303,8 @@ void CCollisionObject::SetCollisionObjectType(CollisionObjectType collisionObjec
 		{
 			for ( int i = 0; i < BarrelVtxCount2; i++ )
 			{
-				CVector3D vertex, normal;
+				CVertex vertex;
+				CVector3D normal;
 				vertex[0] = BarrelVtx2[i*6];
 				vertex[1] = BarrelVtx2[i*6+1];
 				vertex[2] = BarrelVtx2[i*6+2];
@@ -675,17 +676,17 @@ void CCollisionObject::Render(bool bWireframe/* = false*/) const
 			const CVector3D& vertex0 = m_Vertices[edge.GetVertexIndex(0)];
 			const CVector3D& vertex1 = m_Vertices[edge.GetVertexIndex(1)];
 
-			// sihlouette edges
-			if ( edge.m_bFlag )
-			{
-				glLineWidth(5.0f);
-				glColor3f(0, 0, 1.0f);	
-			}
-			else
-			{
-				glLineWidth(1.0f);
-				glColor3f(0,0,0);	
-			}
+			//// sihlouette edges
+			//if ( edge.m_bFlag )
+			//{
+			//	glLineWidth(5.0f);
+			//	glColor3f(0, 0, 1.0f);	
+			//}
+			//else
+			//{
+			//	glLineWidth(1.0f);
+			//	glColor3f(0,0,0);	
+			//}
 
 			glBegin(GL_LINE_STRIP);
 				glVertex3f(vertex0.m_X, vertex0.m_Y, vertex0.m_Z);
@@ -693,27 +694,27 @@ void CCollisionObject::Render(bool bWireframe/* = false*/) const
 			glEnd();
 		}
 				
-		// normal
-		glBegin(GL_LINES);
+		//// normal
+		//glBegin(GL_LINES);
 
-		for ( int i = 0; i < (int)m_Faces.size(); i++ )
-		{
-			const CTriangleFace& face = m_Faces[i];
-			
-			CVector3D normal(face.PlaneEquation()[0], face.PlaneEquation()[1], face.PlaneEquation()[2]);
-			
-			const CVector3D& v0 = m_Vertices[face.GetVertexIndex(0)];
-			const CVector3D& v1 = m_Vertices[face.GetVertexIndex(1)];
-			const CVector3D& v2 = m_Vertices[face.GetVertexIndex(2)];
+		//for ( int i = 0; i < (int)m_Faces.size(); i++ )
+		//{
+		//	const CTriangleFace& face = m_Faces[i];
+		//	
+		//	CVector3D normal(face.PlaneEquation()[0], face.PlaneEquation()[1], face.PlaneEquation()[2]);
+		//	
+		//	const CVector3D& v0 = m_Vertices[face.GetVertexIndex(0)];
+		//	const CVector3D& v1 = m_Vertices[face.GetVertexIndex(1)];
+		//	const CVector3D& v2 = m_Vertices[face.GetVertexIndex(2)];
 
-			CVector3D c = (v0 + v1 + v2) * 0.3333333f;
-			CVector3D n = c + normal;
-			
-			glVertex3f(c.m_X, c.m_Y, c.m_Z);
-			glVertex3f(n.m_X, n.m_Y, n.m_Z);
-		}
+		//	CVector3D c = (v0 + v1 + v2) * 0.3333333f;
+		//	CVector3D n = c + normal;
+		//	
+		//	glVertex3f(c.m_X, c.m_Y, c.m_Z);
+		//	glVertex3f(n.m_X, n.m_Y, n.m_Z);
+		//}
 
-		glEnd();
+		//glEnd();
 
 		// convex heightfield visualization
 		glPointSize(3.0f);
@@ -724,8 +725,6 @@ void CCollisionObject::Render(bool bWireframe/* = false*/) const
 		{
 			const CVector3D& point = m_VisualizedPoints[i];
 			glVertex3f(point.m_X, point.m_Y, point.m_Z);
-
-
 		}
 
 		glEnd();
@@ -772,7 +771,7 @@ bool CCollisionObject::Load(const char* filename)
 			continue;
 		else if ( sToken == "v" ) // vertex
 		{
-			CVector3D pnt;
+			CVertex pnt;
 			
 			// x
 			++iter;
@@ -887,6 +886,9 @@ bool CCollisionObject::Load(const char* filename)
 				assert(0); // must not reach here!
 
 			tri.SetEdgeIndex(i, (*iterEdge).GetIndex());
+
+			// set face index for vertices
+			m_Vertices[tri.GetVertexIndex(i)].SetFaceIndex(tri.GetIndex());
 		}		
 	}
 

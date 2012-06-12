@@ -20,6 +20,42 @@ CEMCCAlgorithm::~CEMCCAlgorithm(void)
 
 bool CEMCCAlgorithm::CheckCollision(CCollisionObject& objA, CCollisionObject& objB, CNarrowCollisionInfo* pCollisionInfo, bool bProximity/* = false*/)
 {
+	CNarrowCollisionInfo AB;
+	InternalCheckCollision(objA, objB, &AB, bProximity);
+
+	CNarrowCollisionInfo BA;
+	InternalCheckCollision(objB, objA, &BA, bProximity);
+
+	if ( AB.bIntersect && BA.bIntersect )
+	{
+		if ( AB.penetrationDepth < BA.penetrationDepth )
+			*pCollisionInfo = AB;
+		else
+			*pCollisionInfo = BA;
+
+		return true;
+	}
+	else if ( AB.bIntersect && !BA.bIntersect )
+	{
+		*pCollisionInfo = AB;
+	}
+	else if ( !AB.bIntersect && BA.bIntersect )
+	{
+		*pCollisionInfo = BA;
+	}
+	else
+	{
+		pCollisionInfo->bIntersect = false;
+		pCollisionInfo->penetrationDepth = 0;
+		pCollisionInfo->proximityDistance = 0;
+		pCollisionInfo->pObjA = &objA;
+		pCollisionInfo->pObjB = &objB;
+		return false;
+	}
+}
+
+bool CEMCCAlgorithm::InternalCheckCollision(CCollisionObject& objA, CCollisionObject& objB, CNarrowCollisionInfo* pCollisionInfo, bool bProximity/* = false*/)
+{
 	assert(objA.GetCollisionObjectType() == CCollisionObject::ConvexHull);
 	assert(objB.GetCollisionObjectType() == CCollisionObject::ConvexHull || objB.GetCollisionObjectType() == CCollisionObject::LineSegment ); 
 
@@ -45,19 +81,19 @@ bool CEMCCAlgorithm::CheckCollision(CCollisionObject& objA, CCollisionObject& ob
 		bool bIntersect = true;
 
 		float minDist = -FLT_MAX;
-		
 
 		// edgeVert0 and edgeVert1 are in local frame of objA
 		CVector3D edgeVert0 = transW2A * objB.GetTransform() * objB.GetVertices()[objB.GetEdges()[e].GetVertexIndex(0)];
 		CVector3D edgeVert1 = transW2A * objB.GetTransform() * objB.GetVertices()[objB.GetEdges()[e].GetVertexIndex(1)];
 
+		CVector3D n0B = transW2A * objB.GetTransform() * objB.GetFaces()[objB.GetEdges()[e].GetTriangleIndex(0)].GetNormal();
+		CVector3D n1B = transW2A * objB.GetTransform() * objB.GetFaces()[objB.GetEdges()[e].GetTriangleIndex(1)].GetNormal();
+
 		CVector3D vec = -(edgeVert1 - edgeVert0);
 
 		for ( int i = 0; i < (int)objA.GetEdges().size(); i++ )
 		{
-			CEdge& edge = objA.GetEdges()[i];
-
-			objA.GetEdges()[i].m_bFlag = false;
+			const CEdge& edge = objA.GetEdges()[i];
 
 			CVector3D n0 = objA.GetFaces()[edge.GetTriangleIndex(0)].GetNormal();
 			CVector3D n1 = objA.GetFaces()[edge.GetTriangleIndex(1)].GetNormal();
@@ -68,8 +104,6 @@ bool CEMCCAlgorithm::CheckCollision(CCollisionObject& objA, CCollisionObject& ob
 			// Find silhouette edges from objA which is visible by 'vec'.
 			if ( (dot0 > 0 && dot1 <= 0) || (dot0 <= 0 && dot1 > 0) )
 			{
-				objA.GetEdges()[i].m_bFlag = true;
-
 				// translate vertices so that edgeVert0 can be origin
 				CVector3D vec0 = objA.GetVertices()[edge.GetVertexIndex(0)] - edgeVert0;
 				CVector3D vec1 = objA.GetVertices()[edge.GetVertexIndex(1)] - edgeVert0;
@@ -80,7 +114,7 @@ bool CEMCCAlgorithm::CheckCollision(CCollisionObject& objA, CCollisionObject& ob
 					n = -n;
 
 				assert(n.Dot(n0) >= 0 && n.Dot(n1) >= 0);
-
+				
 				float dist = -vec1.Dot(n);
 				CVector3D pntA;
 				pntA = -dist * n;
@@ -93,21 +127,25 @@ bool CEMCCAlgorithm::CheckCollision(CCollisionObject& objA, CCollisionObject& ob
 				}
 				else if ( dist > minDist )
 				{
-					minDist = dist;
+					// If 'n' is a separating axis
+					if ( n.Dot(n0B) >= 0 && n.Dot(n1B) >= 0 )
+					{
+						minDist = dist;
 
-					float t;
-					CVector3D vecN;
-					float distToEdge = DistancePointToEdge(pntA, vec0, vec1, t, vecN);
+						float t;
+						CVector3D vecN;
+						float distToEdge = DistancePointToEdge(pntA, vec0, vec1, t, vecN);
 
-					assert( 0 <= t && t <= 1.0f );
+						assert( 0 <= t && t <= 1.0f );
 					
-					closestPointA = pntA - distToEdge*vecN + edgeVert0;
-					closestPointB = -distToEdge*vecN + edgeVert0;
+						closestPointA = pntA - distToEdge*vecN + edgeVert0;
+						closestPointB = -distToEdge*vecN + edgeVert0;
+					}
 				}
 			}
 		}
 
-		if ( pCollisionInfo->bIntersect )
+		if ( bIntersect )
 		{
 			for ( int iterN = 0; iterN < (int)objA.GetFaces().size(); iterN++ )
 			{
@@ -142,17 +180,57 @@ bool CEMCCAlgorithm::CheckCollision(CCollisionObject& objA, CCollisionObject& ob
 				}
 				else if ( dist > minDist )
 				{
-					minDist = dist;
-	
 					if ( bTranslated )
 					{
-						closestPointA = pntA + edgeVert0 - vec;						
-						closestPointB = edgeVert0 - vec;
+						const CVertex& vertB = objB.GetVertices()[objB.GetEdges()[e].GetVertexIndex(1)];
+
+						bool bSeparatingPlane = true;
+						const std::vector<int>& indexFaces = vertB.GetFaceIndeces();
+
+						// check whether 'tri' is a separating plane. 
+						for ( int m = 0; m < indexFaces.size(); m++ )
+						{
+							const CVector3D& normal = transW2A * objB.GetTransform() * objB.GetFaces()[indexFaces[m]].GetNormal();
+
+							if ( n.Dot(normal) > 0 )
+							{
+								bSeparatingPlane = false;
+								break;
+							}
+						}
+
+						if ( bSeparatingPlane )
+						{
+							minDist = dist;
+							closestPointA = pntA + edgeVert0 - vec;						
+							closestPointB = edgeVert0 - vec;
+						}
 					}
 					else
 					{
-						closestPointA = pntA + edgeVert0;
-						closestPointB = edgeVert0;
+						const CVertex& vertB = objB.GetVertices()[objB.GetEdges()[e].GetVertexIndex(0)];
+
+						bool bSeparatingPlane = true;
+						const std::vector<int>& indexFaces = vertB.GetFaceIndeces();
+
+						// check whether 'tri' is a separating plane. 
+						for ( int m = 0; m < indexFaces.size(); m++ )
+						{
+							const CVector3D& normal = transW2A * objB.GetTransform() * objB.GetFaces()[indexFaces[m]].GetNormal();
+
+							if ( n.Dot(normal) > 0 )
+							{
+								bSeparatingPlane = false;
+								break;
+							}
+						}
+
+						if ( bSeparatingPlane )
+						{
+							minDist = dist;
+							closestPointA = pntA + edgeVert0;
+							closestPointB = edgeVert0;
+						}
 					}					
 				}
 			}

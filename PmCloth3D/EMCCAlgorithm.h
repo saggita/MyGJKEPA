@@ -13,5 +13,7 @@ public:
 	virtual ~CEMCCAlgorithm(void);
 
 	virtual bool CheckCollision(CCollisionObject& objA, CCollisionObject& objB, CNarrowCollisionInfo* pCollisionInfo, bool bProximity = false);
+private:
+	bool InternalCheckCollision(CCollisionObject& objA, CCollisionObject& objB, CNarrowCollisionInfo* pCollisionInfo, bool bProximity = false);
 };
 
