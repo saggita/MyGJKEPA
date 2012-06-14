@@ -315,6 +315,10 @@ void OnRender()
 	DrawTextGlut("'b' : next batch", -g_Width/2 + 10, g_Height/2 - (linePos += 20));
 	DrawTextGlut("'g' : toggle CPU/GPU solver", -g_Width/2 + 10, g_Height/2 - (linePos += 20));
 
+	char str[100];
+	sprintf(str, "Penetration depth:%10.7f", g_WorldSim.m_pNarrowPhase->GetPairs()[0].penetrationDepth);
+	DrawTextGlut(str, -g_Width/2 + 10, g_Height/2 - (linePos += 20));
+
 	glMatrixMode(GL_PROJECTION);	
 	glPopMatrix();	
 
@@ -423,6 +427,15 @@ void OnKeyboard(unsigned char key, int x, int y)
 			g_WorldSim.m_bGPU = !g_WorldSim.m_bGPU;
 			g_WorldSim.ClearAll();
 			g_WorldSim.Create();
+			g_bPause = bPausePrev;
+		}
+		break;
+	case 'r':
+	case 'R':
+		{
+			bool bPausePrev = g_bPause;
+			g_bPause = true;
+			g_WorldSim.m_bRotateObjects = !g_WorldSim.m_bRotateObjects;
 			g_bPause = bPausePrev;
 		}
 		break;

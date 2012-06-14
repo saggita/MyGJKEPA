@@ -76,10 +76,12 @@ bool CEMCCAlgorithm::InternalCheckCollision(CCollisionObject& objA, CCollisionOb
 	CTransform transW2A = objA.GetTransform().InverseOther();
 
 	float maxDist = -FLT_MAX;
-	float minDist = -FLT_MAX;
+	
 
 	for ( int e = 0; e < (int)objB.GetEdges().size(); e++ )
 	{
+		float minDist = -FLT_MAX;
+
 		// We are trying to find out non-intersecting case here. So we start off with an assumption of positive case.  
 		bool bIntersect = true;
 
@@ -116,16 +118,48 @@ bool CEMCCAlgorithm::InternalCheckCollision(CCollisionObject& objA, CCollisionOb
 			
 				CVector3D n = (vec1A - vec0A).Cross(vec).Normalize();
 
+				////////////////////////////////////////////////////
+				// WRONG!!!!
 				if ( n.Dot(n0) < 0 || n.Dot(n1) < 0 )
 					n = -n;
 
 				assert(n.Dot(n0) >= 0 && n.Dot(n1) >= 0);
+				////////////////////////////////////////////////////
 
-				// 'n' can be a seprating axis
-				float nDotn0B = n.Dot(n0B);
-				float nDotn1B = n.Dot(n1B);
+				//-------------------------------------------
+				// Check whether 'n' may be a seprating axis
+				//-------------------------------------------
+				bool bMayBeSeparatingAxis = true;
 
-				if ( nDotn0B <= 0 && nDotn1B <= 0 )
+				for ( int twoEnds = 0; twoEnds < 2; twoEnds++ )
+				{
+					const std::vector<int>& indexEdges = objB.GetVertices()[edgeB.GetVertexIndex(twoEnds)].GetEdgeIndeces();
+
+					for ( int a = 0; a < (int)indexEdges.size(); a++ )
+					{
+						if ( edgeB.GetIndex() == indexEdges[a] )
+							continue;
+
+						int idx = objB.GetEdges()[indexEdges[a]].GetVertexIndex(0);
+
+						if ( idx == edgeB.GetVertexIndex(0) )
+							idx = objB.GetEdges()[indexEdges[a]].GetVertexIndex(1);
+
+						CVector3D vecE = objB.GetVertices()[idx] - objB.GetVertices()[edgeB.GetVertexIndex(twoEnds)];
+						vecE = transW2A.GetRotation() * objB.GetTransform().GetRotation() * vecE;
+
+						if ( n.Dot(vecE) < 0 )
+						{
+							bMayBeSeparatingAxis = false;
+							break;
+						}
+					}
+
+					if ( !bMayBeSeparatingAxis )
+						break;
+				}
+
+				if ( bMayBeSeparatingAxis )
 				{
 					// distance from origin to the face created by the cross product of 'edgeA' and 'edgeB' in the local frame of 'objA'.
 					float dist = -vec1A.Dot(n);
@@ -190,21 +224,27 @@ bool CEMCCAlgorithm::InternalCheckCollision(CCollisionObject& objA, CCollisionOb
 				// 'SignedDistanceFromPointToPlane' returns negative distance if the point is in the other side of plane when cosidering plane normal vector. 
 				float dist = SignedDistanceFromPointToPlane(origin, tri.PlaneEquation(), &pntA);
 
-				// Check whether 'tri' can be a separating plane or not.
-				bool bCanBeSeparatingPlane = true;
+				// Check whether 'tri' may be a separating plane or not.
+				bool bMayBeSeparatingPlane = true;
 
 				if ( bTranslated )
 				{
 					const CVertex& vertB = objB.GetVertices()[edgeB.GetVertexIndex(1)];
-					const std::vector<int>& indexFaces = vertB.GetFaceIndeces();
+					const std::vector<int>& indexEdges = vertB.GetEdgeIndeces();
 
-					for ( int m = 0; m < (int)indexFaces.size(); m++ )
+					for ( int m = 0; m < (int)indexEdges.size(); m++ )
 					{
-						const CVector3D& normal = transW2A.GetRotation() * objB.GetTransform().GetRotation() * objB.GetFaces()[indexFaces[m]].GetNormal();
+						int idx = objB.GetEdges()[indexEdges[m]].GetVertexIndex(0);
 
-						if ( n.Dot(normal) > 0 )
+						if ( idx == edgeB.GetVertexIndex(1) )
+							idx = objB.GetEdges()[indexEdges[m]].GetVertexIndex(1);
+
+						CVector3D vecE = objB.GetVertices()[idx] - objB.GetVertices()[edgeB.GetVertexIndex(1)];
+						vecE = transW2A.GetRotation() * objB.GetTransform().GetRotation() * vecE;
+
+						if ( n.Dot(vecE) < 0 )
 						{
-							bCanBeSeparatingPlane = false;
+							bMayBeSeparatingPlane = false;
 							break;
 						}
 					}
@@ -212,26 +252,32 @@ bool CEMCCAlgorithm::InternalCheckCollision(CCollisionObject& objA, CCollisionOb
 				else
 				{
 					const CVertex& vertB = objB.GetVertices()[edgeB.GetVertexIndex(0)];
-					const std::vector<int>& indexFaces = vertB.GetFaceIndeces();
+					const std::vector<int>& indexEdges = vertB.GetEdgeIndeces();
 
-					for ( int m = 0; m < (int)indexFaces.size(); m++ )
+					for ( int m = 0; m < (int)indexEdges.size(); m++ )
 					{
-						const CVector3D& normal = transW2A.GetRotation() * objB.GetTransform().GetRotation() * objB.GetFaces()[indexFaces[m]].GetNormal();
+						int idx = objB.GetEdges()[indexEdges[m]].GetVertexIndex(0);
 
-						if ( n.Dot(normal) > 0 )
+						if ( idx == edgeB.GetVertexIndex(0) )
+							idx = objB.GetEdges()[indexEdges[m]].GetVertexIndex(1);
+
+						CVector3D vecE = objB.GetVertices()[idx] - objB.GetVertices()[edgeB.GetVertexIndex(1)];
+						vecE = transW2A.GetRotation() * objB.GetTransform().GetRotation() * vecE;
+
+						if ( n.Dot(vecE) < 0 )
 						{
-							bCanBeSeparatingPlane = false;
+							bMayBeSeparatingPlane = false;
 							break;
 						}
 					}
 				}
 
-				if ( bCanBeSeparatingPlane )
+				if ( bMayBeSeparatingPlane )
 				{
 					// If the distance is positive, the plane is a separating plane. 
 					if ( dist > 0 )
 					{
-						bIntersect |= false;
+						bIntersect = false;
 					}
 					else if ( dist > minDist )
 					{
@@ -259,18 +305,27 @@ bool CEMCCAlgorithm::InternalCheckCollision(CCollisionObject& objA, CCollisionOb
 			assert(minDist <= 0);
 
 			pCollisionInfo->bIntersect = true;
-
-			//if ( -minDist > maxDist )
+			
+			if ( minDist > maxDist )
 			{
 				pCollisionInfo->penetrationDepth = -minDist;
 				pCollisionInfo->witnessPntA = closestPointA;
 				pCollisionInfo->witnessPntB = objB.GetTransform().InverseOther() * transA2W * closestPointB;
 
-				maxDist = -minDist;
+				maxDist = minDist;
 			}
 		}
 	}
 	
+	/*if ( pCollisionInfo->bIntersect )
+	{
+		assert(maxDist <= 0);
+
+		pCollisionInfo->penetrationDepth = -maxDist;
+		pCollisionInfo->witnessPntA = closestPointA;
+		pCollisionInfo->witnessPntB = objB.GetTransform().InverseOther() * transA2W * closestPointB;
+	}*/
+
 	return pCollisionInfo->bIntersect;
 }
 

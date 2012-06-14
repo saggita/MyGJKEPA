@@ -21,7 +21,7 @@
 cl_context        g_cxGPUMainContext = NULL;
 cl_command_queue  g_cqGPUCommandQue = NULL;
 
-CWorldSimulation::CWorldSimulation(void) : m_Gravity(0.0f, -9.87f, 0.0f),/* m_pCloth(NULL),*/ m_RenderBatchIndex(0), m_bGPU(false)
+CWorldSimulation::CWorldSimulation(void) : m_Gravity(0.0f, -9.87f, 0.0f),/* m_pCloth(NULL),*/ m_RenderBatchIndex(0), m_bGPU(false), m_bRotateObjects(false)
 { 
 	m_Substeps = 1;
 
@@ -173,7 +173,7 @@ void CWorldSimulation::Create()
 	rotB = CQuaternion(CVector3D(0.0f, 1.0f, 0.0f).Normalize(), 3.141592f/4.0f) * rotB;
 
 	pObjectB->GetTransform().GetRotation().SetRotation(rotB);
-	pObjectB->GetTransform().GetTranslation().Set(3.0f, 4.5f, 0.0f);
+	pObjectB->GetTransform().GetTranslation().Set(3.0f, 5.5f, 0.0f);
 
 	m_pNarrowPhase->AddPair(CNarrowCollisionInfo(pObjectA, pObjectB));
 
@@ -258,7 +258,7 @@ unsigned int CWorldSimulation::SubsUpdate(float dt)
 {
 	m_dt = dt;
 	
-	if ( m_pNarrowPhase && m_pNarrowPhase->GetPairs().size() > 0 )
+	if ( m_bRotateObjects && m_pNarrowPhase && m_pNarrowPhase->GetPairs().size() > 0 )
 	{
 		const float angleRad = 0.001f;
 

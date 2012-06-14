@@ -22,6 +22,7 @@ public:
 
 	float m_dt;
 	int m_Substeps; // = 1
+	bool m_bRotateObjects;
 		
 	//CCloth* m_pCloth;
 	CVector3D m_Gravity;

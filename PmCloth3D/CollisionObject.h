@@ -19,6 +19,7 @@ public:
 
 private:
 	std::vector<int> m_IndexFaces;
+	std::vector<int> m_IndexEdges;
 
 public:
 	void SetFaceIndex(int indexFace)
@@ -34,6 +35,21 @@ public:
 	const std::vector<int>& GetFaceIndeces() const
 	{		
 		return m_IndexFaces;
+	}
+
+	void SetEdgeIndex(int indexEdge)
+	{
+		std::vector<int>::iterator iter = std::find(m_IndexEdges.begin(), m_IndexEdges.end(), indexEdge);
+
+		if ( iter == m_IndexEdges.end() )
+		{
+			m_IndexEdges.push_back(indexEdge);
+		}
+	}
+
+	const std::vector<int>& GetEdgeIndeces() const
+	{		
+		return m_IndexEdges;
 	}
 
 	CVertex& operator=(const CVertex& other)

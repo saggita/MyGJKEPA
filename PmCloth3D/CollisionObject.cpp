@@ -10,25 +10,7 @@
 #include "CollisionObject.h"
 #include "StringTokenizer.h"
 
-void DrawTextGlut(const char* str, float x, float y) 
-{
-	glRasterPos2f(x, y);
-	glColor3d(0.0, 0.0, 0.0);
-
-	for (int i = 0; str[i] != '\0'; i++) 
-		glutBitmapCharacter(GLUT_BITMAP_HELVETICA_12, str[i]);
-
-}
-
-void DrawTextGlut(const char* str, float x, float y, float z) 
-{
-	glRasterPos3f(x, y, z);
-	glColor3d(0.0, 0.0, 0.0);
-
-	for (int i = 0; str[i] != '\0'; i++) 
-		glutBitmapCharacter(GLUT_BITMAP_HELVETICA_12, str[i]);
-
-}
+static void DrawTextGlut(const char* str, float x, float y, float z, float r = 0.0f, float g = 0.0f, float b = 0.0f);
 
 #define BarrelVtxCount2 57
 #define BarrelIndexCount 60
@@ -718,6 +700,16 @@ void CCollisionObject::Render(bool bWireframe/* = false*/) const
 
 			DrawTextGlut(str, middle.m_X, middle.m_Y, middle.m_Z);
 		}
+
+		// vertices
+		for ( int i = 0; i < (int)m_Vertices.size(); i++ )
+		{
+			const CVertex& vert = m_Vertices[i];
+			char str[100];
+			sprintf(str, "%d(%3.2f, %3.2f, %3.2f)", i, vert.m_X, vert.m_Y, vert.m_Z);		
+
+			DrawTextGlut(str, vert.m_X, vert.m_Y, vert.m_Z, 0, 0, 1.0f);
+		}
 				
 		//// normal
 		//glBegin(GL_LINES);
@@ -890,6 +882,9 @@ bool CCollisionObject::Load(const char* filename)
 
 				edge.SetIndex((int)m_Edges.size());
 				m_Edges.push_back(edge);
+
+				m_Vertices[edge.GetVertexIndex(0)].SetEdgeIndex(edge.GetIndex());
+				m_Vertices[edge.GetVertexIndex(1)].SetEdgeIndex(edge.GetIndex());
 			}
 			else
 				(*iterEdge).SetTriangleIndex(1, tri.GetIndex());
@@ -1058,4 +1053,24 @@ CCollisionObject& CCollisionObject::operator=(const CCollisionObject& other)
 	m_pBufRBodiesGPU = other.m_pBufRBodiesGPU;
 
 	return (*this);
+}
+
+void DrawTextGlut(const char* str, float x, float y) 
+{
+	glRasterPos2f(x, y);
+	glColor3d(0.0, 0.0, 0.0);
+
+	for (int i = 0; str[i] != '\0'; i++) 
+		glutBitmapCharacter(GLUT_BITMAP_HELVETICA_12, str[i]);
+
+}
+
+void DrawTextGlut(const char* str, float x, float y, float z, float r, float g, float b) 
+{
+	glRasterPos3f(x, y, z);
+	glColor3f(r, g, b);
+
+	for (int i = 0; str[i] != '\0'; i++) 
+		glutBitmapCharacter(GLUT_BITMAP_HELVETICA_12, str[i]);
+
 }
