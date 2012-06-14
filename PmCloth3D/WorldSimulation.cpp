@@ -121,10 +121,8 @@ void CWorldSimulation::Create()
 	m_pNarrowPhase->SetConvexCollisionAlgorithmType(CNarrowPhaseCollisionDetection::EMCC);
 
 	//-----------
-	// Object 0
+	// Object A
 	//-----------
-	CCollisionObject* pObjectA;
-
 	if ( m_bGPU )
 		pObjectA = new CCollisionObject(m_ddcl, m_ddhost);
 	else
@@ -132,18 +130,17 @@ void CWorldSimulation::Create()
 
 	pObjectA->SetCollisionObjectType(CCollisionObject::ConvexHull);
 	pObjectA->SetMargin(0.0f); // margin should be set before Load(..) 
-	//pObjectA->Load("smallGeoSphere.obj");
 	pObjectA->Load("box.obj");
-	//pObjectA->Load("cylinder.obj");
 	
-	pObjectA->GetTransform().GetTranslation().Set(5.0f, 6.0f, -2.0f);
-	//pObjectA->SetSize(6.0f, 3.0f, 2.0f);
+	pObjectA->GetTransform().GetTranslation().Set(0.0f, 5.0f, 0.0f);
 	pObjectA->SetColor(1.0f, 0.0f, 0.0f);
 	//pObjectA->GetTransform().GetRotation().SetRotation(CQuaternion(CVector3D(1.0f, 1.0f, 0.0f).Normalize(), 3.141592f/3.0f));
 
 	//-----------
-	// Object 1
+	// Object B
 	//-----------
+
+	//// Line segment
 	//CCollisionObject* pObjectB;
 
 	//if ( m_bGPU )
@@ -152,24 +149,16 @@ void CWorldSimulation::Create()
 	//	pObjectB = new CCollisionObject();
 
 	//pObjectB->SetCollisionObjectType(CCollisionObject::LineSegment);
-	////pObjectB->SetSize(3.0f, 4.0f, 5.0f);
 	//pObjectB->SetColor(0.7f, 0.7f, 0.0f);
 	//pObjectB->SetMargin(0.0f);
-	////pObjectB->Load("box.obj");
 
-	//pObjectB->GetVertices().push_back(CVector3D(2.0, 0.0, 0.0));
-	//pObjectB->GetVertices().push_back(CVector3D(-2.0, 0.0, 0.0));
+	//pObjectB->GetVertices().push_back(CVertex(2.0, 0.0, 0.0));
+	//pObjectB->GetVertices().push_back(CVertex(-2.0, 0.0, 0.0));
 	//pObjectB->GetEdges().push_back(CEdge(0, 1));
 	//pObjectB->GetEdges()[0].SetIndex(0);
-
-
-	////pObjectB->GetTransform().GetRotation().SetRotation(CQuaternion(CVector3D(1.0f, 0.0f, 0.0f).Normalize(), 0.0f));
 	//pObjectB->GetTransform().GetTranslation().Set(3.0f, 6.0f, -2.0f);
-	////pObjectB->GetTransform().GetTranslation().Set(2.0f, 10.0f, 0.0f);
 
-
-	CCollisionObject* pObjectB;
-
+	// box convex object
 	if ( m_bGPU )
 		pObjectB = new CCollisionObject(m_ddcl, m_ddhost);
 	else
@@ -180,9 +169,11 @@ void CWorldSimulation::Create()
 	pObjectB->SetMargin(0.0f);
 	pObjectB->Load("box.obj");
 
-	//pObjectB->GetTransform().GetRotation().SetRotation(CQuaternion(CVector3D(1.0f, 0.0f, 0.0f).Normalize(), 0.0f));
-	pObjectB->GetTransform().GetTranslation().Set(2.0f, 6.0f, -2.0f);
-	//pObjectB->GetTransform().GetTranslation().Set(2.0f, 10.0f, 0.0f);
+	CQuaternion rotB = CQuaternion(CVector3D(1.0f, 0.0f, 0.0f).Normalize(), 3.141592f/2.0f) * CQuaternion(CVector3D(0.0f, 1.0f, 0.0f).Normalize(), 3.141592f/4.0f);
+	rotB = CQuaternion(CVector3D(0.0f, 1.0f, 0.0f).Normalize(), 3.141592f/4.0f) * rotB;
+
+	pObjectB->GetTransform().GetRotation().SetRotation(rotB);
+	pObjectB->GetTransform().GetTranslation().Set(3.0f, 4.5f, 0.0f);
 
 	m_pNarrowPhase->AddPair(CNarrowCollisionInfo(pObjectA, pObjectB));
 
@@ -319,6 +310,13 @@ unsigned int CWorldSimulation::SubsUpdate(float dt)
 			g_MarkerB.GetTransform().GetTranslation().Set(0, 0, 0);
 		}
 	}
+
+	/*const CEdge& edgeB = pObjectB->GetEdges()[0];
+	CVector3D edgeVert0B = pObjectB->GetTransform() * pObjectB->GetVertices()[edgeB.GetVertexIndex(0)];
+	CVector3D edgeVert1B = pObjectB->GetTransform() * pObjectB->GetVertices()[edgeB.GetVertexIndex(1)];
+
+	g_MarkerA.GetTransform().GetTranslation() = edgeVert0B;
+	g_MarkerB.GetTransform().GetTranslation() = edgeVert1B;*/
 
 	/*m_pCloth->Integrate(dt);
 	m_pCloth->ResolveCollision(*pObjectA, dt);

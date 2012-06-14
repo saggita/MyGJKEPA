@@ -33,6 +33,9 @@ protected:
 	Device* m_ddhost;	
 	int m_NumOfConvexRBodies;
 
+	CCollisionObject* pObjectA;
+	CCollisionObject* pObjectB;
+
 public:
 	bool InitCL();
 	void Create();

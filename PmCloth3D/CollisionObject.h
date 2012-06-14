@@ -11,6 +11,7 @@ class CVertex : public CVector3D
 {
 public:
 	CVertex() {}
+	CVertex(float x, float y, float z) : CVector3D(x, y, z) {}
 	CVertex(const CVertex& other) : CVector3D(other) 
 	{
 		m_IndexFaces = other.m_IndexFaces;

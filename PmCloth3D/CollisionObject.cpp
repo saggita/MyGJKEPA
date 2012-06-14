@@ -10,6 +10,25 @@
 #include "CollisionObject.h"
 #include "StringTokenizer.h"
 
+void DrawTextGlut(const char* str, float x, float y) 
+{
+	glRasterPos2f(x, y);
+	glColor3d(0.0, 0.0, 0.0);
+
+	for (int i = 0; str[i] != '\0'; i++) 
+		glutBitmapCharacter(GLUT_BITMAP_HELVETICA_12, str[i]);
+
+}
+
+void DrawTextGlut(const char* str, float x, float y, float z) 
+{
+	glRasterPos3f(x, y, z);
+	glColor3d(0.0, 0.0, 0.0);
+
+	for (int i = 0; str[i] != '\0'; i++) 
+		glutBitmapCharacter(GLUT_BITMAP_HELVETICA_12, str[i]);
+
+}
 
 #define BarrelVtxCount2 57
 #define BarrelIndexCount 60
@@ -676,22 +695,28 @@ void CCollisionObject::Render(bool bWireframe/* = false*/) const
 			const CVector3D& vertex0 = m_Vertices[edge.GetVertexIndex(0)];
 			const CVector3D& vertex1 = m_Vertices[edge.GetVertexIndex(1)];
 
-			//// sihlouette edges
-			//if ( edge.m_bFlag )
-			//{
-			//	glLineWidth(5.0f);
-			//	glColor3f(0, 0, 1.0f);	
-			//}
-			//else
-			//{
-			//	glLineWidth(1.0f);
-			//	glColor3f(0,0,0);	
-			//}
+			// sihlouette edges
+			if ( edge.m_bFlag )
+			{
+				glLineWidth(3.0f);
+				glColor3f(0, 0, 1.0f);	
+			}
+			else
+			{
+				glLineWidth(1.0f);
+				glColor3f(0,0,0);	
+			}
 
 			glBegin(GL_LINE_STRIP);
 				glVertex3f(vertex0.m_X, vertex0.m_Y, vertex0.m_Z);
 				glVertex3f(vertex1.m_X, vertex1.m_Y, vertex1.m_Z);
 			glEnd();
+
+			char str[100];
+			itoa(i, str,10);
+			CVector3D middle = 0.5f * (vertex0 + vertex1);
+
+			DrawTextGlut(str, middle.m_X, middle.m_Y, middle.m_Z);
 		}
 				
 		//// normal
