@@ -591,8 +591,11 @@ float DistanceEdgeToEdge(const CVector3D& x00, const CVector3D& x01, const CVect
 		}
 	}
 
-	p = Clamp(p, 0.0, 1.0);
-	q = Clamp(q, 0.0, 1.0);
+	if ( bClampToNearest )
+	{
+		p = Clamp(p, 0.0, 1.0);
+		q = Clamp(q, 0.0, 1.0);
+	}
 	
 	return d;
 }

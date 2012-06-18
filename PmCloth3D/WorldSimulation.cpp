@@ -172,6 +172,8 @@ void CWorldSimulation::Create()
 	CQuaternion rotB = CQuaternion(CVector3D(1.0f, 0.0f, 0.0f).Normalize(), 3.141592f/2.0f) * CQuaternion(CVector3D(0.0f, 1.0f, 0.0f).Normalize(), 3.141592f/4.0f);
 	rotB = CQuaternion(CVector3D(0.0f, 1.0f, 0.0f).Normalize(), 3.141592f/4.0f) * rotB;
 
+	//CQuaternion rotB(0.24053794, 0.6649446, 0.66494441, 0.24053794);
+
 	pObjectB->GetTransform().GetRotation().SetRotation(rotB);
 	pObjectB->GetTransform().GetTranslation().Set(3.0f, 5.5f, 0.0f);
 

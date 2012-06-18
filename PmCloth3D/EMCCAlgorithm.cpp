@@ -23,7 +23,7 @@ bool CEMCCAlgorithm::CheckCollision(CCollisionObject& objA, CCollisionObject& ob
 	CNarrowCollisionInfo AB;
 	InternalCheckCollision(objA, objB, &AB, bProximity);
 
-	/*CNarrowCollisionInfo BA;
+	CNarrowCollisionInfo BA;
 	InternalCheckCollision(objB, objA, &BA, bProximity);
 
 	if ( AB.bIntersect && BA.bIntersect )
@@ -31,7 +31,15 @@ bool CEMCCAlgorithm::CheckCollision(CCollisionObject& objA, CCollisionObject& ob
 		if ( AB.penetrationDepth < BA.penetrationDepth )
 			*pCollisionInfo = AB;
 		else
-			*pCollisionInfo = BA;
+		{
+			pCollisionInfo->bIntersect = BA.bIntersect;
+			pCollisionInfo->penetrationDepth = BA.penetrationDepth;
+			pCollisionInfo->proximityDistance = BA.proximityDistance;
+			pCollisionInfo->pObjA = BA.pObjB;
+			pCollisionInfo->pObjB = BA.pObjA;
+			pCollisionInfo->witnessPntA = BA.witnessPntB;
+			pCollisionInfo->witnessPntB = BA.witnessPntA;
+		}
 	}
 	else if ( AB.bIntersect && !BA.bIntersect )
 	{
@@ -39,19 +47,20 @@ bool CEMCCAlgorithm::CheckCollision(CCollisionObject& objA, CCollisionObject& ob
 	}
 	else if ( !AB.bIntersect && BA.bIntersect )
 	{
-		*pCollisionInfo = BA;
+		pCollisionInfo->bIntersect = BA.bIntersect;
+		pCollisionInfo->penetrationDepth = BA.penetrationDepth;
+		pCollisionInfo->proximityDistance = BA.proximityDistance;
+		pCollisionInfo->pObjA = BA.pObjB;
+		pCollisionInfo->pObjB = BA.pObjA;
+		pCollisionInfo->witnessPntA = BA.witnessPntB;
+		pCollisionInfo->witnessPntB = BA.witnessPntA;
 	}
 	else
 	{
 		pCollisionInfo->bIntersect = false;
 		pCollisionInfo->penetrationDepth = 0;
 		pCollisionInfo->proximityDistance = 0;		
-	}*/
-
-	*pCollisionInfo = AB;
-
-	pCollisionInfo->pObjA = &objA;
-	pCollisionInfo->pObjB = &objB;
+	}
 
 	return pCollisionInfo->bIntersect;
 }
@@ -76,14 +85,13 @@ bool CEMCCAlgorithm::InternalCheckCollision(CCollisionObject& objA, CCollisionOb
 	CTransform transW2A = objA.GetTransform().InverseOther();
 
 	float maxDist = -FLT_MAX;
-	
 
+	// We are trying to find out non-intersecting case here. So we start off with an assumption of positive case.  
+	bool bIntersect = true;
+	
 	for ( int e = 0; e < (int)objB.GetEdges().size(); e++ )
 	{
 		float minDist = -FLT_MAX;
-
-		// We are trying to find out non-intersecting case here. So we start off with an assumption of positive case.  
-		bool bIntersect = true;
 
 		const CEdge& edgeB = objB.GetEdges()[e];
 
@@ -117,6 +125,10 @@ bool CEMCCAlgorithm::InternalCheckCollision(CCollisionObject& objA, CCollisionOb
 				CVector3D vec1A = objA.GetVertices()[edgeA.GetVertexIndex(1)] - edgeVert0B;
 			
 				CVector3D n = (vec1A - vec0A).Cross(vec).Normalize();
+
+				CVector3D nW = transA2W.GetRotation() * n;
+				CVector3D n0W = transA2W.GetRotation() * n0;
+				CVector3D n1W = transA2W.GetRotation() * n1;
 
 				////////////////////////////////////////////////////
 				// WRONG!!!!
@@ -170,10 +182,14 @@ bool CEMCCAlgorithm::InternalCheckCollision(CCollisionObject& objA, CCollisionOb
 					if ( dist > 0 )
 					{
 						bIntersect = false;
+						pCollisionInfo->bIntersect = false; 
+			
+						// At this point, we know that objA and objB are disjoint. No need to proceed futher. 
+						return false;
 					}
 					else if ( dist > minDist )
 					{
-						minDist = dist;
+						
 
 						/*float t;
 						CVector3D vecN;
@@ -190,8 +206,13 @@ bool CEMCCAlgorithm::InternalCheckCollision(CCollisionObject& objA, CCollisionOb
 						CVector3D vecN;
 						float distEdgeEdge = DistanceEdgeToEdge(vec0A + edgeVert0B, vec1A + edgeVert0B, edgeVert0B, edgeVert1B, p, q, vecN, false);
 
-						closestPointA = p*(vec0A + edgeVert0B) + (1.0f-p)*(vec1A + edgeVert0B);
-						closestPointB = q*edgeVert0B + (1.0f-q)*edgeVert1B;
+						if ( 0 <= p && p <= 1.0f && 0 <= q && q <= 1.0f )
+						{
+							minDist = dist;
+
+							closestPointA = p*(vec0A + edgeVert0B) + (1.0f-p)*(vec1A + edgeVert0B);
+							closestPointB = q*edgeVert0B + (1.0f-q)*edgeVert1B;
+						}
 					}
 				}
 			}
@@ -278,6 +299,10 @@ bool CEMCCAlgorithm::InternalCheckCollision(CCollisionObject& objA, CCollisionOb
 					if ( dist > 0 )
 					{
 						bIntersect = false;
+						pCollisionInfo->bIntersect = false; 
+			
+						// At this point, we know that objA and objB are disjoint. No need to proceed futher. 
+						return false;
 					}
 					else if ( dist > minDist )
 					{
@@ -310,21 +335,17 @@ bool CEMCCAlgorithm::InternalCheckCollision(CCollisionObject& objA, CCollisionOb
 			{
 				pCollisionInfo->penetrationDepth = -minDist;
 				pCollisionInfo->witnessPntA = closestPointA;
-				pCollisionInfo->witnessPntB = objB.GetTransform().InverseOther() * transA2W * closestPointB;
+				pCollisionInfo->witnessPntB = closestPointB;
 
 				maxDist = minDist;
 			}
 		}
 	}
 	
-	/*if ( pCollisionInfo->bIntersect )
-	{
-		assert(maxDist <= 0);
-
-		pCollisionInfo->penetrationDepth = -maxDist;
-		pCollisionInfo->witnessPntA = closestPointA;
-		pCollisionInfo->witnessPntB = objB.GetTransform().InverseOther() * transA2W * closestPointB;
-	}*/
+	if ( pCollisionInfo->bIntersect )
+	{	
+		pCollisionInfo->witnessPntB = objB.GetTransform().InverseOther() * transA2W * pCollisionInfo->witnessPntB;
+	}
 
 	return pCollisionInfo->bIntersect;
 }
