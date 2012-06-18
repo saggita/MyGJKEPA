@@ -184,7 +184,7 @@ bool CEMCCAlgorithm::InternalCheckCollision(CCollisionObject& objA, CCollisionOb
 						bIntersect = false;
 						pCollisionInfo->bIntersect = false; 
 			
-						// At this point, we know that objA and objB are disjoint. No need to proceed futher. 
+						// At this point, we know that objA and objB are disjoint. No need to proceed futher. Tortoise
 						return false;
 					}
 					else if ( dist > minDist )

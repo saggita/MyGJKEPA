@@ -316,7 +316,7 @@ void OnRender()
 	DrawTextGlut("'g' : toggle CPU/GPU solver", -g_Width/2 + 10, g_Height/2 - (linePos += 20));
 
 	char str[100];
-	sprintf(str, "Penetration depth:%10.7f", g_WorldSim.m_pNarrowPhase->GetPairs()[0].penetrationDepth);
+	sprintf(str, "Penetration depth:%11.8f", g_WorldSim.m_pNarrowPhase->GetPairs()[0].penetrationDepth);
 	DrawTextGlut(str, -g_Width/2 + 10, g_Height/2 - (linePos += 20));
 
 	glMatrixMode(GL_PROJECTION);	
