@@ -169,11 +169,11 @@ void CWorldSimulation::Create()
 	pObjectB->SetMargin(0.0f);
 	pObjectB->Load("box.obj");
 
-	CQuaternion rotB = CQuaternion(CVector3D(1.0f, 0.0f, 0.0f).Normalize(), 3.141592f/2.0f) * CQuaternion(CVector3D(0.0f, 1.0f, 0.0f).Normalize(), 3.141592f/4.0f);
-	rotB = CQuaternion(CVector3D(0.0f, 1.0f, 0.0f).Normalize(), 3.141592f/4.0f) * rotB;
+	//CQuaternion rotB = CQuaternion(CVector3D(1.0f, 0.0f, 0.0f).Normalize(), 3.141592f/2.0f) * CQuaternion(CVector3D(0.0f, 1.0f, 0.0f).Normalize(), 3.141592f/4.0f);
+	//rotB = CQuaternion(CVector3D(0.0f, 1.0f, 0.0f).Normalize(), 3.141592f/4.0f) * rotB;
 
 	//CQuaternion rotB(0.24053794, 0.6649446, 0.66494441, 0.24053794);
-	//CQuaternion rotB(-0.34227660, -0.91814625, 0.089724503, -0.17858225);
+	CQuaternion rotB(-0.34227660, -0.91814625, 0.089724503, -0.17858225);
 
 
 	pObjectB->GetTransform().GetRotation().SetRotation(rotB);

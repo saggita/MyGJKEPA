@@ -292,32 +292,52 @@ void OnRender()
 	sInfo.append(frame);
 	DrawTextGlut(sInfo.c_str(), -g_Width/2 + 10, g_Height/2 - (linePos += 20));
 
-	// batch
-	char batch[5];
-	itoa(g_WorldSim.m_RenderBatchIndex, batch, 10);
-	sInfo = "Batch: ";
-	sInfo.append(batch);
-	DrawTextGlut(sInfo.c_str(), -g_Width/2 + 10, g_Height/2 - (linePos += 20));
+	//// batch
+	//char batch[5];
+	//itoa(g_WorldSim.m_RenderBatchIndex, batch, 10);
+	//sInfo = "Batch: ";
+	//sInfo.append(batch);
+	//DrawTextGlut(sInfo.c_str(), -g_Width/2 + 10, g_Height/2 - (linePos += 20));
 
-	// toggle CPU/GPU
-	if ( g_WorldSim.m_bGPU )
-		sInfo = "GPU solver";
-	else
-		sInfo = "CPU solver";
+	//// toggle CPU/GPU
+	//if ( g_WorldSim.m_bGPU )
+	//	sInfo = "GPU solver";
+	//else
+	//	sInfo = "CPU solver";
 
-	DrawTextGlut(sInfo.c_str(), -g_Width/2 + 10, g_Height/2 - (linePos += 20));
+	//DrawTextGlut(sInfo.c_str(), -g_Width/2 + 10, g_Height/2 - (linePos += 20));
 
-	// help for keys
-	DrawTextGlut("===========================================", -g_Width/2 + 10, g_Height/2 - (linePos += 20));
+	// help for keys	
 	DrawTextGlut("space: advance one step", -g_Width/2 + 10, g_Height/2 - (linePos += 20));
 	DrawTextGlut("'s': start or stop", -g_Width/2 + 10, g_Height/2 - (linePos += 20));
-	DrawTextGlut("'c': reset", -g_Width/2 + 10, g_Height/2 - (linePos += 20));
-	DrawTextGlut("'b' : next batch", -g_Width/2 + 10, g_Height/2 - (linePos += 20));
-	DrawTextGlut("'g' : toggle CPU/GPU solver", -g_Width/2 + 10, g_Height/2 - (linePos += 20));
+	DrawTextGlut("'r': toggle rotating", -g_Width/2 + 10, g_Height/2 - (linePos += 20));
+	//DrawTextGlut("'c': reset", -g_Width/2 + 10, g_Height/2 - (linePos += 20));
+	//DrawTextGlut("'b' : next batch", -g_Width/2 + 10, g_Height/2 - (linePos += 20));
+	//DrawTextGlut("'g' : toggle CPU/GPU solver", -g_Width/2 + 10, g_Height/2 - (linePos += 20));
+
+	DrawTextGlut("===========================================", -g_Width/2 + 10, g_Height/2 - (linePos += 20));
 
 	char str[100];
-	sprintf(str, "Penetration depth:%11.8f", g_WorldSim.m_pNarrowPhase->GetPairs()[0].penetrationDepth);
+	sprintf(str, "Penetration depth:%11.9f", g_WorldSim.m_pNarrowPhase->GetPairs()[0].penetrationDepth);
 	DrawTextGlut(str, -g_Width/2 + 10, g_Height/2 - (linePos += 20));
+
+	{
+		const CTransform& trans = g_WorldSim.m_pNarrowPhase->GetPairs()[0].pObjA->GetTransform();
+		sprintf(str, "ObjectA translation(%11.9f, %11.9f, %11.9f)", trans.GetTranslation().m_X, trans.GetTranslation().m_Y, trans.GetTranslation().m_Z);
+		DrawTextGlut(str, -g_Width/2 + 10, g_Height/2 - (linePos += 20));
+
+		sprintf(str, "ObjectA rotation(%11.9f, %11.9f, %11.9f, %11.9f)", trans.GetRotation().m_X, trans.GetRotation().m_Y, trans.GetRotation().m_Z, trans.GetRotation().m_W);
+		DrawTextGlut(str, -g_Width/2 + 10, g_Height/2 - (linePos += 20));
+	}
+
+	{
+		const CTransform& trans = g_WorldSim.m_pNarrowPhase->GetPairs()[0].pObjB->GetTransform();
+		sprintf(str, "ObjectB translation(%11.9f, %11.9f, %11.9f)", trans.GetTranslation().m_X, trans.GetTranslation().m_Y, trans.GetTranslation().m_Z);
+		DrawTextGlut(str, -g_Width/2 + 10, g_Height/2 - (linePos += 20));
+
+		sprintf(str, "ObjectB rotation(%11.9f, %11.9f, %11.9f, %11.9f)", trans.GetRotation().m_X, trans.GetRotation().m_Y, trans.GetRotation().m_Z, trans.GetRotation().m_W);
+		DrawTextGlut(str, -g_Width/2 + 10, g_Height/2 - (linePos += 20));
+	}
 
 	glMatrixMode(GL_PROJECTION);	
 	glPopMatrix();	

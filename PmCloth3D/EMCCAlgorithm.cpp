@@ -41,7 +41,7 @@ bool CEMCCAlgorithm::CheckCollision(CCollisionObject& objA, CCollisionObject& ob
 			pCollisionInfo->witnessPntB = BA.witnessPntA;
 		}
 	}
-	else if ( AB.bIntersect && !BA.bIntersect )
+	/*else if ( AB.bIntersect && !BA.bIntersect )
 	{
 		*pCollisionInfo = AB;
 	}
@@ -54,7 +54,7 @@ bool CEMCCAlgorithm::CheckCollision(CCollisionObject& objA, CCollisionObject& ob
 		pCollisionInfo->pObjB = BA.pObjA;
 		pCollisionInfo->witnessPntA = BA.witnessPntB;
 		pCollisionInfo->witnessPntB = BA.witnessPntA;
-	}
+	}*/	
 	else
 	{
 		pCollisionInfo->bIntersect = false;
@@ -84,15 +84,14 @@ bool CEMCCAlgorithm::InternalCheckCollision(CCollisionObject& objA, CCollisionOb
 	CTransform transA2W = objA.GetTransform();
 	CTransform transW2A = objA.GetTransform().InverseOther();
 
-	float maxDist = -FLT_MAX;
+	// minimum penetration depth. Note that we regard penetration depth as negative value. 
+	float minDist = -FLT_MAX;
 
 	// We are trying to find out non-intersecting case here. So we start off with an assumption of positive case.  
 	bool bIntersect = true;
 	
 	for ( int e = 0; e < (int)objB.GetEdges().size(); e++ )
 	{
-		float minDist = -FLT_MAX;
-
 		const CEdge& edgeB = objB.GetEdges()[e];
 
 		// edgeVert0B and edgeVert1B are from objB and defined in local frame of objA
@@ -108,7 +107,6 @@ bool CEMCCAlgorithm::InternalCheckCollision(CCollisionObject& objA, CCollisionOb
 		{
 			CEdge& edgeA = objA.GetEdges()[i];
 			edgeA.m_bFlag = false;
-
 			CVector3D n0 = objA.GetFaces()[edgeA.GetTriangleIndex(0)].GetNormal();
 			CVector3D n1 = objA.GetFaces()[edgeA.GetTriangleIndex(1)].GetNormal();
 
@@ -126,10 +124,6 @@ bool CEMCCAlgorithm::InternalCheckCollision(CCollisionObject& objA, CCollisionOb
 			
 				CVector3D n = (vec1A - vec0A).Cross(vec).Normalize();
 
-				CVector3D nW = transA2W.GetRotation() * n;
-				CVector3D n0W = transA2W.GetRotation() * n0;
-				CVector3D n1W = transA2W.GetRotation() * n1;
-
 				////////////////////////////////////////////////////
 				// WRONG!!!!
 				if ( n.Dot(n0) < 0 || n.Dot(n1) < 0 )
@@ -137,6 +131,11 @@ bool CEMCCAlgorithm::InternalCheckCollision(CCollisionObject& objA, CCollisionOb
 
 				assert(n.Dot(n0) >= 0 && n.Dot(n1) >= 0);
 				////////////////////////////////////////////////////
+
+				// For debug. 
+				CVector3D nW = transA2W.GetRotation() * n;
+				CVector3D n0W = transA2W.GetRotation() * n0;
+				CVector3D n1W = transA2W.GetRotation() * n1;
 
 				//-------------------------------------------
 				// Check whether 'n' may be a seprating axis
@@ -189,8 +188,6 @@ bool CEMCCAlgorithm::InternalCheckCollision(CCollisionObject& objA, CCollisionOb
 					}
 					else if ( dist > minDist )
 					{
-						
-
 						/*float t;
 						CVector3D vecN;
 						float distToEdge = DistancePointToEdge(pntA, vec0A, vec1A, t, vecN);
@@ -220,7 +217,7 @@ bool CEMCCAlgorithm::InternalCheckCollision(CCollisionObject& objA, CCollisionOb
 
 		if ( bIntersect )
 		{
-			for ( int iterN = 0; iterN < (int)objA.GetFaces().size(); iterN++ )
+			for ( int iterN = 0; iterN < (int)objA.GetFaces().size(); iterN++ )			
 			{
 				CTriangleFace tri = objA.GetFaces()[iterN];
 
@@ -330,15 +327,9 @@ bool CEMCCAlgorithm::InternalCheckCollision(CCollisionObject& objA, CCollisionOb
 			assert(minDist <= 0);
 
 			pCollisionInfo->bIntersect = true;
-			
-			if ( minDist > maxDist )
-			{
-				pCollisionInfo->penetrationDepth = -minDist;
-				pCollisionInfo->witnessPntA = closestPointA;
-				pCollisionInfo->witnessPntB = closestPointB;
-
-				maxDist = minDist;
-			}
+			pCollisionInfo->penetrationDepth = -minDist;
+			pCollisionInfo->witnessPntA = closestPointA;
+			pCollisionInfo->witnessPntB = closestPointB;
 		}
 	}
 	

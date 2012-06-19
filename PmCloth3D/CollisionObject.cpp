@@ -678,12 +678,12 @@ void CCollisionObject::Render(bool bWireframe/* = false*/) const
 			const CVector3D& vertex1 = m_Vertices[edge.GetVertexIndex(1)];
 
 			// sihlouette edges
-			/*if ( edge.m_bFlag )
+			if ( edge.m_bFlag )
 			{
 				glLineWidth(3.0f);
 				glColor3f(0, 0, 1.0f);	
 			}
-			else*/
+			else
 			{
 				glLineWidth(1.0f);
 				glColor3f(0,0,0);	
