@@ -702,14 +702,14 @@ void CCollisionObject::Render(bool bWireframe/* = false*/) const
 		}
 
 		// vertices
-		for ( int i = 0; i < (int)m_Vertices.size(); i++ )
+		/*for ( int i = 0; i < (int)m_Vertices.size(); i++ )
 		{
 			const CVertex& vert = m_Vertices[i];
 			char str[100];
 			sprintf(str, "%d(%3.2f, %3.2f, %3.2f)", i, vert.m_X, vert.m_Y, vert.m_Z);		
 
 			DrawTextGlut(str, vert.m_X, vert.m_Y, vert.m_Z, 0, 0, 1.0f);
-		}
+		}*/
 				
 		//// normal
 		//glBegin(GL_LINES);
@@ -928,6 +928,32 @@ bool CCollisionObject::Load(const char* filename)
 		face.PlaneEquation()[1] = n.m_Y;
 		face.PlaneEquation()[2] = n.m_Z;
 		face.PlaneEquation()[3] = d;
+	}
+
+	// Set up m_WindingOrderEdge
+	for ( int i = 0; i < (int)m_Faces.size(); i++ )
+	{
+		CTriangleFace& tri = m_Faces[i];
+
+		for ( int j = 0; j < 3; j++ )
+		{
+			CEdge& edge = m_Edges[tri.GetEdgeIndex(j)];
+
+			int indexVertEdge0 = edge.GetVertexIndex(0);
+
+			for ( int k = 0; k < 3; k++ )
+			{
+				if ( indexVertEdge0 == tri.GetVertexIndex(k) )
+				{
+					int l = (k < 2)? k+1 : 0; 
+
+					if ( edge.GetVertexIndex(1) == tri.GetVertexIndex(l) )
+						tri.SetWindingOrderEdge(j, true);
+					else
+						tri.SetWindingOrderEdge(j, false);
+				}
+			}
+		}
 	}
 
 	if ( m_pConvexHeightField )

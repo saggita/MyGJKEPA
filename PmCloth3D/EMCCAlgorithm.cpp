@@ -24,7 +24,9 @@ bool CEMCCAlgorithm::CheckCollision(CCollisionObject& objA, CCollisionObject& ob
 	InternalCheckCollision(objA, objB, &AB, bProximity);
 
 	CNarrowCollisionInfo BA;
-	InternalCheckCollision(objB, objA, &BA, bProximity);
+
+	if ( AB.bIntersect )
+		InternalCheckCollision(objB, objA, &BA, bProximity);
 
 	if ( AB.bIntersect && BA.bIntersect )
 	{
@@ -122,20 +124,35 @@ bool CEMCCAlgorithm::InternalCheckCollision(CCollisionObject& objA, CCollisionOb
 				CVector3D vec0A = objA.GetVertices()[edgeA.GetVertexIndex(0)] - edgeVert0B;
 				CVector3D vec1A = objA.GetVertices()[edgeA.GetVertexIndex(1)] - edgeVert0B;
 			
-				CVector3D n = (vec1A - vec0A).Cross(vec).Normalize();
+				CVector3D n;
+
+				if ( dot0 > 0 )
+				{
+					if ( objA.GetFaces()[edgeA.GetTriangleIndex(0)].GetWindingOrderEdgeByGlobalEdgeIndex(edgeA.GetIndex()) )
+						n = (vec1A - vec0A).Cross(vec).Normalize();
+					else
+						n = -(vec1A - vec0A).Cross(vec).Normalize();
+				}
+				else if ( dot1 > 0 )
+				{
+					if ( objA.GetFaces()[edgeA.GetTriangleIndex(1)].GetWindingOrderEdgeByGlobalEdgeIndex(edgeA.GetIndex()) )
+						n = (vec1A - vec0A).Cross(vec).Normalize();
+					else
+						n = -(vec1A - vec0A).Cross(vec).Normalize();
+				}
 
 				////////////////////////////////////////////////////
 				// WRONG!!!!
-				if ( n.Dot(n0) < 0 || n.Dot(n1) < 0 )
+				/*if ( n.Dot(n0) < 0 || n.Dot(n1) < 0 )
 					n = -n;
 
-				assert(n.Dot(n0) >= 0 && n.Dot(n1) >= 0);
+				assert(n.Dot(n0) >= 0 && n.Dot(n1) >= 0);*/
 				////////////////////////////////////////////////////
 
 				// For debug. 
-				CVector3D nW = transA2W.GetRotation() * n;
-				CVector3D n0W = transA2W.GetRotation() * n0;
-				CVector3D n1W = transA2W.GetRotation() * n1;
+				//CVector3D nW = transA2W.GetRotation() * n;
+				//CVector3D n0W = transA2W.GetRotation() * n0;
+				//CVector3D n1W = transA2W.GetRotation() * n1;
 
 				//-------------------------------------------
 				// Check whether 'n' may be a seprating axis

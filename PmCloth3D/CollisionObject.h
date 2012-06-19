@@ -76,6 +76,12 @@ protected:
 	int m_Index;
 	int m_IndexVrx[3];
 	int m_IndexEdge[3];
+
+	// If true, a vector formed by two points starting from CEdge::m_IndexVrx[0] and ending at CEdge::m_IndexVrx[1] will be right direction
+	// in terms of normal vector of this triangle face. The right direction means three vectors will make the counter-clock-wise orientation
+	// around normal vector. If false, swap the two points and it will create the right direction. 
+	bool m_WindingOrderEdge[3]; 
+
 	float m_PlaneEqn[4];
 	
 public:
@@ -101,6 +107,30 @@ public:
 	{
 		assert( 0 <= i && i < 3 );
 		m_IndexEdge[i] = edgeIndex;
+	}
+
+	bool GetWindingOrderEdge(int i) const
+	{
+		assert( 0 <= i && i < 3 );
+		return m_WindingOrderEdge[i];
+	}
+
+	bool GetWindingOrderEdgeByGlobalEdgeIndex(int indexEdge) const
+	{
+		for ( int i = 0; i < 3; i++ )
+		{
+			if ( m_IndexEdge[i] == indexEdge )
+				return m_WindingOrderEdge[i];
+		}
+
+		assert(false); // should not reach here. 
+		return true;
+	}
+
+	void SetWindingOrderEdge(int i, bool bWindingOderEdge)
+	{
+		assert( 0 <= i && i < 3 );
+		m_WindingOrderEdge[i] = bWindingOderEdge;
 	}
 
 	int GetIndex() const { return m_Index; }
