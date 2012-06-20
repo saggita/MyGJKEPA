@@ -85,6 +85,8 @@ bool CEMCCAlgorithm::InternalCheckCollision(CCollisionObject& objA, CCollisionOb
 
 	CTransform transA2W = objA.GetTransform();
 	CTransform transW2A = objA.GetTransform().InverseOther();
+	CTransform transB2A = transW2A * objB.GetTransform();
+	CQuaternion quatB2A = transW2A.GetRotation() * objB.GetTransform().GetRotation();
 
 	// minimum penetration depth. Note that we regard penetration depth as negative value. 
 	float minDist = -FLT_MAX;
@@ -97,11 +99,11 @@ bool CEMCCAlgorithm::InternalCheckCollision(CCollisionObject& objA, CCollisionOb
 		const CEdge& edgeB = objB.GetEdges()[e];
 
 		// edgeVert0B and edgeVert1B are from objB and defined in local frame of objA
-		CVector3D edgeVert0B = transW2A * objB.GetTransform() * objB.GetVertices()[edgeB.GetVertexIndex(0)];
-		CVector3D edgeVert1B = transW2A * objB.GetTransform() * objB.GetVertices()[edgeB.GetVertexIndex(1)];
+		CVector3D edgeVert0B = transB2A * objB.GetVertices()[edgeB.GetVertexIndex(0)];
+		CVector3D edgeVert1B = transB2A * objB.GetVertices()[edgeB.GetVertexIndex(1)];
 
-		CVector3D n0B = transW2A.GetRotation() * objB.GetTransform().GetRotation() * objB.GetFaces()[edgeB.GetTriangleIndex(0)].GetNormal();
-		CVector3D n1B = transW2A.GetRotation() * objB.GetTransform().GetRotation() * objB.GetFaces()[edgeB.GetTriangleIndex(1)].GetNormal();
+		CVector3D n0B = quatB2A * objB.GetFaces()[edgeB.GetTriangleIndex(0)].GetNormal();
+		CVector3D n1B = quatB2A * objB.GetFaces()[edgeB.GetTriangleIndex(1)].GetNormal();
 
 		CVector3D vec = -(edgeVert1B - edgeVert0B);
 
@@ -174,7 +176,7 @@ bool CEMCCAlgorithm::InternalCheckCollision(CCollisionObject& objA, CCollisionOb
 							idx = objB.GetEdges()[indexEdges[a]].GetVertexIndex(1);
 
 						CVector3D vecE = objB.GetVertices()[idx] - objB.GetVertices()[edgeB.GetVertexIndex(twoEnds)];
-						vecE = transW2A.GetRotation() * objB.GetTransform().GetRotation() * vecE;
+						vecE = quatB2A * vecE;
 
 						if ( n.Dot(vecE) < 0 )
 						{
@@ -257,7 +259,10 @@ bool CEMCCAlgorithm::InternalCheckCollision(CCollisionObject& objA, CCollisionOb
 				CVector3D pntA;
 
 				// 'SignedDistanceFromPointToPlane' returns negative distance if the point is in the other side of plane when cosidering plane normal vector. 
-				float dist = SignedDistanceFromPointToPlane(origin, tri.PlaneEquation(), &pntA);
+				//float dist = SignedDistanceFromPointToPlane(origin, tri.PlaneEquation(), &pntA);
+
+				float dist = tri.PlaneEquation()[3];
+				pntA = - dist * n;
 
 				// Check whether 'tri' may be a separating plane or not.
 				bool bMayBeSeparatingPlane = true;
@@ -275,7 +280,7 @@ bool CEMCCAlgorithm::InternalCheckCollision(CCollisionObject& objA, CCollisionOb
 							idx = objB.GetEdges()[indexEdges[m]].GetVertexIndex(1);
 
 						CVector3D vecE = objB.GetVertices()[idx] - objB.GetVertices()[edgeB.GetVertexIndex(1)];
-						vecE = transW2A.GetRotation() * objB.GetTransform().GetRotation() * vecE;
+						vecE = quatB2A * vecE;
 
 						if ( n.Dot(vecE) < 0 )
 						{
@@ -297,7 +302,7 @@ bool CEMCCAlgorithm::InternalCheckCollision(CCollisionObject& objA, CCollisionOb
 							idx = objB.GetEdges()[indexEdges[m]].GetVertexIndex(1);
 
 						CVector3D vecE = objB.GetVertices()[idx] - objB.GetVertices()[edgeB.GetVertexIndex(1)];
-						vecE = transW2A.GetRotation() * objB.GetTransform().GetRotation() * vecE;
+						vecE = quatB2A * vecE;
 
 						if ( n.Dot(vecE) < 0 )
 						{
