@@ -44,7 +44,7 @@ static void DrawTextGlut(const char* str, float x, float y);
 
 void InitSimulation()
 {
-	g_WorldSim.m_bGPU = false;
+	g_WorldSim.m_bGPU = true;
 	g_WorldSim.Create();
 	g_CurFrame = 0;
 }
@@ -141,6 +141,10 @@ void SetWindowTitle()
 		else if ( colAlgoType == CNarrowPhaseCollisionDetection::EMCC )
 		{
 			g_sWindowTitleInfo = "EMCC method";
+		}
+		else if ( colAlgoType == CNarrowPhaseCollisionDetection::EMCC_CL )
+		{
+			g_sWindowTitleInfo = "EMCC OpenCL method";
 		}
 	}
 }
@@ -498,6 +502,10 @@ void OnKeyboard(unsigned char key, int x, int y)
 					colAlgoType = CNarrowPhaseCollisionDetection::EMCC;					
 				}
 				else if ( colAlgoType == CNarrowPhaseCollisionDetection::EMCC )
+				{
+					colAlgoType = CNarrowPhaseCollisionDetection::EMCC_CL;
+				}
+				else if ( colAlgoType == CNarrowPhaseCollisionDetection::EMCC_CL )
 				{
 					colAlgoType = CNarrowPhaseCollisionDetection::GJK_EPA;
 				}

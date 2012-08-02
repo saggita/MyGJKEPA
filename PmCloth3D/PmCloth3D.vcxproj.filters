@@ -84,6 +84,12 @@
     <ClCompile Include="MinkowskiSum.cpp">
       <Filter>NarrowPhaseCollision</Filter>
     </ClCompile>
+    <ClCompile Include="EMCCAlgorithmCL.cpp">
+      <Filter>NarrowPhaseCollision</Filter>
+    </ClCompile>
+    <ClCompile Include="CollisionObjectCL.cpp">
+      <Filter>NarrowPhaseCollision</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="WorldSimulation.h" />
@@ -221,6 +227,12 @@
     <ClInclude Include="MinkowskiSum.h">
       <Filter>NarrowPhaseCollision</Filter>
     </ClInclude>
+    <ClInclude Include="EMCCAlgorithmCL.h">
+      <Filter>NarrowPhaseCollision</Filter>
+    </ClInclude>
+    <ClInclude Include="CollisionObjectCL.h">
+      <Filter>NarrowPhaseCollision</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="ConvexHeightField">
@@ -346,6 +358,9 @@
       <Filter>OpenCLC10</Filter>
     </None>
     <None Include="OpenCLC10\VSolveLinks.cl">
+      <Filter>OpenCLC10</Filter>
+    </None>
+    <None Include="OpenCLC10\EMCC.cl">
       <Filter>OpenCLC10</Filter>
     </None>
   </ItemGroup>

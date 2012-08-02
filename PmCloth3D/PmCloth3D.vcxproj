@@ -36,6 +36,7 @@
     <ClInclude Include="ClothCL.h" />
     <ClInclude Include="CollisionDetections.h" />
     <ClInclude Include="CollisionObject.h" />
+    <ClInclude Include="CollisionObjectCL.h" />
     <ClInclude Include="ConvexCollisionAlgorithm.h" />
     <ClInclude Include="ConvexHeightField\ChNarrowphase.h" />
     <ClInclude Include="ConvexHeightField\CollideUtils.h" />
@@ -46,6 +47,7 @@
     <ClInclude Include="ConvexHeightField\RigidBody.h" />
     <ClInclude Include="ConvexHeightField\TypeDefinition.h" />
     <ClInclude Include="EMCCAlgorithm.h" />
+    <ClInclude Include="EMCCAlgorithmCL.h" />
     <ClInclude Include="EPAAlgorithm.h" />
     <ClInclude Include="EPAEdge.h" />
     <ClInclude Include="EPAPolytope.h" />
@@ -77,9 +79,11 @@
     <ClCompile Include="ClothCL.cpp" />
     <ClCompile Include="CollisionDetections.cpp" />
     <ClCompile Include="CollisionObject.cpp" />
+    <ClCompile Include="CollisionObjectCL.cpp" />
     <ClCompile Include="ConvexCollisionAlgorithm.cpp" />
     <ClCompile Include="ConvexHeightField\ConvexHeightFieldShape.cpp" />
     <ClCompile Include="EMCCAlgorithm.cpp" />
+    <ClCompile Include="EMCCAlgorithmCL.cpp" />
     <ClCompile Include="EPAAlgorithm.cpp" />
     <ClCompile Include="EPAEdge.cpp" />
     <ClCompile Include="EPAPolytope.cpp" />
@@ -117,6 +121,7 @@
     <None Include="ConvexHeightField\ChNarrowphaseKernels.cl" />
     <None Include="OpenCLC10\ApplyForces.cl" />
     <None Include="OpenCLC10\ComputeBounds.cl" />
+    <None Include="OpenCLC10\EMCC.cl" />
     <None Include="OpenCLC10\Integrate.cl" />
     <None Include="OpenCLC10\OutputToVertexArray.cl" />
     <None Include="OpenCLC10\PrepareLinks.cl" />

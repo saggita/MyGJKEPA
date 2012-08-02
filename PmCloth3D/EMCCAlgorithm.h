@@ -5,7 +5,7 @@
 class CCollisionObject;
 class CNarrowCollisionInfo;
 
-// Brute-force iterative method to compute narrowphase collision info 
+// Explicit Minkowski Convex Collision Algorithm
 class CEMCCAlgorithm : public IConvexCollisionAlgorithm
 {
 public:

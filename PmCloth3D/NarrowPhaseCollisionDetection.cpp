@@ -4,8 +4,9 @@
 #include "BIMAlgorithm.h"
 #include "CHFAlgorithm.h"
 #include "EMCCAlgorithm.h"
+#include "EMCCAlgorithmCL.h"
 
-CNarrowPhaseCollisionDetection::CNarrowPhaseCollisionDetection(void) : m_AlgorithmType(BIM), m_pAlgorithm(NULL)
+CNarrowPhaseCollisionDetection::CNarrowPhaseCollisionDetection(void) : m_AlgorithmType(EMCC), m_pAlgorithm(NULL)
 {
 	SetConvexCollisionAlgorithmType(m_AlgorithmType);
 }
@@ -30,6 +31,8 @@ void CNarrowPhaseCollisionDetection::SetConvexCollisionAlgorithmType(CollisionAl
 		m_pAlgorithm = new CCHFAlgorithm;
 	else if ( m_AlgorithmType == EMCC )
 		m_pAlgorithm = new CEMCCAlgorithm;
+	else if ( m_AlgorithmType == EMCC_CL )
+		m_pAlgorithm = new CEMCCAlgorithmCL;
 }
 
 int CNarrowPhaseCollisionDetection::CheckCollisions()

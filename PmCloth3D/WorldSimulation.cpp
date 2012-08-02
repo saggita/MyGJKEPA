@@ -130,8 +130,8 @@ void CWorldSimulation::Create()
 
 	pObjectA->SetCollisionObjectType(CCollisionObject::ConvexHull);
 	pObjectA->SetMargin(0.0f); // margin should be set before Load(..) 
-	//pObjectA->Load("box.obj");
-	pObjectA->Load("smallGeoSphere.obj");
+	pObjectA->Load("box.obj");
+	//pObjectA->Load("smallGeoSphere.obj");
 	
 	pObjectA->GetTransform().GetTranslation().Set(0.0f, 5.0f, 0.0f);
 	pObjectA->SetColor(1.0f, 0.0f, 0.0f);
@@ -168,8 +168,8 @@ void CWorldSimulation::Create()
 	pObjectB->SetCollisionObjectType(CCollisionObject::ConvexHull);
 	pObjectB->SetColor(0.7f, 0.7f, 0.0f);
 	pObjectB->SetMargin(0.0f);
-	//pObjectB->Load("box.obj");
-	pObjectB->Load("smallGeoSphere.obj");
+	pObjectB->Load("box.obj");
+	//pObjectB->Load("smallGeoSphere.obj");
 
 	CQuaternion rotB = CQuaternion(CVector3D(1.0f, 0.0f, 0.0f).Normalize(), 3.141592f/2.0f) * CQuaternion(CVector3D(0.0f, 1.0f, 0.0f).Normalize(), 3.141592f/4.0f);
 	rotB = CQuaternion(CVector3D(0.0f, 1.0f, 0.0f).Normalize(), 3.141592f/4.0f) * rotB;

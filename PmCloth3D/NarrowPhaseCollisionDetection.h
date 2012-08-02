@@ -39,7 +39,7 @@ public:
 class CNarrowPhaseCollisionDetection
 {
 public:
-	enum CollisionAlgorithmType { GJK_EPA, BIM, CHF, EMCC };
+	enum CollisionAlgorithmType { GJK_EPA, BIM, CHF, EMCC, EMCC_CL };
 
 	CNarrowPhaseCollisionDetection(void);
 	virtual ~CNarrowPhaseCollisionDetection(void);
