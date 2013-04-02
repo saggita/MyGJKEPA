@@ -278,10 +278,14 @@ void OnRender()
     /* model space equals one pixel in window space.                 */
     glScaled(aspect, aspect, 1.0);
 
+	glDisable(GL_LIGHTING);
+
 	glMatrixMode(GL_MODELVIEW);
 	glPushMatrix();
 	glLoadIdentity();	
 	
+	
+
 	std::string sInfo = "Current Algorithm(press 'a' to change): ";
 	sInfo.append(g_sWindowTitleInfo);
 

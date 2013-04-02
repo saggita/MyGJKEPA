@@ -101,7 +101,12 @@ bool CGJKAlgorithm::CheckCollision(CCollisionObject& objA, CCollisionObject& obj
 		// So we just exit this function if we don't check proximity. If we compute proximity(distance), we should not terminate here
 		// and keep iterating until w becomes a part of simplex or dist is close enough to be proxmity distance satisfing (dist^2 - v*w <= dist^2 * tolerance). 
 		// In this case, penetration depth will be negative and this function will return false since objects don't intersect. 
-		if ( !bProximity && vw > 0.0 && vw*vw > (distSqr * marginSqr) )
+		bool bFoundSeparatingAxis = false;
+
+		if ( vw > 0.0 && vw*vw > (distSqr * marginSqr) )
+			bFoundSeparatingAxis = true;
+
+		if ( !bProximity && bFoundSeparatingAxis )
 			return false;
 
 		// Check if w is a part of simplex already. If so, it means v == w and v is a closest point to origin in Minkowski differnce and 
@@ -139,15 +144,20 @@ bool CGJKAlgorithm::CheckCollision(CCollisionObject& objA, CCollisionObject& obj
 
 		// If there is not much improvement since previous iteration
 		// TODO: Do I need to check this? 
-		/*if ( distSqrPrev - distSqr <= DBL_EPSILON * distSqrPrev )
+		if ( abs(distSqrPrev - distSqr) <= DBL_EPSILON * distSqrPrev )
 		{
-			return true;
-		}*/
-
+			return GenerateCollisionInfo(objA, objB, transB2A, simplex, v, distSqr, pCollisionInfo);	
+		}
+		
 		// If simplex is full, we found a simplex(tetrahedron) containing origin. 
 		// We stop iterating and pass this simplex to EPA to find penetration depth and closest points.
 		if ( simplex.IsFull() )
-			break;
+		{
+			if ( bFoundSeparatingAxis )
+				return false;
+			else
+				break;
+		}
 
 		// Instead seeing if distSqr is zero within tolerance, we use relative tolerance using max sqaured lengh from simplex.
 		// This is explained in 'Collision Detection in Interactive 3D'.
@@ -158,7 +168,7 @@ bool CGJKAlgorithm::CheckCollision(CCollisionObject& objA, CCollisionObject& obj
 		//if ( distSqr <= DBL_EPSILON * simplex.MaxLengthSqr() ) 
 		if ( distSqr <= 1e-6 ) 
 			return false; // TODO:break or return false?
-				
+
 		++numIter;
 	} 
 

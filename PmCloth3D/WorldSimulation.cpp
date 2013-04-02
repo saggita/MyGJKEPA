@@ -129,7 +129,7 @@ void CWorldSimulation::Create()
 		pObjectA = new CCollisionObject();
 
 	pObjectA->SetCollisionObjectType(CCollisionObject::ConvexHull);
-	pObjectA->SetMargin(0.0f); // margin should be set before Load(..) 
+	pObjectA->SetMargin(0.0001f); // margin should be set before Load(..) 
 	pObjectA->Load("box.obj");
 	//pObjectA->Load("smallGeoSphere.obj");
 	
@@ -167,7 +167,7 @@ void CWorldSimulation::Create()
 
 	pObjectB->SetCollisionObjectType(CCollisionObject::ConvexHull);
 	pObjectB->SetColor(0.7f, 0.7f, 0.0f);
-	pObjectB->SetMargin(0.0f);
+	pObjectB->SetMargin(0.0001f);
 	pObjectB->Load("box.obj");
 	//pObjectB->Load("smallGeoSphere.obj");
 
@@ -179,8 +179,8 @@ void CWorldSimulation::Create()
 
 
 	pObjectB->GetTransform().GetRotation().SetRotation(rotB);
-	pObjectB->GetTransform().GetTranslation().Set(3.0f, 5.5f, 0.0f);
-	//pObjectB->GetTransform().GetTranslation().Set(-3.0182564, 5.4898696, 0.010012830);
+	//pObjectB->GetTransform().GetTranslation().Set(3.0f, 5.5f, 0.0f);
+	pObjectB->GetTransform().GetTranslation().Set(-3.0182564, 5.4898696, 0.010012830);
 
 	m_pNarrowPhase->AddPair(CNarrowCollisionInfo(pObjectA, pObjectB));
 

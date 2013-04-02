@@ -108,7 +108,11 @@ bool CEPAPolytope::AddTetrahedron(const CVector3D& p0, const CVector3D& p1, cons
 
 	if ( (p1-p0).Cross(p2-p0).Dot(p0) > 0 ) // p0, p1, p2 winding in counter-clockwise
 	{
-		assert((p1-p0).Cross(p2-p0).Dot(p3) < 0 ); // tet must contain the origin.
+		//assert((p1-p0).Cross(p2-p0).Dot(p3) < 0 ); // tet must contain the origin.
+
+		// tet must contain the origin.
+		if ( (p1-p0).Cross(p2-p0).Dot(p3) >= 0 )
+			return false;
 
 		pTri[0] = new CEPATriangle(index[0], index[1], index[2]); assert(CheckWinding(p0, p1, p2));
 		pTri[1] = new CEPATriangle(index[0], index[3], index[1]); assert(CheckWinding(p0, p3, p1));
@@ -117,7 +121,11 @@ bool CEPAPolytope::AddTetrahedron(const CVector3D& p0, const CVector3D& p1, cons
 	}
 	else // p0, p2, p1 winding in counter-clockwise
 	{
-		assert((p2-p0).Cross(p1-p0).Dot(p3) < 0 ); // tet must contain the origin.
+		//assert((p2-p0).Cross(p1-p0).Dot(p3) < 0 ); // tet must contain the origin.
+
+		// tet must contain the origin.
+		if ( (p2-p0).Cross(p1-p0).Dot(p3) >= 0 )
+			return false;
 
 		pTri[0] = new CEPATriangle(index[0], index[2], index[1]); assert(CheckWinding(p0, p2, p1));
 		pTri[1] = new CEPATriangle(index[0], index[3], index[2]); assert(CheckWinding(p0, p3, p2));
@@ -181,8 +189,14 @@ bool CEPAPolytope::AddTetrahedron(const CVector3D& p0, const CVector3D& p1, cons
 // By gluing these two tetrahedrons, hexahedron can be formed.
 bool CEPAPolytope::AddHexahedron(const CVector3D& p0, const CVector3D& p1, const CVector3D& p2, const CVector3D& w0, const CVector3D& w1)
 {
-	assert((p1-p0).Cross(p2-p0).Dot(w0-p0) > 0);
-	assert((p1-p0).Cross(p2-p0).Dot(w1-p0) < 0);
+	/*assert((p1-p0).Cross(p2-p0).Dot(w0-p0) > 0);
+	assert((p1-p0).Cross(p2-p0).Dot(w1-p0) < 0);*/
+
+	if ( (p1-p0).Cross(p2-p0).Dot(w0-p0) <= 0 )
+		return false;
+
+	if ( (p1-p0).Cross(p2-p0).Dot(w1-p0) >= 0 )
+		return false;
 
 	int index[5];
 	m_Vertices.push_back(p0);
@@ -264,14 +278,22 @@ bool CEPAPolytope::AddHexahedron(const CVector3D& p0, const CVector3D& p1, const
 	{
 		pTri[i]->ComputeClosestPointToOrigin(*this);
 
-#ifdef _DEBUG
+//#ifdef _DEBUG
+//		pTri[i]->m_Index = m_Count++;
+//
+//		for ( int j = 0; j < 3; j++ )
+//		{
+//			assert(pTri[i]->m_AdjacentTriangles[j] == pTri[i]->m_Edges[j]->m_pPairEdge->GetEPATriangle());
+//		}
+//#endif
+
 		pTri[i]->m_Index = m_Count++;
 
 		for ( int j = 0; j < 3; j++ )
 		{
-			assert(pTri[i]->m_AdjacentTriangles[j] == pTri[i]->m_Edges[j]->m_pPairEdge->GetEPATriangle());
+			if ( !(pTri[i]->m_AdjacentTriangles[j] == pTri[i]->m_Edges[j]->m_pPairEdge->GetEPATriangle()) )
+				return false;
 		}
-#endif
 
 		m_Triangles.push_back(pTri[i]);
 		std::push_heap(m_Triangles.begin(), m_Triangles.end(), compare);
@@ -328,23 +350,45 @@ bool CEPAPolytope::ExpandPolytopeWithNewPoint(const CVector3D& w, CEPATriangle* 
 	// Now, we create new triangles to patch the silhouette loop 
 	int silhouetteSize = (int)m_SilhouetteVertices.size();
 
-#ifdef _DEBUG
+// Instead doing 'assert', we return false, if 'assert' fails. 
+// This can happen when two objects are almost touching and numeric instability occurs. 
+
+	//#ifdef _DEBUG
+//	for ( int i = 0; i < (int)m_Triangles.size(); i++ )
+//	{
+//		if ( m_Triangles[i]->IsObsolete() )
+//			continue;
+//
+//		if ( m_Triangles[i]->m_bVisible )
+//			assert(m_Triangles[i]->IsVisibleFromPoint(w) == true);
+//		else
+//			assert(m_Triangles[i]->IsVisibleFromPoint(w) == false);
+//	}
+//	
+//	for ( int i = 0; i < (int)silhouetteSize; i++ )
+//	{
+//		assert(m_SilhouetteTriangles[i]->IsVisibleFromPoint(w) == false);
+//	}
+//#endif
+
 	for ( int i = 0; i < (int)m_Triangles.size(); i++ )
 	{
 		if ( m_Triangles[i]->IsObsolete() )
 			continue;
 
 		if ( m_Triangles[i]->m_bVisible )
-			assert(m_Triangles[i]->IsVisibleFromPoint(w) == true);
+			if ( m_Triangles[i]->IsVisibleFromPoint(w) != true )
+				return false;
 		else
-			assert(m_Triangles[i]->IsVisibleFromPoint(w) == false);
+			if ( m_Triangles[i]->IsVisibleFromPoint(w) != false )
+				return false;
 	}
 	
 	for ( int i = 0; i < (int)silhouetteSize; i++ )
 	{
-		assert(m_SilhouetteTriangles[i]->IsVisibleFromPoint(w) == false);
+		if ( m_SilhouetteTriangles[i]->IsVisibleFromPoint(w) != false )
+			return false;
 	}
-#endif
 
 	std::vector<CEPATriangle*> newTriangles;
 	newTriangles.reserve(silhouetteSize);

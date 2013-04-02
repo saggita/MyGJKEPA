@@ -68,13 +68,15 @@ bool CEPAAlgorithm::ComputePenetrationDepthAndContactPoints(const CGJKSimplex& s
 				CVector3D w0 =  objA.GetLocalSupportPoint(n) - transB2A * objB.GetLocalSupportPoint(rotA2B * (-n));
 				CVector3D w1 =  objA.GetLocalSupportPoint(-n) - transB2A * objB.GetLocalSupportPoint(rotA2B * n);
 
-				m_Polytope.AddHexahedron(points[0], points[1], points[2], w0, w1);
+				if ( !m_Polytope.AddHexahedron(points[0], points[1], points[2], w0, w1) )
+					return false;
 			}
 			break;
 		case 4:
 			{
 				// In this cae, simplex computed from GJK is a tetrahedron. 
-				m_Polytope.AddTetrahedron(points[0], points[1], points[2], points[3]);
+				if ( !m_Polytope.AddTetrahedron(points[0], points[1], points[2], points[3]) )
+					return false;
 			}
 			break;
 	}
@@ -127,7 +129,11 @@ bool CEPAAlgorithm::ComputePenetrationDepthAndContactPoints(const CGJKSimplex& s
 			break;
 		}
 
-		m_Polytope.ExpandPolytopeWithNewPoint(w, pClosestTriangle);
+		if ( !m_Polytope.ExpandPolytopeWithNewPoint(w, pClosestTriangle) )
+		{
+			pCollisionInfo->bIntersect = false;
+			return false;
+		}
 
 		suppPointsA.push_back(supportPointA);
 		suppPointsB.push_back(supportPointB);
