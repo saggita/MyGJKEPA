@@ -106,7 +106,7 @@ bool CEPAAlgorithm::ComputePenetrationDepthAndContactPoints(const CGJKSimplex& s
 		CVector3D w = supportPointA - supportPointB;
 
 		// Compute upper and lower bounds
-		upperBound = std::min(upperBound, w * v.NormalizeOther());
+		upperBound = min(upperBound, w * v.NormalizeOther());
 
 #ifdef _DEBUG
  		//lowerBound = std::max(lowerBound, v.Length());
@@ -114,7 +114,7 @@ bool CEPAAlgorithm::ComputePenetrationDepthAndContactPoints(const CGJKSimplex& s
 #endif
 
 		//lowerBound = v.Length();
-		lowerBound = std::max(lowerBound, v.Length());
+		lowerBound = max(lowerBound, v.Length());
 
 		if ( upperBound - lowerBound < 1e-4 || numIter == maxIteration - 1 )
 		{

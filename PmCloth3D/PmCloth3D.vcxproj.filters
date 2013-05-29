@@ -90,6 +90,27 @@
     <ClCompile Include="CollisionObjectCL.cpp">
       <Filter>NarrowPhaseCollision</Filter>
     </ClCompile>
+    <ClCompile Include="libccd-1.4\src\mpr.c">
+      <Filter>NarrowPhaseCollision\libccd</Filter>
+    </ClCompile>
+    <ClCompile Include="libccd-1.4\src\polytope.c">
+      <Filter>NarrowPhaseCollision\libccd</Filter>
+    </ClCompile>
+    <ClCompile Include="libccd-1.4\src\support.c">
+      <Filter>NarrowPhaseCollision\libccd</Filter>
+    </ClCompile>
+    <ClCompile Include="libccd-1.4\src\vec3.c">
+      <Filter>NarrowPhaseCollision\libccd</Filter>
+    </ClCompile>
+    <ClCompile Include="libccd-1.4\src\ccd.c">
+      <Filter>NarrowPhaseCollision\libccd</Filter>
+    </ClCompile>
+    <ClCompile Include="LIBCCDGJKAlgorithm.cpp">
+      <Filter>NarrowPhaseCollision</Filter>
+    </ClCompile>
+    <ClCompile Include="libccd-1.4\src\supportfn.c">
+      <Filter>NarrowPhaseCollision\libccd</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="WorldSimulation.h" />
@@ -233,6 +254,45 @@
     <ClInclude Include="CollisionObjectCL.h">
       <Filter>NarrowPhaseCollision</Filter>
     </ClInclude>
+    <ClInclude Include="libccd-1.4\src\ccd\vec3.h">
+      <Filter>NarrowPhaseCollision\libccd</Filter>
+    </ClInclude>
+    <ClInclude Include="libccd-1.4\src\ccd\support.h">
+      <Filter>NarrowPhaseCollision\libccd</Filter>
+    </ClInclude>
+    <ClInclude Include="libccd-1.4\src\ccd\simplex.h">
+      <Filter>NarrowPhaseCollision\libccd</Filter>
+    </ClInclude>
+    <ClInclude Include="libccd-1.4\src\ccd\quat.h">
+      <Filter>NarrowPhaseCollision\libccd</Filter>
+    </ClInclude>
+    <ClInclude Include="libccd-1.4\src\ccd\polytope.h">
+      <Filter>NarrowPhaseCollision\libccd</Filter>
+    </ClInclude>
+    <ClInclude Include="libccd-1.4\src\ccd\list.h">
+      <Filter>NarrowPhaseCollision\libccd</Filter>
+    </ClInclude>
+    <ClInclude Include="libccd-1.4\src\ccd\dbg.h">
+      <Filter>NarrowPhaseCollision\libccd</Filter>
+    </ClInclude>
+    <ClInclude Include="libccd-1.4\src\ccd\config.h">
+      <Filter>NarrowPhaseCollision\libccd</Filter>
+    </ClInclude>
+    <ClInclude Include="libccd-1.4\src\ccd\compiler.h">
+      <Filter>NarrowPhaseCollision\libccd</Filter>
+    </ClInclude>
+    <ClInclude Include="libccd-1.4\src\ccd\ccd.h">
+      <Filter>NarrowPhaseCollision\libccd</Filter>
+    </ClInclude>
+    <ClInclude Include="libccd-1.4\src\ccd\alloc.h">
+      <Filter>NarrowPhaseCollision\libccd</Filter>
+    </ClInclude>
+    <ClInclude Include="LIBCCDGJKAlgorithm.h">
+      <Filter>NarrowPhaseCollision</Filter>
+    </ClInclude>
+    <ClInclude Include="libccd-1.4\src\ccd\supportfn.h">
+      <Filter>NarrowPhaseCollision\libccd</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="ConvexHeightField">
@@ -276,6 +336,9 @@
     </Filter>
     <Filter Include="OpenCLC10">
       <UniqueIdentifier>{0876ae55-344b-4189-bba5-9ba8445cacbd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="NarrowPhaseCollision\libccd">
+      <UniqueIdentifier>{c7e822f6-569b-4daa-9c57-f7cffdb08c02}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

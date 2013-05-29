@@ -44,8 +44,9 @@ static void DrawTextGlut(const char* str, float x, float y);
 
 void InitSimulation()
 {
-	g_WorldSim.m_bGPU = true;
+	g_WorldSim.m_bGPU = false;
 	g_WorldSim.Create();
+	g_WorldSim.m_pNarrowPhase->SetConvexCollisionAlgorithmType(CNarrowPhaseCollisionDetection::LIBCCD_MPR);
 	g_CurFrame = 0;
 }
 

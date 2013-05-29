@@ -56,6 +56,19 @@
     <ClInclude Include="GJKSimplex.h" />
     <ClInclude Include="global.h" />
     <ClInclude Include="ICollidable.h" />
+    <ClInclude Include="libccd-1.4\src\ccd\alloc.h" />
+    <ClInclude Include="libccd-1.4\src\ccd\ccd.h" />
+    <ClInclude Include="libccd-1.4\src\ccd\compiler.h" />
+    <ClInclude Include="libccd-1.4\src\ccd\config.h" />
+    <ClInclude Include="libccd-1.4\src\ccd\dbg.h" />
+    <ClInclude Include="libccd-1.4\src\ccd\list.h" />
+    <ClInclude Include="libccd-1.4\src\ccd\polytope.h" />
+    <ClInclude Include="libccd-1.4\src\ccd\quat.h" />
+    <ClInclude Include="libccd-1.4\src\ccd\simplex.h" />
+    <ClInclude Include="libccd-1.4\src\ccd\support.h" />
+    <ClInclude Include="libccd-1.4\src\ccd\supportfn.h" />
+    <ClInclude Include="libccd-1.4\src\ccd\vec3.h" />
+    <ClInclude Include="LIBCCDGJKAlgorithm.h" />
     <ClInclude Include="mathUtil.h" />
     <ClInclude Include="Matrix33.h" />
     <ClInclude Include="Matrix44.h" />
@@ -91,6 +104,13 @@
     <ClCompile Include="GJKAlgorithm.cpp" />
     <ClCompile Include="GJKSimplex.cpp" />
     <ClCompile Include="ICollidable.cpp" />
+    <ClCompile Include="libccd-1.4\src\ccd.c" />
+    <ClCompile Include="libccd-1.4\src\mpr.c" />
+    <ClCompile Include="libccd-1.4\src\polytope.c" />
+    <ClCompile Include="libccd-1.4\src\support.c" />
+    <ClCompile Include="libccd-1.4\src\supportfn.c" />
+    <ClCompile Include="libccd-1.4\src\vec3.c" />
+    <ClCompile Include="LIBCCDGJKAlgorithm.cpp" />
     <ClCompile Include="mathUtil.cpp" />
     <ClCompile Include="Matrix33.cpp" />
     <ClCompile Include="Matrix44.cpp" />
@@ -191,7 +211,7 @@
       <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions);_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <OpenMPSupport>true</OpenMPSupport>
-      <AdditionalIncludeDirectories>.;../;../../;Adl;Adl/AdlDemos/;Adl/AdlDemos/TestBed/;$(AMDAPPSDKROOT)\include;$(DXSDK_DIR)/Include;../extern/glut/include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.;../;../../;Adl;Adl/AdlDemos/;Adl/AdlDemos/TestBed/;$(AMDAPPSDKROOT)\include;$(DXSDK_DIR)/Include;../extern/glut/include;.\libccd-1.4\src\</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>

@@ -5,6 +5,7 @@
 #include "CHFAlgorithm.h"
 #include "EMCCAlgorithm.h"
 #include "EMCCAlgorithmCL.h"
+#include "LIBCCDGJKAlgorithm.h"
 
 CNarrowPhaseCollisionDetection::CNarrowPhaseCollisionDetection(void) : m_AlgorithmType(EMCC), m_pAlgorithm(NULL)
 {
@@ -33,6 +34,8 @@ void CNarrowPhaseCollisionDetection::SetConvexCollisionAlgorithmType(CollisionAl
 		m_pAlgorithm = new CEMCCAlgorithm;
 	else if ( m_AlgorithmType == EMCC_CL )
 		m_pAlgorithm = new CEMCCAlgorithmCL;
+	else if ( m_AlgorithmType == LIBCCD_MPR )
+		m_pAlgorithm = new CLIBCCDGJKAlgorithm;
 }
 
 int CNarrowPhaseCollisionDetection::CheckCollisions()
