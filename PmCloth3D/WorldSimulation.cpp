@@ -190,9 +190,9 @@ void CWorldSimulation::Create()
 	//CQuaternion rotB(-0.34227660, -0.91814625, 0.089724503, -0.17858225);
 
 
-	pObjectB->GetTransform().GetRotation().SetRotation(rotB);
+	//pObjectB->GetTransform().GetRotation().SetRotation(rotB);
 	//pObjectB->GetTransform().GetTranslation().Set(3.0f, 5.5f, 0.0f);
-	pObjectB->GetTransform().GetTranslation().Set(-3.0182564, 5.4898696, 0.010012830);
+	pObjectB->GetTransform().GetTranslation().Set(3.0f - 1e-6, 5.5f, 1.0f);
 
 	m_pNarrowPhase->AddPair(CNarrowCollisionInfo(pObjectA, pObjectB));
 
